@@ -76,7 +76,7 @@ typedef std::map<int, JointTopology> TopologyMap;
 class YouBotDiagnostics {
 public:
 	YouBotDiagnostics(std::fstream * file, int noOfBase = 0, int noOfArm = 0);
-	~YouBotDiagnostics(){}
+	~YouBotDiagnostics();
 
 	void startDiagnostics();
 
@@ -137,6 +137,10 @@ private:
 
 	std::stringstream outputStream;
 
+	// instance of the EthercatMaster.
+	// It is a pointer because multiple instances are created and destroyed for testing purposes
+	youbot::EthercatMaster* ethercatMaster;
+
 	// save the slave types in a map
 	map<string, string> slaveTypMap;
 
@@ -152,6 +156,7 @@ private:
 	unsigned noOfArmMasterBoards;
 	unsigned noOfArmSlaveControllers;
 
+	std::string configFileName;
 	std::fstream * outputFile;
 
 };

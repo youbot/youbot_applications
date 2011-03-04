@@ -10,6 +10,8 @@ YouBotDiagnostics::YouBotDiagnostics(std::fstream * file, int noOfBase, int noOf
 	slaveTypMap.insert( pair<string,string>( ARM_MASTER_BOARD,  string("ARM-Master" ) ) );
 	slaveTypMap.insert( pair<string,string>( BASE_MASTER_BOARD, string("BASE-Master") ) );
 
+	ethercatMaster = 0;
+
 	statusOK           = true;
 	checkMasterboards  = true;
 	quickRestartTestOK = true;
@@ -23,9 +25,16 @@ YouBotDiagnostics::YouBotDiagnostics(std::fstream * file, int noOfBase, int noOf
 	noOfArmMasterBoards      = 0;
 	noOfArmSlaveControllers  = 0;
 
+	configFileName = "youbot-ethercat.cfg";
 	outputFile = file;
 }
 
+YouBotDiagnostics::~YouBotDiagnostics() {
+	if (ethercatMaster) {
+		ethercatMaster->destroy();
+		ethercatMaster = 0;
+	}
+}
 
 void YouBotDiagnostics::startDiagnostics()
 {
@@ -83,7 +92,7 @@ void YouBotDiagnostics::init()
 	// check if an EthercatMaster is available
 	try
 	{
-		EthercatMaster::getInstance();
+		ethercatMaster = &EthercatMaster::getInstance(configFileName, YOUBOT_CONFIGURATIONS_DIR);
 	}
 	catch(exception& ex)
 	{
@@ -118,7 +127,8 @@ void YouBotDiagnostics::init()
 	}
 
 	//get all slaves information of the etherCAT-BUS-topolgy
-	EthercatMaster::getInstance().getEthercatDiagnosticInformation(etherCATSlaves);
+	if (ethercatMaster)
+		ethercatMaster->getEthercatDiagnosticInformation(etherCATSlaves);
 
 	if(etherCATSlaves.size() < 1)
 	{
@@ -149,10 +159,10 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 	EncoderTicksPerRound ticksPerRound;
 	InverseMovementDirection inverseDir;
 	JointLimits jLimits;
-
+	MotorContollerGearRatio contollerGearRatio;
+    
 	ticksPerRound.setParameter(4096);
-	inverseDir.setParameter(false);
-	jLimits.setParameter(0,10000, true);
+	contollerGearRatio.setParameter(1);
 
 	*outputFile << "----- Topological Information of all slaves: -----" << endl;
 
@@ -214,11 +224,13 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 			jName.setParameter( name.str() );
 
 			gearRatio.setParameter(364.0/9405.0);
+			inverseDir.setParameter(false);
 
 			it->second.joint->setConfigurationParameter(jName);
 			it->second.joint->setConfigurationParameter(gearRatio);
 			it->second.joint->setConfigurationParameter(ticksPerRound);
 			it->second.joint->setConfigurationParameter(inverseDir);
+			it->second.joint->setConfigurationParameter(contollerGearRatio);
 		}
 
 		if( !strcmp( etherCATSlaves[i].name, ARM_CONTROLLER   ) )
@@ -241,16 +253,54 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 			name << "joint_" << jointNo;
 			jName.setParameter( name.str() );
 
-//			if(jointCfg == 1 || jointCfg == 2) gearRatio.setParameter(1.0/156.0);
-//			if(jointCfg == 3 )				   gearRatio.setParameter(1.0/100.0);
-//			if(jointCfg == 4 || jointCfg == 5) gearRatio.setParameter(1.0/ 71.0);
-			gearRatio.setParameter(1.0/1.0);
+
+			switch (jointCfg)
+			{
+				case 1:
+					gearRatio.setParameter(1.0/156.0);
+					inverseDir.setParameter(true);
+					jLimits.setParameter(1000,580000, true);
+					break;
+
+				case 2:
+					gearRatio.setParameter(1.0/156.0);
+					inverseDir.setParameter(true);
+					jLimits.setParameter(1000,260000, true);
+					break;
+
+				case 3:
+					gearRatio.setParameter(1.0/100.0);
+					inverseDir.setParameter(true);
+					jLimits.setParameter(0,320000, true);
+					break;
+
+				case 4:
+					gearRatio.setParameter(1.0/ 71.0);
+					inverseDir.setParameter(true);
+					jLimits.setParameter(0,155000, true);
+					break;
+
+				case 5:
+					gearRatio.setParameter(1.0/ 71.0);
+					inverseDir.setParameter(true);
+					jLimits.setParameter(1000,255000, true);
+					break;
+			}
+//			gearRatio.setParameter(1.0/1.0);
 
 			it->second.joint->setConfigurationParameter(jName);
 			it->second.joint->setConfigurationParameter(ticksPerRound);
 			it->second.joint->setConfigurationParameter(inverseDir);
-			it->second.joint->setConfigurationParameter(jLimits);
+			//it->second.joint->setConfigurationParameter(jLimits);
 			it->second.joint->setConfigurationParameter(gearRatio);
+			it->second.joint->setConfigurationParameter(contollerGearRatio);
+
+			if (jointCfg == 5)
+			{
+				MotorPoles motorPole;
+				motorPole.setParameter(8);
+				it->second.joint->setConfigurationParameter(motorPole);
+			}
 		}
 	}
 
@@ -484,10 +534,10 @@ void YouBotDiagnostics::testFunctionOfControllerboards()
 			float startPos = msrAngle.angle.value();
 
 			//now set velocity mode and check position changes
-			cmdSpeed.angularVelocity = -0.25 * radian_per_second;
+			cmdSpeed.angularVelocity = 0.2 * radian_per_second;
 			activeJoint->setData(cmdSpeed);
 
-			//run velocitiy mode for "timeLimit" seconds;
+			//run velocitiy mode for "repeatLimit" seconds;
 			int repeatLimit = 3;
 			for (int i = 0; i < repeatLimit; i++)
 			{
@@ -498,6 +548,7 @@ void YouBotDiagnostics::testFunctionOfControllerboards()
 				difAngle = newAngle - oldAngle;
 				oldAngle = newAngle;
 
+//				cout << "newAngle >>> " << newAngle << " <<<"<< endl;
 				if (i == 0) *outputFile << "StartPosition: " << startPos << endl;
 				*outputFile << "difference of position: "  << setw(6) << difAngle << " and current: " << msrCurrent.current.value() <<endl;
 				//set axis back to homeposition
@@ -509,7 +560,7 @@ void YouBotDiagnostics::testFunctionOfControllerboards()
 
 				if ( i == (repeatLimit-1) )
 				{
-					cmdAngle.angle = 0.01 * radian;
+					cmdAngle.angle = 0.0 * radian;
 					activeJoint->setData(cmdAngle);
 				}
 			}
@@ -642,8 +693,13 @@ void YouBotDiagnostics::quickRestartTest()
 	for (int i = 0; i < 3; i++)
 	{
 		*outputFile << "Number of all slaves before "<< i+1 <<". restart: " << noOfAllEtherCATSlaves << endl;
-		EthercatMaster::getInstance().destroy();
-		EthercatMaster::getInstance().getEthercatDiagnosticInformation(etherCATSlaves);
+		if (ethercatMaster) {
+			ethercatMaster->destroy();
+			ethercatMaster = 0;
+		}
+		ethercatMaster = &EthercatMaster::getInstance(configFileName, YOUBOT_CONFIGURATIONS_DIR);
+		if (ethercatMaster)
+			ethercatMaster->getEthercatDiagnosticInformation(etherCATSlaves);
 		*outputFile << "Number of all slaves after restart: " << etherCATSlaves.size() << endl;
 
 		if (i != 2)
