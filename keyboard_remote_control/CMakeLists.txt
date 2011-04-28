@@ -38,3 +38,4 @@ TARGET_LINK_LIBRARIES(youBot_KeyboardRemoteControl
 	ncurses
 )
 
+INSTALL(TARGETS youBot_KeyboardRemoteControl RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
