@@ -59,7 +59,7 @@
 #include "youbot/YouBotGripper.hpp"
 #include "youbot/YouBotBase.hpp"
 #include "youbot/YouBotManipulator.hpp"
-//#include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/date_time/posix_time/posix_time.hpp"
 #include <vector>
 #include <sstream>
 #include <boost/limits.hpp>
@@ -84,13 +84,16 @@ using namespace youbot;
 class JointConfigurator {
 public:
 
-  JointConfigurator(part baseOrArm, int jointNumber, std::string configname = "joint-parameter.cfg");
+  JointConfigurator(part baseOrArm, int jointNumber, std::string configname = "joint-parameter.cfg", std::string configNameProtected = "protected-joint-parameter.cfg");
 
   ~JointConfigurator();
   void readParameters();
   void readPasswordProtectedParameters();
   void setParametersToJoint();
   void storeParametersToJoint();
+  void setProtectedParametersToJoint();
+  void storeProtectedParametersToJoint();
+  void getPassword();
   void menu();
 
 private:
@@ -98,7 +101,9 @@ private:
   bool AreSame(double A, double B);
   YouBotJoint* joint;
   ConfigFile* configfile;
+  ConfigFile* configfilePP;
   bool ParameterRead;
+  bool ProtectedParameterRead;
   part ArmOrBase;
   int jointNumber;
   std::string version;
@@ -197,7 +202,6 @@ private:
   bool RampGeneratorSpeedAndPositionControl_actual;
   bool RampGeneratorSpeedAndPositionControl_file;
 
-  // ReinitializationSinusoidalCommutation
   SetEncoderCounterZeroAtNextNChannel SetEncoderCounterZeroAtNextNChannel_Parameter;
   bool SetEncoderCounterZeroAtNextNChannel_actual;
   bool SetEncoderCounterZeroAtNextNChannel_file;
@@ -330,7 +334,6 @@ private:
   int SineCompensationFactor_actual;
   int SineCompensationFactor_file;
 
-  //ApproveProtectedParameters
   EncoderNullPolarity EncoderNullPolarity_Parameter;
   bool EncoderNullPolarity_actual;
   bool EncoderNullPolarity_file;
@@ -393,10 +396,12 @@ private:
 
 };
 
-JointConfigurator::JointConfigurator(part baseOrArm, int jointNumber, std::string configname) {
+JointConfigurator::JointConfigurator(part baseOrArm, int jointNumber, std::string configname, std::string configNameProtected) {
 
   ParameterRead = false;
+  ProtectedParameterRead = false;
   configfile = new ConfigFile(configname, std::string(CONFIG_DIR));
+  configfilePP = new ConfigFile(configNameProtected, std::string(CONFIG_DIR));
   this->ArmOrBase = baseOrArm;
   this->jointNumber = jointNumber;
   
@@ -739,419 +744,427 @@ void JointConfigurator::readParameters() {
 void JointConfigurator::readPasswordProtectedParameters(){
   std::cout << "===================== Password Protected Parameters =====================" << std::endl;
 
+  double dummy;
+  
   joint->getConfigurationParameter(PWMLimit_Parameter);
   PWMLimit_Parameter.getParameter(PWMLimit_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PWMLimit");
-//  PWMLimit_file = dummy;
-//  if (PWMLimit_actual != PWMLimit_file) {
-//    std::cout << "PWMLimit                  \t\t\t\tactual: " << PWMLimit_actual << " \tNEW VALUE: " << PWMLimit_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "PWMLimit");
+  PWMLimit_file = dummy;
+  if (PWMLimit_actual != PWMLimit_file) {
+    std::cout << "PWMLimit                  \t\t\t\tactual: " << PWMLimit_actual << " \tNEW VALUE: " << PWMLimit_file << std::endl;
+  } else {
     std::cout << "PWMLimit                  \t\t\t\tactual: " << PWMLimit_actual << std::endl;
-//  }
+  }
 
   joint->getConfigurationParameter(MaximumMotorCurrent_Parameter);
   MaximumMotorCurrent_Parameter.getParameter(MaximumMotorCurrent_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MaximumMotorCurrent");
-//  MaximumMotorCurrent_file = dummy * ampere;
-//  if (!AreSame(MaximumMotorCurrent_actual.value(), MaximumMotorCurrent_file.value())) {
-//    std::cout << "MaximumMotorCurrent      \t\t\t\tactual: " << MaximumMotorCurrent_actual << " \tNEW VALUE: " << MaximumMotorCurrent_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "MaximumMotorCurrent");
+  MaximumMotorCurrent_file = dummy * ampere;
+  if (!AreSame(MaximumMotorCurrent_actual.value(), MaximumMotorCurrent_file.value())) {
+    std::cout << "MaximumMotorCurrent      \t\t\t\tactual: " << MaximumMotorCurrent_actual << " \tNEW VALUE: " << MaximumMotorCurrent_file << std::endl;
+  } else {
     std::cout << "MaximumMotorCurrent      \t\t\t\tactual: " << MaximumMotorCurrent_actual << std::endl;
-//  }
+  }
 
   joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
   MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
-//  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
-//  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
-//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
+  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
+  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
+  } else {
     std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
-//  }
+  }
 
 	joint->getConfigurationParameter(ClearTargetDistance_Parameter);
   ClearTargetDistance_Parameter.getParameter(ClearTargetDistance_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ClearTargetDistance");
-//  ClearTargetDistance_file = dummy;
-//  if (ClearTargetDistance_actual != ClearTargetDistance_file) {
-//    std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << " \tNEW VALUE: " << ClearTargetDistance_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "ClearTargetDistance");
+  ClearTargetDistance_file = dummy;
+  if (ClearTargetDistance_actual != ClearTargetDistance_file) {
+    std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << " \tNEW VALUE: " << ClearTargetDistance_file << std::endl;
+  } else {
     std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << std::endl;
-//  }
+  }
 
   joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
   PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
-//  PositionTargetReachedDistance_file = dummy;
-//  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
-//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
+  PositionTargetReachedDistance_file = dummy;
+  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
+    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
+  } else {
     std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
-//  }
+  }
 
 	joint->getConfigurationParameter(ThermalWindingTimeConstant_Parameter);
   ThermalWindingTimeConstant_Parameter.getParameter(ThermalWindingTimeConstant_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ThermalWindingTimeConstant");
-//  ThermalWindingTimeConstant_file = dummy * si::seconds;
-//  if (!AreSame(ThermalWindingTimeConstant_actual.value(), ThermalWindingTimeConstant_file.value())) {
-//    std::cout << "ThermalWindingTimeConstant \t\t\t\tactual: " << ThermalWindingTimeConstant_actual << " \tNEW VALUE: " << ThermalWindingTimeConstant_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "ThermalWindingTimeConstant");
+  ThermalWindingTimeConstant_file = dummy * si::seconds;
+  if (!AreSame(ThermalWindingTimeConstant_actual.value(), ThermalWindingTimeConstant_file.value())) {
+    std::cout << "ThermalWindingTimeConstant \t\t\t\tactual: " << ThermalWindingTimeConstant_actual << " \tNEW VALUE: " << ThermalWindingTimeConstant_file << std::endl;
+  } else {
     std::cout << "ThermalWindingTimeConstant \t\t\t\tactual: " << ThermalWindingTimeConstant_actual << std::endl;
-//  }
+  }
   
   joint->getConfigurationParameter(I2tLimit_Parameter);
   I2tLimit_Parameter.getParameter(I2tLimit_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "I2tLimit");
-//  I2tLimit_file = dummy;
-//  if (!AreSame(I2tLimit_actual, I2tLimit_file)) {
-//    std::cout << "I2tLimit \t\t\t\t\t\tactual: " << I2tLimit_actual << " \tNEW VALUE: " << I2tLimit_file << std::endl;
-//  } else {
+  configfilePP->readInto(dummy, "Joint_Parameter", "I2tLimit");
+  I2tLimit_file = dummy;
+  if (!AreSame(I2tLimit_actual, I2tLimit_file)) {
+    std::cout << "I2tLimit \t\t\t\t\t\tactual: " << I2tLimit_actual << " \tNEW VALUE: " << I2tLimit_file << std::endl;
+  } else {
     std::cout << "I2tLimit \t\t\t\t\t\tactual: " << I2tLimit_actual << std::endl;
-//  }
+  }
   
-  joint->getConfigurationParameter(I2tExceedCounter_Parameter);
-  I2tExceedCounter_Parameter.getParameter(I2tExceedCounter_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "I2tExceedCounter");
-//  I2tExceedCounter_file = dummy;
-//  if (!AreSame(I2tExceedCounter_actual, I2tExceedCounter_file)) {
-//    std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << " \tNEW VALUE: " << I2tExceedCounter_file << std::endl;
-//  } else {
-    std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << std::endl;
-//  }
 
+
+
+	joint->getConfigurationParameter(PIDControlTime_Parameter);
+  PIDControlTime_Parameter.getParameter(PIDControlTime_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "PIDControlTime");
+  PIDControlTime_file = dummy * si::seconds;
+  if (!AreSame(PIDControlTime_actual.value(), PIDControlTime_file.value())) {
+    std::cout << "PIDControlTime           \t\t\t\tactual: " << PIDControlTime_actual << " \tNEW VALUE: " << PIDControlTime_file << std::endl;
+  } else {
+    std::cout << "PIDControlTime           \t\t\t\tactual: " << PIDControlTime_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(CurrentControlLoopDelay_Parameter);
+  CurrentControlLoopDelay_Parameter.getParameter(CurrentControlLoopDelay_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "CurrentControlLoopDelay");
+  CurrentControlLoopDelay_file = dummy * si::seconds;
+  if (!AreSame(CurrentControlLoopDelay_actual.value(), CurrentControlLoopDelay_file.value())) {
+    std::cout << "CurrentControlLoopDelay  \t\t\t\tactual: " << CurrentControlLoopDelay_actual << " \tNEW VALUE: " << CurrentControlLoopDelay_file << std::endl;
+  } else {
+    std::cout << "CurrentControlLoopDelay  \t\t\t\tactual: " << CurrentControlLoopDelay_actual << std::endl;
+  }
+
+	joint->getConfigurationParameter(PWMHysteresis_Parameter);
+  PWMHysteresis_Parameter.getParameter(PWMHysteresis_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "PWMHysteresis");
+  PWMHysteresis_file = dummy;
+  if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
+    std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << " \tNEW VALUE: " << PWMHysteresis_file << std::endl;
+  } else {
+    std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(ClearISumIfPWMReachesMaximum_Parameter);
+  ClearISumIfPWMReachesMaximum_Parameter.getParameter(ClearISumIfPWMReachesMaximum_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "ClearISumIfPWMReachesMaximum");
+  ClearISumIfPWMReachesMaximum_file = dummy;
+  if (!AreSame(ClearISumIfPWMReachesMaximum_actual, ClearISumIfPWMReachesMaximum_file)) {
+    std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << " \tNEW VALUE: " << ClearISumIfPWMReachesMaximum_file << std::endl;
+  } else {
+    std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(ClearISumIfOvershootsTarget_Parameter);
+  ClearISumIfOvershootsTarget_Parameter.getParameter(ClearISumIfOvershootsTarget_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "ClearISumIfOvershootsTarget");
+  ClearISumIfOvershootsTarget_file = dummy;
+  if (!AreSame(ClearISumIfOvershootsTarget_actual, ClearISumIfOvershootsTarget_file)) {
+    std::cout << "ClearISumIfOvershootsTarget    \t\t\t\tactual: " << ClearISumIfOvershootsTarget_actual << " \tNEW VALUE: " << ClearISumIfOvershootsTarget_file << std::endl;
+  } else {
+    std::cout << "ClearISumIfOvershootsTarget    \t\t\t\tactual: " <<ClearISumIfOvershootsTarget_actual << std::endl;
+  }
+
+	joint->getConfigurationParameter(PIDControllerState_Parameter);
+  PIDControllerState_Parameter.getParameter(PIDControllerState_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "PIDControllerState");
+  PIDControllerState_file = dummy;
+  if (!AreSame(PIDControllerState_actual, PIDControllerState_file)) {
+    std::cout << "PIDControllerState \t\t\t\t\tactual: " << PIDControllerState_actual << " \tNEW VALUE: " << PIDControllerState_file << std::endl;
+  } else {
+    std::cout << "PIDControllerState \t\t\t\t\tactual: " << PIDControllerState_actual << std::endl;
+  }
+
+	joint->getConfigurationParameter(CommutationMode_Parameter);
+  CommutationMode_Parameter.getParameter(CommutationMode_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "CommutationMode");
+  CommutationMode_file = dummy;
+  if (!AreSame(CommutationMode_actual, CommutationMode_file)) {
+    std::cout << "CommutationMode \t\t\t\t\tactual: " << CommutationMode_actual << " \tNEW VALUE: " << CommutationMode_file << std::endl;
+  } else {
+    std::cout << "CommutationMode \t\t\t\t\tactual: " << CommutationMode_actual << std::endl;
+  }
+
+	joint->getConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
+  SetEncoderCounterZeroAtNextNChannel_Parameter.getParameter(SetEncoderCounterZeroAtNextNChannel_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "SetEncoderCounterZeroAtNextNChannel");
+  SetEncoderCounterZeroAtNextNChannel_file = dummy;
+  if (!AreSame(SetEncoderCounterZeroAtNextNChannel_actual, SetEncoderCounterZeroAtNextNChannel_file)) {
+    std::cout << "SetEncoderCounterZeroAtNextNChannel \t\t\tactual: " << SetEncoderCounterZeroAtNextNChannel_actual << " \tNEW VALUE: " << SetEncoderCounterZeroAtNextNChannel_file << std::endl;
+  } else {
+    std::cout << "SetEncoderCounterZeroAtNextNChannel \t\t\tactual: " << SetEncoderCounterZeroAtNextNChannel_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(SetEncoderCounterZeroAtNextSwitch_Parameter);
+  SetEncoderCounterZeroAtNextSwitch_Parameter.getParameter(SetEncoderCounterZeroAtNextSwitch_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "SetEncoderCounterZeroAtNextSwitch");
+  SetEncoderCounterZeroAtNextSwitch_file = dummy;
+  if (!AreSame(SetEncoderCounterZeroAtNextSwitch_actual, SetEncoderCounterZeroAtNextSwitch_file)) {
+    std::cout << "SetEncoderCounterZeroAtNextSwitch  \t\t\tactual: " << SetEncoderCounterZeroAtNextSwitch_actual << " \tNEW VALUE: " << SetEncoderCounterZeroAtNextSwitch_file << std::endl;
+  } else {
+    std::cout << "SetEncoderCounterZeroAtNextSwitch  \t\t\tactual: " << SetEncoderCounterZeroAtNextSwitch_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(SetEncoderCounterZeroOnlyOnce_Parameter);
+  SetEncoderCounterZeroOnlyOnce_Parameter.getParameter(SetEncoderCounterZeroOnlyOnce_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "SetEncoderCounterZeroOnlyOnce");
+  SetEncoderCounterZeroOnlyOnce_file = dummy;
+  if (!AreSame(SetEncoderCounterZeroOnlyOnce_actual, SetEncoderCounterZeroOnlyOnce_file)) {
+    std::cout << "SetEncoderCounterZeroOnlyOnce  \t\t\t\tactual: " << SetEncoderCounterZeroOnlyOnce_actual << " \tNEW VALUE: " << SetEncoderCounterZeroOnlyOnce_file << std::endl;
+  } else {
+    std::cout << "SetEncoderCounterZeroOnlyOnce  \t\t\t\tactual: " << SetEncoderCounterZeroOnlyOnce_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(EncoderStopSwitch_Parameter);
+  EncoderStopSwitch_Parameter.getParameter(EncoderStopSwitch_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "EncoderStopSwitch");
+  EncoderStopSwitch_file = dummy;
+  if (!AreSame(EncoderStopSwitch_actual, EncoderStopSwitch_file)) {
+    std::cout << "EncoderStopSwitch  \t\t\t\t\tactual: " << EncoderStopSwitch_actual << " \tNEW VALUE: " << EncoderStopSwitch_file << std::endl;
+  } else {
+    std::cout << "EncoderStopSwitch  \t\t\t\t\tactual: " << EncoderStopSwitch_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(ActualCommutationOffset_Parameter);
+  ActualCommutationOffset_Parameter.getParameter(ActualCommutationOffset_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "ActualCommutationOffset");
+  ActualCommutationOffset_file = dummy;
+  if (!AreSame(ActualCommutationOffset_actual, ActualCommutationOffset_file)) {
+    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << " \tNEW VALUE: " << ActualCommutationOffset_file << std::endl;
+  } else {
+    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(StopSwitchPolarity_Parameter);
+  StopSwitchPolarity_Parameter.getParameter(StopSwitchPolarity_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "StopSwitchPolarity");
+  StopSwitchPolarity_file = dummy;
+  if (!AreSame(StopSwitchPolarity_actual, StopSwitchPolarity_file)) {
+    std::cout << "StopSwitchPolarity \t\t\t\t\tactual: " << StopSwitchPolarity_actual << " \tNEW VALUE: " << StopSwitchPolarity_file << std::endl;
+  } else {
+    std::cout << "StopSwitchPolarity \t\t\t\t\tactual: " << StopSwitchPolarity_actual << std::endl;
+  }
+
+	joint->getConfigurationParameter(CommutationMotorCurrent_Parameter);
+  CommutationMotorCurrent_Parameter.getParameter(CommutationMotorCurrent_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "CommutationMotorCurrent");
+  CommutationMotorCurrent_file = dummy * ampere;
+  if (!AreSame(CommutationMotorCurrent_actual.value(), CommutationMotorCurrent_file.value())) {
+    std::cout << "CommutationMotorCurrent \t\t\t\tactual: " << CommutationMotorCurrent_actual << " \tNEW VALUE: " << CommutationMotorCurrent_file << std::endl;
+  } else {
+    std::cout << "CommutationMotorCurrent \t\t\t\tactual: " << CommutationMotorCurrent_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(MotorContollerGearRatio_Parameter);
+  MotorContollerGearRatio_Parameter.getParameter(MotorContollerGearRatio_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MotorContollerGearRatio");
+  MotorContollerGearRatio_file = dummy;
+  if (!AreSame(MotorContollerGearRatio_actual, MotorContollerGearRatio_file)) {
+    std::cout << "MotorContollerGearRatio \t\t\t\tactual: " << MotorContollerGearRatio_actual << " \tNEW VALUE: " << MotorContollerGearRatio_file << std::endl;
+  } else {
+    std::cout << "MotorContollerGearRatio \t\t\t\tactual: " << MotorContollerGearRatio_actual << std::endl;
+  }
+
+	joint->getConfigurationParameter(MassInertiaConstant_Parameter);
+  MassInertiaConstant_Parameter.getParameter(MassInertiaConstant_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MassInertiaConstant");
+  MassInertiaConstant_file = dummy;
+  if (!AreSame(MassInertiaConstant_actual, MassInertiaConstant_file)) {
+    std::cout << "MassInertiaConstant \t\t\t\t\tactual: " << MassInertiaConstant_actual << " \tNEW VALUE: " << MassInertiaConstant_file << std::endl;
+  } else {
+    std::cout << "MassInertiaConstant \t\t\t\t\tactual: " << MassInertiaConstant_actual << std::endl;
+  }
+
+	  joint->getConfigurationParameter(BEMFConstant_Parameter);
+  BEMFConstant_Parameter.getParameter(BEMFConstant_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "BEMFConstant");
+  BEMFConstant_file = dummy;
+  if (!AreSame(BEMFConstant_actual, BEMFConstant_file)) {
+    std::cout << "BEMFConstant \t\t\t\t\t\tactual: " << BEMFConstant_actual << " \tNEW VALUE: " << BEMFConstant_file << std::endl;
+  } else {
+    std::cout << "BEMFConstant \t\t\t\t\t\tactual: " << BEMFConstant_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(SineInitializationVelocity_Parameter);
+  SineInitializationVelocity_Parameter.getParameter(SineInitializationVelocity_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "SineInitializationVelocity");
+  SineInitializationVelocity_file = dummy * radian_per_second;
+  if (!AreSame(SineInitializationVelocity_actual.value(), SineInitializationVelocity_file.value())) {
+    std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << " \tNEW VALUE: " << SineInitializationVelocity_file << std::endl;
+  } else {
+    std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(CommutationCompensationClockwise_Parameter);
+  CommutationCompensationClockwise_Parameter.getParameter(CommutationCompensationClockwise_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "CommutationCompensationClockwise");
+  CommutationCompensationClockwise_file = dummy;
+  if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
+    std::cout << "CommutationCompensationClockwise \t\t\tactual: " << CommutationCompensationClockwise_actual << " \tNEW VALUE: " << CommutationCompensationClockwise_file << std::endl;
+  } else {
+    std::cout << "CommutationCompensationClockwise \t\t\tactual: " << CommutationCompensationClockwise_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
+  CommutationCompensationCounterClockwise_Parameter.getParameter(CommutationCompensationCounterClockwise_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "CommutationCompensationCounterClockwise");
+  CommutationCompensationCounterClockwise_file = dummy;
+  if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
+    std::cout << "CommutationCompensationCounterClockwise \t\tactual: " << CommutationCompensationCounterClockwise_actual << " \tNEW VALUE: " << CommutationCompensationCounterClockwise_file << std::endl;
+  } else {
+    std::cout << "CommutationCompensationCounterClockwise \t\tactual: " << CommutationCompensationCounterClockwise_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(InitSineDelay_Parameter);
+  InitSineDelay_Parameter.getParameter(InitSineDelay_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "InitSineDelay");
+  InitSineDelay_file = dummy * si::seconds;
+  if (!AreSame(InitSineDelay_actual.value(), InitSineDelay_file.value())) {
+    std::cout << "InitSineDelay \t\t\t\t\t\tactual: " << InitSineDelay_actual << " \tNEW VALUE: " << InitSineDelay_file << std::endl;
+  } else {
+    std::cout << "InitSineDelay \t\t\t\t\t\tactual: " << InitSineDelay_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(ActivateOvervoltageProtection_Parameter);
+  ActivateOvervoltageProtection_Parameter.getParameter(ActivateOvervoltageProtection_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "ActivateOvervoltageProtection");
+  ActivateOvervoltageProtection_file = dummy;
+  if (!AreSame(ActivateOvervoltageProtection_actual, ActivateOvervoltageProtection_file)) {
+    std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << " \tNEW VALUE: " << ActivateOvervoltageProtection_file << std::endl;
+  } else {
+    std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(MaximumPWMChangePerPIDInterval_Parameter);
+  MaximumPWMChangePerPIDInterval_Parameter.getParameter(MaximumPWMChangePerPIDInterval_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MaximumPWMChangePerPIDInterval");
+  MaximumPWMChangePerPIDInterval_file = dummy;
+  if (!AreSame(MaximumPWMChangePerPIDInterval_actual, MaximumPWMChangePerPIDInterval_file)) {
+    std::cout << "MaximumPWMChangePerPIDInterval \t\t\t\tactual: " << MaximumPWMChangePerPIDInterval_actual << " \tNEW VALUE: " << MaximumPWMChangePerPIDInterval_file << std::endl;
+  } else {
+    std::cout << "MaximumPWMChangePerPIDInterval \t\t\t\tactual: " << MaximumPWMChangePerPIDInterval_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(SineCompensationFactor_Parameter);
+  SineCompensationFactor_Parameter.getParameter(SineCompensationFactor_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "SineCompensationFactor");
+  SineCompensationFactor_file = dummy;
+  if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
+    std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << " \tNEW VALUE: " << SineCompensationFactor_file << std::endl;
+  } else {
+    std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(EncoderNullPolarity_Parameter);
+  EncoderNullPolarity_Parameter.getParameter(EncoderNullPolarity_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "EncoderNullPolarity");
+  EncoderNullPolarity_file = dummy;
+  if (!AreSame(EncoderNullPolarity_actual, EncoderNullPolarity_file)) {
+    std::cout << "EncoderNullPolarity \t\t\t\t\tactual: " << EncoderNullPolarity_actual << " \tNEW VALUE: " << EncoderNullPolarity_file << std::endl;
+  } else {
+    std::cout << "EncoderNullPolarity \t\t\t\t\tactual: " << EncoderNullPolarity_actual << std::endl;
+  }
+  
+  
+  joint->getConfigurationParameter(EncoderResolution_Parameter);
+  EncoderResolution_Parameter.getParameter(EncoderResolution_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "EncoderResolution");
+  EncoderResolution_file = dummy;
+  if (!AreSame(EncoderResolution_actual, EncoderResolution_file)) {
+    std::cout << "EncoderResolution \t\t\t\t\tactual: " << EncoderResolution_actual << " \tNEW VALUE: " << EncoderResolution_file << std::endl;
+  } else {
+    std::cout << "EncoderResolution \t\t\t\t\tactual: " << EncoderResolution_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(HallSensorPolarityReversal_Parameter);
+  HallSensorPolarityReversal_Parameter.getParameter(HallSensorPolarityReversal_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "HallSensorPolarityReversal");
+  HallSensorPolarityReversal_file = dummy;
+  if (!AreSame(HallSensorPolarityReversal_actual, HallSensorPolarityReversal_file)) {
+    std::cout << "HallSensorPolarityReversal \t\t\t\tactual: " << HallSensorPolarityReversal_actual << " \tNEW VALUE: " << HallSensorPolarityReversal_file << std::endl;
+  } else {
+    std::cout << "HallSensorPolarityReversal \t\t\t\tactual: " << HallSensorPolarityReversal_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(InitializationMode_Parameter);
+  InitializationMode_Parameter.getParameter(InitializationMode_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "InitializationMode");
+  InitializationMode_file = dummy;
+  if (!AreSame(InitializationMode_actual, InitializationMode_file)) {
+    std::cout << "InitializationMode \t\t\t\t\tactual: " << InitializationMode_actual << " \tNEW VALUE: " << InitializationMode_file << std::endl;
+  } else {
+    std::cout << "InitializationMode \t\t\t\t\tactual: " << InitializationMode_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(MotorCoilResistance_Parameter);
+  MotorCoilResistance_Parameter.getParameter(MotorCoilResistance_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MotorCoilResistance");
+  MotorCoilResistance_file = dummy * ohm;
+  if (!AreSame(MotorCoilResistance_actual.value(), MotorCoilResistance_file.value())) {
+    std::cout << "MotorCoilResistance \t\t\t\t\tactual: " << MotorCoilResistance_actual << " \tNEW VALUE: " << MotorCoilResistance_file << std::endl;
+  } else {
+    std::cout << "MotorCoilResistance \t\t\t\t\tactual: " << MotorCoilResistance_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(MotorPoles_Parameter);
+  MotorPoles_Parameter.getParameter(MotorPoles_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MotorPoles");
+  MotorPoles_file = dummy;
+  if (!AreSame(MotorPoles_actual, MotorPoles_file)) {
+    std::cout << "MotorPoles \t\t\t\t\t\tactual: " << MotorPoles_actual << " \tNEW VALUE: " << MotorPoles_file << std::endl;
+  } else {
+    std::cout << "MotorPoles \t\t\t\t\t\tactual: " << MotorPoles_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
+  PWMSchemeBlockCommutation_Parameter.getParameter(PWMSchemeBlockCommutation_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "PWMSchemeBlockCommutation");
+  PWMSchemeBlockCommutation_file = dummy;
+  if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
+    std::cout << "PWMSchemeBlockCommutation \t\t\t\tactual: " << PWMSchemeBlockCommutation_actual << " \tNEW VALUE: " << PWMSchemeBlockCommutation_file << std::endl;
+  } else {
+    std::cout << "PWMSchemeBlockCommutation \t\t\t\tactual: " << PWMSchemeBlockCommutation_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(ReversingEncoderDirection_Parameter);
+  ReversingEncoderDirection_Parameter.getParameter(ReversingEncoderDirection_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "ReversingEncoderDirection");
+  ReversingEncoderDirection_file = dummy;
+  if (!AreSame(ReversingEncoderDirection_actual, ReversingEncoderDirection_file)) {
+    std::cout << "ReversingEncoderDirection \t\t\t\tactual: " << ReversingEncoderDirection_actual << " \tNEW VALUE: " << ReversingEncoderDirection_file << std::endl;
+  } else {
+    std::cout << "ReversingEncoderDirection \t\t\t\tactual: " << ReversingEncoderDirection_actual << std::endl;
+  }
+
+  ProtectedParameterRead = true;
+}
+
+//=======================READ ONLY =============================
+/*
 	joint->getConfigurationParameter(OperationalTime_Parameter);
   OperationalTime_Parameter.getParameter(OperationalTime_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "OperationalTime");
+//  configfilePP->readInto(dummy, "Joint_Parameter", "OperationalTime");
 //  OperationalTime_file = dummy * si::seconds;
 //  if (!AreSame(OperationalTime_actual.value(), OperationalTime_file.value())) {
 //    std::cout << "OperationalTime \t\t\t\t\tactual: " << OperationalTime_actual << " \tNEW VALUE: " << OperationalTime_file << std::endl;
 //  } else {
     std::cout << "OperationalTime \t\t\t\t\tactual: " << OperationalTime_actual << std::endl;
 //  }
-
-	joint->getConfigurationParameter(PIDControlTime_Parameter);
-  PIDControlTime_Parameter.getParameter(PIDControlTime_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PIDControlTime");
-//  PIDControlTime_file = dummy * si::seconds;
-//  if (!AreSame(PIDControlTime_actual.value(), PIDControlTime_file.value())) {
-//    std::cout << "PIDControlTime           \t\t\t\tactual: " << PIDControlTime_actual << " \tNEW VALUE: " << PIDControlTime_file << std::endl;
-//  } else {
-    std::cout << "PIDControlTime           \t\t\t\tactual: " << PIDControlTime_actual << std::endl;
-//  }
-
-  joint->getConfigurationParameter(CurrentControlLoopDelay_Parameter);
-  CurrentControlLoopDelay_Parameter.getParameter(CurrentControlLoopDelay_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "CurrentControlLoopDelay");
-//  CurrentControlLoopDelay_file = dummy * si::seconds;
-//  if (!AreSame(CurrentControlLoopDelay_actual.value(), CurrentControlLoopDelay_file.value())) {
-//    std::cout << "CurrentControlLoopDelay  \t\t\t\tactual: " << CurrentControlLoopDelay_actual << " \tNEW VALUE: " << CurrentControlLoopDelay_file << std::endl;
-//  } else {
-    std::cout << "CurrentControlLoopDelay  \t\t\t\tactual: " << CurrentControlLoopDelay_actual << std::endl;
-//  }
-
-	joint->getConfigurationParameter(PWMHysteresis_Parameter);
-  PWMHysteresis_Parameter.getParameter(PWMHysteresis_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PWMHysteresis");
-//  PWMHysteresis_file = dummy;
-//  if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
-//    std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << " \tNEW VALUE: " << PWMHysteresis_file << std::endl;
-//  } else {
-    std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << std::endl;
-//  }
-
-  joint->getConfigurationParameter(ClearISumIfPWMReachesMaximum_Parameter);
-  ClearISumIfPWMReachesMaximum_Parameter.getParameter(ClearISumIfPWMReachesMaximum_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ClearISumIfPWMReachesMaximum");
-//  ClearISumIfPWMReachesMaximum_file = dummy;
-//  if (!AreSame(ClearISumIfPWMReachesMaximum_actual, ClearISumIfPWMReachesMaximum_file)) {
-//    std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << " \tNEW VALUE: " << ClearISumIfPWMReachesMaximum_file << std::endl;
-//  } else {
-    std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << std::endl;
-//  }
-
-  joint->getConfigurationParameter(ClearISumIfOvershootsTarget_Parameter);
-  ClearISumIfOvershootsTarget_Parameter.getParameter(ClearISumIfOvershootsTarget_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ClearISumIfOvershootsTarget");
-//  ClearISumIfOvershootsTarget_file = dummy;
-//  if (!AreSame(ClearISumIfOvershootsTarget_actual, ClearISumIfOvershootsTarget_file)) {
-//    std::cout << "ClearISumIfOvershootsTarget    \t\t\t\tactual: " << ClearISumIfOvershootsTarget_actual << " \tNEW VALUE: " << ClearISumIfOvershootsTarget_file << std::endl;
-//  } else {
-    std::cout << "ClearISumIfOvershootsTarget    \t\t\t\tactual: " <<ClearISumIfOvershootsTarget_actual << std::endl;
-//  }
-
-	joint->getConfigurationParameter(PIDControllerState_Parameter);
-  PIDControllerState_Parameter.getParameter(PIDControllerState_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PIDControllerState");
-//  PIDControllerState_file = dummy;
-//  if (!AreSame(PIDControllerState_actual, PIDControllerState_file)) {
-//    std::cout << "PIDControllerState \t\t\t\t\tactual: " << PIDControllerState_actual << " \tNEW VALUE: " << PIDControllerState_file << std::endl;
-//  } else {
-    std::cout << "PIDControllerState \t\t\t\t\tactual: " << PIDControllerState_actual << std::endl;
-//  }
-
-	joint->getConfigurationParameter(CommutationMode_Parameter);
-  CommutationMode_Parameter.getParameter(CommutationMode_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "CommutationMode");
-//  CommutationMode_file = dummy;
-//  if (!AreSame(CommutationMode_actual, CommutationMode_file)) {
-//    std::cout << "CommutationMode \t\t\t\t\tactual: " << CommutationMode_actual << " \tNEW VALUE: " << CommutationMode_file << std::endl;
-//  } else {
-    std::cout << "CommutationMode \t\t\t\t\tactual: " << CommutationMode_actual << std::endl;
-//  }
-
-	joint->getConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
-  SetEncoderCounterZeroAtNextNChannel_Parameter.getParameter(SetEncoderCounterZeroAtNextNChannel_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "SetEncoderCounterZeroAtNextNChannel");
-//  SetEncoderCounterZeroAtNextNChannel_file = dummy;
-//  if (!AreSame(SetEncoderCounterZeroAtNextNChannel_actual, SetEncoderCounterZeroAtNextNChannel_file)) {
-//    std::cout << "SetEncoderCounterZeroAtNextNChannel \t\t\tactual: " << SetEncoderCounterZeroAtNextNChannel_actual << " \tNEW VALUE: " << SetEncoderCounterZeroAtNextNChannel_file << std::endl;
-//  } else {
-    std::cout << "SetEncoderCounterZeroAtNextNChannel \t\t\tactual: " << SetEncoderCounterZeroAtNextNChannel_actual << std::endl;
-//  }
-
-  joint->getConfigurationParameter(SetEncoderCounterZeroAtNextSwitch_Parameter);
-  SetEncoderCounterZeroAtNextSwitch_Parameter.getParameter(SetEncoderCounterZeroAtNextSwitch_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "SetEncoderCounterZeroAtNextSwitch");
-//  SetEncoderCounterZeroAtNextSwitch_file = dummy;
-//  if (!AreSame(SetEncoderCounterZeroAtNextSwitch_actual, SetEncoderCounterZeroAtNextSwitch_file)) {
-//    std::cout << "SetEncoderCounterZeroAtNextSwitch  \t\t\tactual: " << SetEncoderCounterZeroAtNextSwitch_actual << " \tNEW VALUE: " << SetEncoderCounterZeroAtNextSwitch_file << std::endl;
-//  } else {
-    std::cout << "SetEncoderCounterZeroAtNextSwitch  \t\t\tactual: " << SetEncoderCounterZeroAtNextSwitch_actual << std::endl;
-//  }
-
-  joint->getConfigurationParameter(SetEncoderCounterZeroOnlyOnce_Parameter);
-  SetEncoderCounterZeroOnlyOnce_Parameter.getParameter(SetEncoderCounterZeroOnlyOnce_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "SetEncoderCounterZeroOnlyOnce");
-//  SetEncoderCounterZeroOnlyOnce_file = dummy;
-//  if (!AreSame(SetEncoderCounterZeroOnlyOnce_actual, SetEncoderCounterZeroOnlyOnce_file)) {
-//    std::cout << "SetEncoderCounterZeroOnlyOnce  \t\t\t\tactual: " << SetEncoderCounterZeroOnlyOnce_actual << " \tNEW VALUE: " << SetEncoderCounterZeroOnlyOnce_file << std::endl;
-//  } else {
-    std::cout << "SetEncoderCounterZeroOnlyOnce  \t\t\t\tactual: " << SetEncoderCounterZeroOnlyOnce_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(EncoderStopSwitch_Parameter);
-  EncoderStopSwitch_Parameter.getParameter(EncoderStopSwitch_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "EncoderStopSwitch");
-//  EncoderStopSwitch_file = dummy;
-//  if (!AreSame(EncoderStopSwitch_actual, EncoderStopSwitch_file)) {
-//    std::cout << "EncoderStopSwitch  \t\t\t\t\tactual: " << EncoderStopSwitch_actual << " \tNEW VALUE: " << EncoderStopSwitch_file << std::endl;
-//  } else {
-    std::cout << "EncoderStopSwitch  \t\t\t\t\tactual: " << EncoderStopSwitch_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(ActualCommutationOffset_Parameter);
-  ActualCommutationOffset_Parameter.getParameter(ActualCommutationOffset_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ActualCommutationOffset");
-//  ActualCommutationOffset_file = dummy;
-//  if (!AreSame(ActualCommutationOffset_actual, ActualCommutationOffset_file)) {
-//    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << " \tNEW VALUE: " << ActualCommutationOffset_file << std::endl;
-//  } else {
-    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(StopSwitchPolarity_Parameter);
-  StopSwitchPolarity_Parameter.getParameter(StopSwitchPolarity_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "StopSwitchPolarity");
-//  StopSwitchPolarity_file = dummy;
-//  if (!AreSame(StopSwitchPolarity_actual, StopSwitchPolarity_file)) {
-//    std::cout << "StopSwitchPolarity \t\t\t\t\tactual: " << StopSwitchPolarity_actual << " \tNEW VALUE: " << StopSwitchPolarity_file << std::endl;
-//  } else {
-    std::cout << "StopSwitchPolarity \t\t\t\t\tactual: " << StopSwitchPolarity_actual << std::endl;
-//  }
-
-	joint->getConfigurationParameter(CommutationMotorCurrent_Parameter);
-  CommutationMotorCurrent_Parameter.getParameter(CommutationMotorCurrent_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "CommutationMotorCurrent");
-//  CommutationMotorCurrent_file = dummy * ampere;
-//  if (!AreSame(CommutationMotorCurrent_actual.value(), CommutationMotorCurrent_file.value())) {
-//    std::cout << "CommutationMotorCurrent \t\t\t\tactual: " << CommutationMotorCurrent_actual << " \tNEW VALUE: " << CommutationMotorCurrent_file << std::endl;
-//  } else {
-    std::cout << "CommutationMotorCurrent \t\t\t\tactual: " << CommutationMotorCurrent_actual << std::endl;
-//  }
-
-  joint->getConfigurationParameter(MotorContollerGearRatio_Parameter);
-  MotorContollerGearRatio_Parameter.getParameter(MotorContollerGearRatio_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MotorContollerGearRatio");
-//  MotorContollerGearRatio_file = dummy;
-//  if (!AreSame(MotorContollerGearRatio_actual, MotorContollerGearRatio_file)) {
-//    std::cout << "MotorContollerGearRatio \t\t\t\tactual: " << MotorContollerGearRatio_actual << " \tNEW VALUE: " << MotorContollerGearRatio_file << std::endl;
-//  } else {
-    std::cout << "MotorContollerGearRatio \t\t\t\tactual: " << MotorContollerGearRatio_actual << std::endl;
-//  }
-
-	joint->getConfigurationParameter(MassInertiaConstant_Parameter);
-  MassInertiaConstant_Parameter.getParameter(MassInertiaConstant_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MassInertiaConstant");
-//  MassInertiaConstant_file = dummy;
-//  if (!AreSame(MassInertiaConstant_actual, MassInertiaConstant_file)) {
-//    std::cout << "MassInertiaConstant \t\t\t\t\tactual: " << MassInertiaConstant_actual << " \tNEW VALUE: " << MassInertiaConstant_file << std::endl;
-//  } else {
-    std::cout << "MassInertiaConstant \t\t\t\t\tactual: " << MassInertiaConstant_actual << std::endl;
-//  }
-
-	  joint->getConfigurationParameter(BEMFConstant_Parameter);
-  BEMFConstant_Parameter.getParameter(BEMFConstant_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "BEMFConstant");
-//  BEMFConstant_file = dummy;
-//  if (!AreSame(BEMFConstant_actual, BEMFConstant_file)) {
-//    std::cout << "BEMFConstant \t\t\t\t\t\tactual: " << BEMFConstant_actual << " \tNEW VALUE: " << BEMFConstant_file << std::endl;
-//  } else {
-    std::cout << "BEMFConstant \t\t\t\t\t\tactual: " << BEMFConstant_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(SineInitializationVelocity_Parameter);
-  SineInitializationVelocity_Parameter.getParameter(SineInitializationVelocity_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "SineInitializationVelocity");
-//  SineInitializationVelocity_file = dummy * radian_per_second;
-//  if (!AreSame(SineInitializationVelocity_actual.value(), SineInitializationVelocity_file.value())) {
-//    std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << " \tNEW VALUE: " << SineInitializationVelocity_file << std::endl;
-//  } else {
-    std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(CommutationCompensationClockwise_Parameter);
-  CommutationCompensationClockwise_Parameter.getParameter(CommutationCompensationClockwise_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "CommutationCompensationClockwise");
-//  CommutationCompensationClockwise_file = dummy;
-//  if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
-//    std::cout << "CommutationCompensationClockwise \t\t\tactual: " << CommutationCompensationClockwise_actual << " \tNEW VALUE: " << CommutationCompensationClockwise_file << std::endl;
-//  } else {
-    std::cout << "CommutationCompensationClockwise \t\t\tactual: " << CommutationCompensationClockwise_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
-  CommutationCompensationCounterClockwise_Parameter.getParameter(CommutationCompensationCounterClockwise_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "CommutationCompensationCounterClockwise");
-//  CommutationCompensationCounterClockwise_file = dummy;
-//  if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
-//    std::cout << "CommutationCompensationCounterClockwise \t\tactual: " << CommutationCompensationCounterClockwise_actual << " \tNEW VALUE: " << CommutationCompensationCounterClockwise_file << std::endl;
-//  } else {
-    std::cout << "CommutationCompensationCounterClockwise \t\tactual: " << CommutationCompensationCounterClockwise_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(InitSineDelay_Parameter);
-  InitSineDelay_Parameter.getParameter(InitSineDelay_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "InitSineDelay");
-//  InitSineDelay_file = dummy * si::seconds;
-//  if (!AreSame(InitSineDelay_actual.value(), InitSineDelay_file.value())) {
-//    std::cout << "InitSineDelay \t\t\t\t\t\tactual: " << InitSineDelay_actual << " \tNEW VALUE: " << InitSineDelay_file << std::endl;
-//  } else {
-    std::cout << "InitSineDelay \t\t\t\t\t\tactual: " << InitSineDelay_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(ActivateOvervoltageProtection_Parameter);
-  ActivateOvervoltageProtection_Parameter.getParameter(ActivateOvervoltageProtection_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ActivateOvervoltageProtection");
-//  ActivateOvervoltageProtection_file = dummy;
-//  if (!AreSame(ActivateOvervoltageProtection_actual, ActivateOvervoltageProtection_file)) {
-//    std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << " \tNEW VALUE: " << ActivateOvervoltageProtection_file << std::endl;
-//  } else {
-    std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(MaximumPWMChangePerPIDInterval_Parameter);
-  MaximumPWMChangePerPIDInterval_Parameter.getParameter(MaximumPWMChangePerPIDInterval_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MaximumPWMChangePerPIDInterval");
-//  MaximumPWMChangePerPIDInterval_file = dummy;
-//  if (!AreSame(MaximumPWMChangePerPIDInterval_actual, MaximumPWMChangePerPIDInterval_file)) {
-//    std::cout << "MaximumPWMChangePerPIDInterval \t\t\t\tactual: " << MaximumPWMChangePerPIDInterval_actual << " \tNEW VALUE: " << MaximumPWMChangePerPIDInterval_file << std::endl;
-//  } else {
-    std::cout << "MaximumPWMChangePerPIDInterval \t\t\t\tactual: " << MaximumPWMChangePerPIDInterval_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(SineCompensationFactor_Parameter);
-  SineCompensationFactor_Parameter.getParameter(SineCompensationFactor_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "SineCompensationFactor");
-//  SineCompensationFactor_file = dummy;
-//  if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
-//    std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << " \tNEW VALUE: " << SineCompensationFactor_file << std::endl;
-//  } else {
-    std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(EncoderNullPolarity_Parameter);
-  EncoderNullPolarity_Parameter.getParameter(EncoderNullPolarity_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "EncoderNullPolarity");
-//  EncoderNullPolarity_file = dummy;
-//  if (!AreSame(EncoderNullPolarity_actual, EncoderNullPolarity_file)) {
-//    std::cout << "EncoderNullPolarity \t\t\t\t\tactual: " << EncoderNullPolarity_actual << " \tNEW VALUE: " << EncoderNullPolarity_file << std::endl;
-//  } else {
-    std::cout << "EncoderNullPolarity \t\t\t\t\tactual: " << EncoderNullPolarity_actual << std::endl;
-//  }
-  
-  
-  joint->getConfigurationParameter(EncoderResolution_Parameter);
-  EncoderResolution_Parameter.getParameter(EncoderResolution_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "EncoderResolution");
-//  EncoderResolution_file = dummy;
-//  if (!AreSame(EncoderResolution_actual, EncoderResolution_file)) {
-//    std::cout << "EncoderResolution \t\t\t\t\tactual: " << EncoderResolution_actual << " \tNEW VALUE: " << EncoderResolution_file << std::endl;
-//  } else {
-    std::cout << "EncoderResolution \t\t\t\t\tactual: " << EncoderResolution_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(HallSensorPolarityReversal_Parameter);
-  HallSensorPolarityReversal_Parameter.getParameter(HallSensorPolarityReversal_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "HallSensorPolarityReversal");
-//  HallSensorPolarityReversal_file = dummy;
-//  if (!AreSame(HallSensorPolarityReversal_actual, HallSensorPolarityReversal_file)) {
-//    std::cout << "HallSensorPolarityReversal \t\t\t\tactual: " << HallSensorPolarityReversal_actual << " \tNEW VALUE: " << HallSensorPolarityReversal_file << std::endl;
-//  } else {
-    std::cout << "HallSensorPolarityReversal \t\t\t\tactual: " << HallSensorPolarityReversal_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(InitializationMode_Parameter);
-  InitializationMode_Parameter.getParameter(InitializationMode_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "InitializationMode");
-//  InitializationMode_file = dummy;
-//  if (!AreSame(InitializationMode_actual, InitializationMode_file)) {
-//    std::cout << "InitializationMode \t\t\t\t\tactual: " << InitializationMode_actual << " \tNEW VALUE: " << InitializationMode_file << std::endl;
-//  } else {
-    std::cout << "InitializationMode \t\t\t\t\tactual: " << InitializationMode_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(MotorCoilResistance_Parameter);
-  MotorCoilResistance_Parameter.getParameter(MotorCoilResistance_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MotorCoilResistance");
-//  MotorCoilResistance_file = dummy * ohm;
-//  if (!AreSame(MotorCoilResistance_actual.value(), MotorCoilResistance_file.value())) {
-//    std::cout << "MotorCoilResistance \t\t\t\t\tactual: " << MotorCoilResistance_actual << " \tNEW VALUE: " << MotorCoilResistance_file << std::endl;
-//  } else {
-    std::cout << "MotorCoilResistance \t\t\t\t\tactual: " << MotorCoilResistance_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(MotorPoles_Parameter);
-  MotorPoles_Parameter.getParameter(MotorPoles_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MotorPoles");
-//  MotorPoles_file = dummy;
-//  if (!AreSame(MotorPoles_actual, MotorPoles_file)) {
-//    std::cout << "MotorPoles \t\t\t\t\t\tactual: " << MotorPoles_actual << " \tNEW VALUE: " << MotorPoles_file << std::endl;
-//  } else {
-    std::cout << "MotorPoles \t\t\t\t\t\tactual: " << MotorPoles_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
-  PWMSchemeBlockCommutation_Parameter.getParameter(PWMSchemeBlockCommutation_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PWMSchemeBlockCommutation");
-//  PWMSchemeBlockCommutation_file = dummy;
-//  if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
-//    std::cout << "PWMSchemeBlockCommutation \t\t\t\tactual: " << PWMSchemeBlockCommutation_actual << " \tNEW VALUE: " << PWMSchemeBlockCommutation_file << std::endl;
-//  } else {
-    std::cout << "PWMSchemeBlockCommutation \t\t\t\tactual: " << PWMSchemeBlockCommutation_actual << std::endl;
-//  }
-  
-  joint->getConfigurationParameter(ReversingEncoderDirection_Parameter);
-  ReversingEncoderDirection_Parameter.getParameter(ReversingEncoderDirection_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "ReversingEncoderDirection");
-//  ReversingEncoderDirection_file = dummy;
-//  if (!AreSame(ReversingEncoderDirection_actual, ReversingEncoderDirection_file)) {
-//    std::cout << "ReversingEncoderDirection \t\t\t\tactual: " << ReversingEncoderDirection_actual << " \tNEW VALUE: " << ReversingEncoderDirection_file << std::endl;
-//  } else {
-    std::cout << "ReversingEncoderDirection \t\t\t\tactual: " << ReversingEncoderDirection_actual << std::endl;
-//  }
-
-}
-
+ * 
+ *   joint->getConfigurationParameter(I2tExceedCounter_Parameter);
+  I2tExceedCounter_Parameter.getParameter(I2tExceedCounter_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "I2tExceedCounter");
+  I2tExceedCounter_file = dummy;
+  if (!AreSame(I2tExceedCounter_actual, I2tExceedCounter_file)) {
+    std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << " \tNEW VALUE: " << I2tExceedCounter_file << std::endl;
+  } else {
+    std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << std::endl;
+  }
+*/
 void JointConfigurator::setParametersToJoint() {
   if(!ParameterRead){
     std::cout << "The Joint Parameters have to been read before hand!"  << std::endl;
@@ -1251,6 +1264,138 @@ void JointConfigurator::setParametersToJoint() {
   std::cout << "Parameters set!" << std::endl;
 }
 
+void JointConfigurator::setProtectedParametersToJoint() {
+  if(!ProtectedParameterRead){
+    std::cout << "The protected Joint Parameters have to been read before hand!"  << std::endl;
+    return;
+  }
+  try{
+  
+  PWMLimit_Parameter.setParameter(PWMLimit_file);
+  joint->setConfigurationParameter(PWMLimit_Parameter);
+  
+  MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
+  joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
+  
+  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+  
+  ClearTargetDistance_Parameter.setParameter(ClearTargetDistance_file);
+  joint->setConfigurationParameter(ClearTargetDistance_Parameter);
+  
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+  
+  PIDControlTime_Parameter.setParameter(PIDControlTime_file);
+  joint->setConfigurationParameter(PIDControlTime_Parameter);
+  
+  CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
+  joint->setConfigurationParameter(CurrentControlLoopDelay_Parameter);
+  
+  PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
+  joint->setConfigurationParameter(PWMHysteresis_Parameter);
+  
+  ClearISumIfPWMReachesMaximum_Parameter.setParameter(ClearISumIfPWMReachesMaximum_file);
+  joint->setConfigurationParameter(ClearISumIfPWMReachesMaximum_Parameter);
+  
+  ClearISumIfOvershootsTarget_Parameter.setParameter(ClearISumIfOvershootsTarget_file);
+  joint->setConfigurationParameter(ClearISumIfOvershootsTarget_Parameter);
+  
+  SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
+  joint->setConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
+  
+  SetEncoderCounterZeroAtNextSwitch_Parameter.setParameter(SetEncoderCounterZeroAtNextSwitch_file);
+  joint->setConfigurationParameter(SetEncoderCounterZeroAtNextSwitch_Parameter);
+  
+  SetEncoderCounterZeroOnlyOnce_Parameter.setParameter(SetEncoderCounterZeroOnlyOnce_file);
+  joint->setConfigurationParameter(SetEncoderCounterZeroOnlyOnce_Parameter);
+  
+  EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
+  joint->setConfigurationParameter(EncoderStopSwitch_Parameter);
+  
+  ActualCommutationOffset_Parameter.setParameter(ActualCommutationOffset_file);
+  joint->setConfigurationParameter(ActualCommutationOffset_Parameter);
+  
+  StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
+  joint->setConfigurationParameter(StopSwitchPolarity_Parameter);
+  
+  CommutationMotorCurrent_Parameter.setParameter(CommutationMotorCurrent_file);
+  joint->setConfigurationParameter(CommutationMotorCurrent_Parameter);
+  
+  MassInertiaConstant_Parameter.setParameter(MassInertiaConstant_file);
+  joint->setConfigurationParameter(MassInertiaConstant_Parameter);
+  
+  BEMFConstant_Parameter.setParameter(BEMFConstant_file);
+  joint->setConfigurationParameter(BEMFConstant_Parameter);
+  
+  SineInitializationVelocity_Parameter.setParameter(SineInitializationVelocity_file);
+  joint->setConfigurationParameter(SineInitializationVelocity_Parameter);
+  
+  CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
+  joint->setConfigurationParameter(CommutationCompensationClockwise_Parameter);
+  
+  CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
+  joint->setConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
+  
+  InitSineDelay_Parameter.setParameter(InitSineDelay_file);
+  joint->setConfigurationParameter(InitSineDelay_Parameter);
+  
+  ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
+  joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
+  
+  MaximumPWMChangePerPIDInterval_Parameter.setParameter(MaximumPWMChangePerPIDInterval_file);
+  joint->setConfigurationParameter(MaximumPWMChangePerPIDInterval_Parameter);
+  
+  SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
+  joint->setConfigurationParameter(SineCompensationFactor_Parameter);
+  
+  EncoderNullPolarity_Parameter.setParameter(EncoderNullPolarity_file);
+  joint->setConfigurationParameter(EncoderNullPolarity_Parameter);
+  
+  MotorContollerGearRatio_Parameter.setParameter(MotorContollerGearRatio_file);
+  joint->setConfigurationParameter(MotorContollerGearRatio_Parameter);
+  
+  CommutationMode_Parameter.setParameter(CommutationMode_file);
+  joint->setConfigurationParameter(CommutationMode_Parameter);
+  
+  EncoderResolution_Parameter.setParameter(EncoderResolution_file);
+  joint->setConfigurationParameter(EncoderResolution_Parameter);
+  
+  HallSensorPolarityReversal_Parameter.setParameter(HallSensorPolarityReversal_file);
+  joint->setConfigurationParameter(HallSensorPolarityReversal_Parameter);
+  
+  InitializationMode_Parameter.setParameter(InitializationMode_file);
+  joint->setConfigurationParameter(InitializationMode_Parameter);
+  
+  MotorCoilResistance_Parameter.setParameter(MotorCoilResistance_file);
+  joint->setConfigurationParameter(MotorCoilResistance_Parameter);
+  
+  MotorPoles_Parameter.setParameter(MotorPoles_file);
+  joint->setConfigurationParameter(MotorPoles_Parameter);
+  
+  PIDControllerState_Parameter.setParameter(PIDControllerState_file);
+  joint->setConfigurationParameter(PIDControllerState_Parameter);
+  
+  PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
+  joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
+  
+  ReversingEncoderDirection_Parameter.setParameter(ReversingEncoderDirection_file);
+  joint->setConfigurationParameter(ReversingEncoderDirection_Parameter);
+  
+  ThermalWindingTimeConstant_Parameter.setParameter(ThermalWindingTimeConstant_file);
+  joint->setConfigurationParameter(ThermalWindingTimeConstant_Parameter);
+  
+  I2tLimit_Parameter.setParameter(I2tLimit_file);
+  joint->setConfigurationParameter(I2tLimit_Parameter);
+  
+  std::cout << "Protected Parameters set!" << std::endl;
+  
+  }catch(JointParameterException& e){
+    
+  }
+}
+
+
 void JointConfigurator::storeParametersToJoint() {
   
   if(!ParameterRead){
@@ -1343,6 +1488,7 @@ void JointConfigurator::storeParametersToJoint() {
   joint->storeConfigurationParameterPermanent(IParameterSecondParametersCurrentControl_Parameter);
   
   DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
+
   joint->storeConfigurationParameterPermanent(DParameterSecondParametersCurrentControl_Parameter);
   
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
@@ -1350,6 +1496,148 @@ void JointConfigurator::storeParametersToJoint() {
   
 
   std::cout << "Parameters stored!" << std::endl;
+}
+
+void JointConfigurator::storeProtectedParametersToJoint() {
+  
+  if(!ProtectedParameterRead){
+    std::cout << "The protected Joint Parameters have to been read before hand!"  << std::endl;
+    return;
+  }
+  try{
+  
+  PWMLimit_Parameter.setParameter(PWMLimit_file);
+  joint->storeConfigurationParameterPermanent(PWMLimit_Parameter);
+  
+  MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
+  joint->storeConfigurationParameterPermanent(MaximumMotorCurrent_Parameter);
+  
+  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+  
+  ClearTargetDistance_Parameter.setParameter(ClearTargetDistance_file);
+  joint->storeConfigurationParameterPermanent(ClearTargetDistance_Parameter);
+  
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+  
+  PIDControlTime_Parameter.setParameter(PIDControlTime_file);
+  joint->storeConfigurationParameterPermanent(PIDControlTime_Parameter);
+  
+  CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
+  joint->storeConfigurationParameterPermanent(CurrentControlLoopDelay_Parameter);
+  
+  PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
+  joint->storeConfigurationParameterPermanent(PWMHysteresis_Parameter);
+  
+  ClearISumIfPWMReachesMaximum_Parameter.setParameter(ClearISumIfPWMReachesMaximum_file);
+  joint->storeConfigurationParameterPermanent(ClearISumIfPWMReachesMaximum_Parameter);
+  
+  ClearISumIfOvershootsTarget_Parameter.setParameter(ClearISumIfOvershootsTarget_file);
+  joint->storeConfigurationParameterPermanent(ClearISumIfOvershootsTarget_Parameter);
+  
+  SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
+  joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroAtNextNChannel_Parameter);
+  
+  SetEncoderCounterZeroAtNextSwitch_Parameter.setParameter(SetEncoderCounterZeroAtNextSwitch_file);
+  joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroAtNextSwitch_Parameter);
+  
+  SetEncoderCounterZeroOnlyOnce_Parameter.setParameter(SetEncoderCounterZeroOnlyOnce_file);
+  joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroOnlyOnce_Parameter);
+  
+  EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
+  joint->storeConfigurationParameterPermanent(EncoderStopSwitch_Parameter);
+  
+  ActualCommutationOffset_Parameter.setParameter(ActualCommutationOffset_file);
+  joint->storeConfigurationParameterPermanent(ActualCommutationOffset_Parameter);
+  
+  StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
+  joint->storeConfigurationParameterPermanent(StopSwitchPolarity_Parameter);
+  
+  CommutationMotorCurrent_Parameter.setParameter(CommutationMotorCurrent_file);
+  joint->storeConfigurationParameterPermanent(CommutationMotorCurrent_Parameter);
+  
+  MassInertiaConstant_Parameter.setParameter(MassInertiaConstant_file);
+  joint->storeConfigurationParameterPermanent(MassInertiaConstant_Parameter);
+  
+  BEMFConstant_Parameter.setParameter(BEMFConstant_file);
+  joint->storeConfigurationParameterPermanent(BEMFConstant_Parameter);
+  
+  SineInitializationVelocity_Parameter.setParameter(SineInitializationVelocity_file);
+  joint->storeConfigurationParameterPermanent(SineInitializationVelocity_Parameter);
+  
+  CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
+  joint->storeConfigurationParameterPermanent(CommutationCompensationClockwise_Parameter);
+  
+  CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
+  joint->storeConfigurationParameterPermanent(CommutationCompensationCounterClockwise_Parameter);
+  
+  InitSineDelay_Parameter.setParameter(InitSineDelay_file);
+  joint->storeConfigurationParameterPermanent(InitSineDelay_Parameter);
+  
+  ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
+  joint->storeConfigurationParameterPermanent(ActivateOvervoltageProtection_Parameter);
+  
+  MaximumPWMChangePerPIDInterval_Parameter.setParameter(MaximumPWMChangePerPIDInterval_file);
+  joint->storeConfigurationParameterPermanent(MaximumPWMChangePerPIDInterval_Parameter);
+  
+  SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
+  joint->storeConfigurationParameterPermanent(SineCompensationFactor_Parameter);
+  
+  EncoderNullPolarity_Parameter.setParameter(EncoderNullPolarity_file);
+  joint->storeConfigurationParameterPermanent(EncoderNullPolarity_Parameter);
+  
+  MotorContollerGearRatio_Parameter.setParameter(MotorContollerGearRatio_file);
+  joint->storeConfigurationParameterPermanent(MotorContollerGearRatio_Parameter);
+  
+  CommutationMode_Parameter.setParameter(CommutationMode_file);
+  joint->storeConfigurationParameterPermanent(CommutationMode_Parameter);
+  
+  EncoderResolution_Parameter.setParameter(EncoderResolution_file);
+  joint->storeConfigurationParameterPermanent(EncoderResolution_Parameter);
+  
+  HallSensorPolarityReversal_Parameter.setParameter(HallSensorPolarityReversal_file);
+  joint->storeConfigurationParameterPermanent(HallSensorPolarityReversal_Parameter);
+  
+  InitializationMode_Parameter.setParameter(InitializationMode_file);
+  joint->storeConfigurationParameterPermanent(InitializationMode_Parameter);
+  
+  MotorCoilResistance_Parameter.setParameter(MotorCoilResistance_file);
+  joint->storeConfigurationParameterPermanent(MotorCoilResistance_Parameter);
+  
+  MotorPoles_Parameter.setParameter(MotorPoles_file);
+  joint->storeConfigurationParameterPermanent(MotorPoles_Parameter);
+  
+  PIDControllerState_Parameter.setParameter(PIDControllerState_file);
+  joint->storeConfigurationParameterPermanent(PIDControllerState_Parameter);
+  
+  PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
+  joint->storeConfigurationParameterPermanent(PWMSchemeBlockCommutation_Parameter);
+  
+  ReversingEncoderDirection_Parameter.setParameter(ReversingEncoderDirection_file);
+  joint->storeConfigurationParameterPermanent(ReversingEncoderDirection_Parameter);
+  
+  ThermalWindingTimeConstant_Parameter.setParameter(ThermalWindingTimeConstant_file);
+  joint->storeConfigurationParameterPermanent(ThermalWindingTimeConstant_Parameter);
+  
+  I2tLimit_Parameter.setParameter(I2tLimit_file);
+  joint->storeConfigurationParameterPermanent(I2tLimit_Parameter);
+  
+  std::cout << "Protected Parameters stored!" << std::endl;
+  }catch(JointParameterException& e){
+    
+  }
+}
+
+void JointConfigurator::getPassword(){
+  
+  int password;
+  std::cout << "Please enter the Password: " << std::endl;
+  std::cin >> password;
+  ApproveProtectedParameters approveParameters;
+  approveParameters.setParameter(password);
+  joint->setConfigurationParameter(approveParameters);
+  
 }
 
 void JointConfigurator::menu() {
@@ -1361,14 +1649,19 @@ void JointConfigurator::menu() {
   }
   
   std::cout << "==========================================" << std::endl;
-  std::cout << "1 = read parameters from joint and file" << std::endl;
-  std::cout << "2 = set parameters to joint" << std::endl;
-  std::cout << "3 = store parameters to joint" << std::endl;
+  std::cout << "1 = show parameters from joint and config file" << std::endl;
+  std::cout << "2 = set config file values to joint" << std::endl;
+  std::cout << "3 = store config file values to joint" << std::endl;
+  std::cout << "==========================================" << std::endl;
   std::cout << "4 = show password protected parameters" << std::endl;
+  std::cout << "5 = enter password" << std::endl;
+  std::cout << "6 = set password protected parameters" << std::endl;
+  std::cout << "7 = store password protected parameters" << std::endl;
   std::cout << "0 = quit" << std::endl;
   std::cout << "==========================================" << std::endl;
   std::cout << ": " << std::flush;
 }
+
 
 bool running = true;
 
@@ -1385,7 +1678,7 @@ int main(int argc, char *argv[]) {
 
   try {
     
-    if(argc < 3 || argc > 4){
+    if(argc < 3 || argc > 5){
       std::cout << "Usage:   sudo ./JointConfigurator MODULE JOINTNUMBER [CONFIGFILE] " << std::endl;
       std::cout << "Example: sudo ./JointConfigurator base 1" << std::endl;
       std::cout << "         sudo ./JointConfigurator arm 1 joint-parameter.cfg" << std::endl;
@@ -1410,12 +1703,17 @@ int main(int argc, char *argv[]) {
     jointNo = atoi(argv[2]);
     
     std::string configfile = "joint-parameter.cfg";
+    std::string configfileProtected = "protected-joint-parameter.cfg";
     
     if(argc == 4){
       configfile = argv[3];
     }
     
-    JointConfigurator helper(baseOrArm, jointNo, configfile);
+    if(argc == 5){
+      configfileProtected = argv[4];
+    }
+    
+    JointConfigurator helper(baseOrArm, jointNo, configfile, configfileProtected);
 
     
     char ch = 'x';
@@ -1442,8 +1740,21 @@ int main(int argc, char *argv[]) {
           helper.readPasswordProtectedParameters();
           helper.menu();
           break;
+        case '5':
+          helper.getPassword();
+          helper.menu();
+          break;
+        case '6':
+          helper.setProtectedParametersToJoint();
+          helper.menu();
+          break;
+        case '7':
+          helper.storeProtectedParametersToJoint();
+          helper.menu();
+          break;
         default:
           break;
+          
       }
     }
 
