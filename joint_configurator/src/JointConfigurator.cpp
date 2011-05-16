@@ -178,10 +178,6 @@ private:
   bool ClearISumIfPWMReachesMaximum_actual;
   bool ClearISumIfPWMReachesMaximum_file;
 
-  ClearISumIfOvershootsTarget ClearISumIfOvershootsTarget_Parameter;
-  bool ClearISumIfOvershootsTarget_actual;
-  bool ClearISumIfOvershootsTarget_file;
-
   PParameterFirstParametersSpeedControl PParameterFirstParametersSpeedControl_Parameter;
   int PParameterFirstParametersSpeedControl_actual;
   int PParameterFirstParametersSpeedControl_file;
@@ -859,16 +855,6 @@ void JointConfigurator::readPasswordProtectedParameters(){
     std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(ClearISumIfOvershootsTarget_Parameter);
-  ClearISumIfOvershootsTarget_Parameter.getParameter(ClearISumIfOvershootsTarget_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "ClearISumIfOvershootsTarget");
-  ClearISumIfOvershootsTarget_file = dummy;
-  if (!AreSame(ClearISumIfOvershootsTarget_actual, ClearISumIfOvershootsTarget_file)) {
-    std::cout << "ClearISumIfOvershootsTarget    \t\t\t\tactual: " << ClearISumIfOvershootsTarget_actual << " \tNEW VALUE: " << ClearISumIfOvershootsTarget_file << std::endl;
-  } else {
-    std::cout << "ClearISumIfOvershootsTarget    \t\t\t\tactual: " <<ClearISumIfOvershootsTarget_actual << std::endl;
-  }
-
 	joint->getConfigurationParameter(PIDControllerState_Parameter);
   PIDControllerState_Parameter.getParameter(PIDControllerState_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "PIDControllerState");
@@ -927,16 +913,6 @@ void JointConfigurator::readPasswordProtectedParameters(){
     std::cout << "EncoderStopSwitch  \t\t\t\t\tactual: " << EncoderStopSwitch_actual << " \tNEW VALUE: " << EncoderStopSwitch_file << std::endl;
   } else {
     std::cout << "EncoderStopSwitch  \t\t\t\t\tactual: " << EncoderStopSwitch_actual << std::endl;
-  }
-  
-  joint->getConfigurationParameter(ActualCommutationOffset_Parameter);
-  ActualCommutationOffset_Parameter.getParameter(ActualCommutationOffset_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "ActualCommutationOffset");
-  ActualCommutationOffset_file = dummy;
-  if (!AreSame(ActualCommutationOffset_actual, ActualCommutationOffset_file)) {
-    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << " \tNEW VALUE: " << ActualCommutationOffset_file << std::endl;
-  } else {
-    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << std::endl;
   }
   
   joint->getConfigurationParameter(StopSwitchPolarity_Parameter);
@@ -1164,6 +1140,16 @@ void JointConfigurator::readPasswordProtectedParameters(){
   } else {
     std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << std::endl;
   }
+ * 
+ *   joint->getConfigurationParameter(ActualCommutationOffset_Parameter);
+  ActualCommutationOffset_Parameter.getParameter(ActualCommutationOffset_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "ActualCommutationOffset");
+  ActualCommutationOffset_file = dummy;
+  if (!AreSame(ActualCommutationOffset_actual, ActualCommutationOffset_file)) {
+    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << " \tNEW VALUE: " << ActualCommutationOffset_file << std::endl;
+  } else {
+    std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << std::endl;
+  }
 */
 void JointConfigurator::setParametersToJoint() {
   if(!ParameterRead){
@@ -1298,9 +1284,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
   ClearISumIfPWMReachesMaximum_Parameter.setParameter(ClearISumIfPWMReachesMaximum_file);
   joint->setConfigurationParameter(ClearISumIfPWMReachesMaximum_Parameter);
   
-  ClearISumIfOvershootsTarget_Parameter.setParameter(ClearISumIfOvershootsTarget_file);
-  joint->setConfigurationParameter(ClearISumIfOvershootsTarget_Parameter);
-  
   SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
   joint->setConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
   
@@ -1312,9 +1295,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
   
   EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
   joint->setConfigurationParameter(EncoderStopSwitch_Parameter);
-  
-  ActualCommutationOffset_Parameter.setParameter(ActualCommutationOffset_file);
-  joint->setConfigurationParameter(ActualCommutationOffset_Parameter);
   
   StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
   joint->setConfigurationParameter(StopSwitchPolarity_Parameter);
@@ -1533,9 +1513,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
   ClearISumIfPWMReachesMaximum_Parameter.setParameter(ClearISumIfPWMReachesMaximum_file);
   joint->storeConfigurationParameterPermanent(ClearISumIfPWMReachesMaximum_Parameter);
   
-  ClearISumIfOvershootsTarget_Parameter.setParameter(ClearISumIfOvershootsTarget_file);
-  joint->storeConfigurationParameterPermanent(ClearISumIfOvershootsTarget_Parameter);
-  
   SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
   joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroAtNextNChannel_Parameter);
   
@@ -1547,9 +1524,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
   
   EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
   joint->storeConfigurationParameterPermanent(EncoderStopSwitch_Parameter);
-  
-  ActualCommutationOffset_Parameter.setParameter(ActualCommutationOffset_file);
-  joint->storeConfigurationParameterPermanent(ActualCommutationOffset_Parameter);
   
   StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
   joint->storeConfigurationParameterPermanent(StopSwitchPolarity_Parameter);
