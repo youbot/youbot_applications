@@ -1722,12 +1722,13 @@ int main(int argc, char *argv[]) {
     std::string configfile = "joint-parameter.cfg";
     std::string configfileProtected = "protected-joint-parameter.cfg";
 
-    if (argc == 4) {
+    if (argc >= 4) {
       configfile = argv[3];
     }
 
     if (argc == 5) {
       configfileProtected = argv[4];
+      LOG(trace) << configfile <<"   " <<configfileProtected;
     }
 
     JointConfigurator helper(baseOrArm, jointNo, configfile, configfileProtected);
