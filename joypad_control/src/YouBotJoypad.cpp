@@ -67,6 +67,9 @@ int YouBotJoypad::init(std::string joypadCfgName, std::string path)
 	try
 	{
 		youBotArm  = new youbot::YouBotManipulator("youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
+		youBotArm->doJointCommutation();
+    
+   	youBotArm->calibrateManipulator();
 		armExisting = true;
 	}
 	catch ( exception& ex )

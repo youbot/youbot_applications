@@ -71,6 +71,7 @@ int main() {
     configfile.readInto(angularVel, "KeyboardRemoteContol", "RotationalVelocity_[radian_per_second]");
 
     YouBotBase myYouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);
+		myYouBotBase.doJointCommutation();
 
     JointVelocitySetpoint setVel;
     quantity<si::velocity> longitudinalVelocity = 0 * meter_per_second;

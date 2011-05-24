@@ -304,8 +304,8 @@ private:
   int BEMFConstant_file;
 
   SineInitializationVelocity SineInitializationVelocity_Parameter;
-  quantity<angular_velocity> SineInitializationVelocity_actual;
-  quantity<angular_velocity> SineInitializationVelocity_file;
+  int SineInitializationVelocity_actual;
+  int SineInitializationVelocity_file;
 
   CommutationCompensationClockwise CommutationCompensationClockwise_Parameter;
   int CommutationCompensationClockwise_actual;
@@ -364,8 +364,8 @@ private:
   unsigned int MotorPoles_file;
 
   PIDControllerState PIDControllerState_Parameter;
-  bool PIDControllerState_actual;
-  bool PIDControllerState_file;
+  int PIDControllerState_actual;
+  int PIDControllerState_file;
 
   PWMSchemeBlockCommutation PWMSchemeBlockCommutation_Parameter;
   unsigned int PWMSchemeBlockCommutation_actual;
@@ -988,8 +988,8 @@ void JointConfigurator::readPasswordProtectedParameters() {
   joint->getConfigurationParameter(SineInitializationVelocity_Parameter);
   SineInitializationVelocity_Parameter.getParameter(SineInitializationVelocity_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "SineInitializationVelocity");
-  SineInitializationVelocity_file = dummy * radian_per_second;
-  if (!AreSame(SineInitializationVelocity_actual.value(), SineInitializationVelocity_file.value())) {
+  SineInitializationVelocity_file = dummy;
+  if (!AreSame(SineInitializationVelocity_actual, SineInitializationVelocity_file)) {
     std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << " \tNEW VALUE: " << SineInitializationVelocity_file << std::endl;
   } else {
     std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << std::endl;
@@ -1691,7 +1691,7 @@ void sigintHandler(int signal) {
 
 int main(int argc, char *argv[]) {
 
-  signal(SIGINT, sigintHandler);
+//  signal(SIGINT, sigintHandler);
 
   try {
 
@@ -1726,7 +1726,7 @@ int main(int argc, char *argv[]) {
       configfile = argv[3];
     }
 
-    if (argc == 5) {
+    if (argc >= 5) {
       configfileProtected = argv[4];
       LOG(trace) << configfile <<"   " <<configfileProtected;
     }

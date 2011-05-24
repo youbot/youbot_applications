@@ -64,7 +64,7 @@ void sigintHandler(int signal)
 //#######################
 int main() {
 
-	signal(SIGINT, sigintHandler);
+//	signal(SIGINT, sigintHandler);
 
 	//Initialising SDL with joystick
 	SDL_Event event;
