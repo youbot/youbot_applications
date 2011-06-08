@@ -1728,7 +1728,6 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 5) {
       configfileProtected = argv[4];
-      LOG(trace) << configfile <<"   " <<configfileProtected;
     }
 
     JointConfigurator helper(baseOrArm, jointNo, configfile, configfileProtected);
