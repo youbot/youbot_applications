@@ -139,18 +139,18 @@ int main() {
 			 * all of the following constants are empirically determined to move the arm into the desired position 
 			 */
 			desiredJointAngle.angle = 2.56244 * radian;
-		//	myYouBotManipulator->getArmJoint(1).setData(desiredJointAngle);
+			myYouBotManipulator->getArmJoint(1).setData(desiredJointAngle);
 
 			desiredJointAngle.angle = 1.04883 * radian;
-		//	myYouBotManipulator->getArmJoint(2).setData(desiredJointAngle);
+			myYouBotManipulator->getArmJoint(2).setData(desiredJointAngle);
 
-			desiredJointAngle.angle = -3.5 * radian;
+			desiredJointAngle.angle = -2.43523 * radian;
 			myYouBotManipulator->getArmJoint(3).setData(desiredJointAngle);
 
 			desiredJointAngle.angle = 1.73184 * radian;
 			myYouBotManipulator->getArmJoint(4).setData(desiredJointAngle);
 			LOG(info) << "unfold arm";
-			SLEEP_MILLISEC(8000);
+			SLEEP_MILLISEC(4000);
 
 			/* fold arm (approx. home position) using empirically determined values for the positions */
 			desiredJointAngle.angle = 0.11 * radian;
@@ -161,7 +161,6 @@ int main() {
 
 			desiredJointAngle.angle = -0.11 * radian;
 			myYouBotManipulator->getArmJoint(3).setData(desiredJointAngle);
-			SLEEP_MILLISEC(4000);
 			desiredJointAngle.angle = 0.11 * radian;
 			myYouBotManipulator->getArmJoint(4).setData(desiredJointAngle);
 			LOG(info) << "fold arm";
