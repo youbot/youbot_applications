@@ -156,7 +156,7 @@ int main() {
 			desiredJointAngle.angle = 0.11 * radian;
 			myYouBotManipulator->getArmJoint(1).setData(desiredJointAngle);
 
-			desiredJointAngle.angle = 0.011 * radian;
+			desiredJointAngle.angle = 0.11 * radian;
 			myYouBotManipulator->getArmJoint(2).setData(desiredJointAngle);
 
 			desiredJointAngle.angle = -0.11 * radian;
