@@ -407,6 +407,10 @@ private:
   quantity<si::angular_velocity> RampGeneratorSpeed_actual;
   I2tSum I2tSum_Parameter;
   unsigned int I2tSum_actual;
+  
+  MotorControllerTimeout MotorControllerTimeout_Parameter;
+  quantity<si::time> MotorControllerTimeout_actual;
+  quantity<si::time> MotorControllerTimeout_file;
 
 };
 
@@ -1135,7 +1139,20 @@ void JointConfigurator::readPasswordProtectedParameters() {
   } else {
     std::cout << "ReversingEncoderDirection \t\t\t\tactual: " << ReversingEncoderDirection_actual << std::endl;
   }
+  
+  joint->getConfigurationParameter(MotorControllerTimeout_Parameter);
+  MotorControllerTimeout_Parameter.getParameter(MotorControllerTimeout_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MotorControllerTimeout");
+  MotorControllerTimeout_file = dummy * second;
+  if (!AreSame(MotorControllerTimeout_actual.value(), MotorControllerTimeout_file.value())) {
+    std::cout << "MotorControllerTimeout \t\t\t\t\tactual: " << MotorControllerTimeout_actual << " \tNEW VALUE: " << MotorControllerTimeout_file << std::endl;
+  } else {
+    std::cout << "MotorControllerTimeout \t\t\t\t\tactual: " << MotorControllerTimeout_actual << std::endl;
+  }
 
+  
+  
+  
   ProtectedParameterRead = true;
 }
 
@@ -1407,6 +1424,10 @@ void JointConfigurator::setProtectedParametersToJoint() {
 
     I2tLimit_Parameter.setParameter(I2tLimit_file);
     joint->setConfigurationParameter(I2tLimit_Parameter);
+    
+    MotorControllerTimeout_Parameter.setParameter(MotorControllerTimeout_file);
+    joint->setConfigurationParameter(MotorControllerTimeout_Parameter);
+    
 
     std::cout << "Protected Parameters set!" << std::endl;
 
@@ -1635,7 +1656,7 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     I2tLimit_Parameter.setParameter(I2tLimit_file);
     joint->storeConfigurationParameterPermanent(I2tLimit_Parameter);
-
+    
     std::cout << "Protected Parameters stored!" << std::endl;
   } catch (JointParameterException& e) {
 
