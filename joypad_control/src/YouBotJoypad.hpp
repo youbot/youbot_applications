@@ -196,9 +196,6 @@ private:
 	// to open or close the gripper
     youbot::GripperBarSpacingSetPoint barSpacing;
 
-	// variables to change the modes of the joints
-    youbot::NoMoreAction NOACT;
-    youbot::StopJoint    STOP;
 
 	//for saving globally valid button configurations
 	unsigned speedUpButton;

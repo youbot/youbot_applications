@@ -54,9 +54,6 @@ YouBotJoypad::YouBotJoypad(int numberOfAxis, int numberOfBalls, int numberOfHat,
 	armExisting		= false;
 	baseExisting	= false;
 
-	NOACT.setParameter(true);
-	STOP.setParameter(true);
-
 	configfile = NULL;
 }
 
