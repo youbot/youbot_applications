@@ -175,10 +175,6 @@ private:
   int PWMHysteresis_actual;
   int PWMHysteresis_file;
 
-  ClearISumIfPWMReachesMaximum ClearISumIfPWMReachesMaximum_Parameter;
-  bool ClearISumIfPWMReachesMaximum_actual;
-  bool ClearISumIfPWMReachesMaximum_file;
-
   PParameterFirstParametersSpeedControl PParameterFirstParametersSpeedControl_Parameter;
   int PParameterFirstParametersSpeedControl_actual;
   int PParameterFirstParametersSpeedControl_file;
@@ -331,14 +327,6 @@ private:
   int SineCompensationFactor_actual;
   int SineCompensationFactor_file;
 
-  EncoderNullPolarity EncoderNullPolarity_Parameter;
-  bool EncoderNullPolarity_actual;
-  bool EncoderNullPolarity_file;
-
-  MotorContollerGearRatio MotorContollerGearRatio_Parameter;
-  unsigned int MotorContollerGearRatio_actual;
-  unsigned int MotorContollerGearRatio_file;
-
   CommutationMode CommutationMode_Parameter;
   unsigned int CommutationMode_actual;
   unsigned int CommutationMode_file;
@@ -363,10 +351,6 @@ private:
   unsigned int MotorPoles_actual;
   unsigned int MotorPoles_file;
 
-  PIDControllerState PIDControllerState_Parameter;
-  int PIDControllerState_actual;
-  int PIDControllerState_file;
-
   PWMSchemeBlockCommutation PWMSchemeBlockCommutation_Parameter;
   unsigned int PWMSchemeBlockCommutation_actual;
   unsigned int PWMSchemeBlockCommutation_file;
@@ -390,6 +374,10 @@ private:
   I2tExceedCounter I2tExceedCounter_Parameter;
   unsigned int I2tExceedCounter_actual;
   unsigned int I2tExceedCounter_file;
+  
+  MotorHaltedVelocity MotorHaltedVelocity_Parameter;
+  int MotorHaltedVelocity_actual;
+  int MotorHaltedVelocity_file;
 
   ActualMotorVoltage ActualMotorVoltage_Parameter;
   unsigned int ActualMotorVoltage_actual;
@@ -407,6 +395,11 @@ private:
   quantity<si::angular_velocity> RampGeneratorSpeed_actual;
   I2tSum I2tSum_Parameter;
   unsigned int I2tSum_actual;
+  ActualMotorDriverTemperature ActualMotorDriverTemperature_Parameter;
+  quantity<celsius::temperature> ActualMotorDriverTemperature_actual;
+  
+  ActualModuleSupplyCurrent ActualModuleSupplyCurrent_Parameter;
+  quantity<si::current> ActualModuleSupplyCurrent_actual;
   
   MotorControllerTimeout MotorControllerTimeout_Parameter;
   quantity<si::time> MotorControllerTimeout_actual;
@@ -758,6 +751,27 @@ void JointConfigurator::readParameters() {
   } else {
     std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << std::endl;
   }
+  
+  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
+  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
+  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
+  } else {
+    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
+  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
+  PositionTargetReachedDistance_file = dummy;
+  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
+    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
+  } else {
+    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
+  }
+  
   ParameterRead = true;
 }
 
@@ -786,16 +800,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "MaximumMotorCurrent      \t\t\t\tactual: " << MaximumMotorCurrent_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
-  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
-  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
-    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
-  } else {
-    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
-  }
-
   joint->getConfigurationParameter(ClearTargetDistance_Parameter);
   ClearTargetDistance_Parameter.getParameter(ClearTargetDistance_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "ClearTargetDistance");
@@ -804,16 +808,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << " \tNEW VALUE: " << ClearTargetDistance_file << std::endl;
   } else {
     std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
-  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
-  PositionTargetReachedDistance_file = dummy;
-  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
-    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
-  } else {
-    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
   }
 
   joint->getConfigurationParameter(ThermalWindingTimeConstant_Parameter);
@@ -867,26 +861,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << " \tNEW VALUE: " << PWMHysteresis_file << std::endl;
   } else {
     std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(ClearISumIfPWMReachesMaximum_Parameter);
-  ClearISumIfPWMReachesMaximum_Parameter.getParameter(ClearISumIfPWMReachesMaximum_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "ClearISumIfPWMReachesMaximum");
-  ClearISumIfPWMReachesMaximum_file = dummy;
-  if (!AreSame(ClearISumIfPWMReachesMaximum_actual, ClearISumIfPWMReachesMaximum_file)) {
-    std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << " \tNEW VALUE: " << ClearISumIfPWMReachesMaximum_file << std::endl;
-  } else {
-    std::cout << "ClearISumIfPWMReachesMaximum   \t\t\t\tactual: " << ClearISumIfPWMReachesMaximum_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(PIDControllerState_Parameter);
-  PIDControllerState_Parameter.getParameter(PIDControllerState_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "PIDControllerState");
-  PIDControllerState_file = dummy;
-  if (!AreSame(PIDControllerState_actual, PIDControllerState_file)) {
-    std::cout << "PIDControllerState \t\t\t\t\tactual: " << PIDControllerState_actual << " \tNEW VALUE: " << PIDControllerState_file << std::endl;
-  } else {
-    std::cout << "PIDControllerState \t\t\t\t\tactual: " << PIDControllerState_actual << std::endl;
   }
 
   joint->getConfigurationParameter(CommutationMode_Parameter);
@@ -959,16 +933,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "CommutationMotorCurrent \t\t\t\tactual: " << CommutationMotorCurrent_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(MotorContollerGearRatio_Parameter);
-  MotorContollerGearRatio_Parameter.getParameter(MotorContollerGearRatio_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "MotorContollerGearRatio");
-  MotorContollerGearRatio_file = dummy;
-  if (!AreSame(MotorContollerGearRatio_actual, MotorContollerGearRatio_file)) {
-    std::cout << "MotorContollerGearRatio \t\t\t\tactual: " << MotorContollerGearRatio_actual << " \tNEW VALUE: " << MotorContollerGearRatio_file << std::endl;
-  } else {
-    std::cout << "MotorContollerGearRatio \t\t\t\tactual: " << MotorContollerGearRatio_actual << std::endl;
-  }
-
   joint->getConfigurationParameter(MassInertiaConstant_Parameter);
   MassInertiaConstant_Parameter.getParameter(MassInertiaConstant_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "MassInertiaConstant");
@@ -991,9 +955,8 @@ void JointConfigurator::readPasswordProtectedParameters() {
 
   joint->getConfigurationParameter(SineInitializationVelocity_Parameter);
   SineInitializationVelocity_Parameter.getParameter(SineInitializationVelocity_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "SineInitializationVelocity");
-  SineInitializationVelocity_file = dummy;
-  if (!AreSame(SineInitializationVelocity_actual, SineInitializationVelocity_file)) {
+  configfilePP->readInto(SineInitializationVelocity_file, "Joint_Parameter", "SineInitializationVelocity");
+  if (SineInitializationVelocity_actual != SineInitializationVelocity_file) {
     std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << " \tNEW VALUE: " << SineInitializationVelocity_file << std::endl;
   } else {
     std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << std::endl;
@@ -1058,17 +1021,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
   } else {
     std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << std::endl;
   }
-
-  joint->getConfigurationParameter(EncoderNullPolarity_Parameter);
-  EncoderNullPolarity_Parameter.getParameter(EncoderNullPolarity_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "EncoderNullPolarity");
-  EncoderNullPolarity_file = dummy;
-  if (!AreSame(EncoderNullPolarity_actual, EncoderNullPolarity_file)) {
-    std::cout << "EncoderNullPolarity \t\t\t\t\tactual: " << EncoderNullPolarity_actual << " \tNEW VALUE: " << EncoderNullPolarity_file << std::endl;
-  } else {
-    std::cout << "EncoderNullPolarity \t\t\t\t\tactual: " << EncoderNullPolarity_actual << std::endl;
-  }
-
 
   joint->getConfigurationParameter(EncoderResolution_Parameter);
   EncoderResolution_Parameter.getParameter(EncoderResolution_actual);
@@ -1150,6 +1102,15 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "MotorControllerTimeout \t\t\t\t\tactual: " << MotorControllerTimeout_actual << std::endl;
   }
 
+  joint->getConfigurationParameter(MotorHaltedVelocity_Parameter);
+  MotorHaltedVelocity_Parameter.getParameter(MotorHaltedVelocity_actual);
+  configfilePP->readInto(dummy, "Joint_Parameter", "MotorHaltedVelocity");
+  MotorHaltedVelocity_file = dummy;
+  if (!AreSame(MotorHaltedVelocity_actual, MotorHaltedVelocity_file)) {
+    std::cout << "MotorHaltedVelocity \t\t\t\t\tactual: " << MotorHaltedVelocity_actual << " \tNEW VALUE: " << MotorHaltedVelocity_file << std::endl;
+  } else {
+    std::cout << "MotorHaltedVelocity \t\t\t\t\tactual: " << MotorHaltedVelocity_actual << std::endl;
+  }
   
   
   
@@ -1205,6 +1166,15 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(I2tExceedCounter_Parameter);
   I2tExceedCounter_Parameter.getParameter(I2tExceedCounter_actual);
   std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << std::endl;
+  
+  joint->getConfigurationParameter(ActualMotorDriverTemperature_Parameter);
+  ActualMotorDriverTemperature_Parameter.getParameter(ActualMotorDriverTemperature_actual);
+  std::cout << "ActualMotorDriverTemperature \t\t\t\tactual: " << ActualMotorDriverTemperature_actual << std::endl;
+  
+//  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
+//  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
+//  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
+  
 
 }
 
@@ -1303,6 +1273,11 @@ void JointConfigurator::setParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
 
+  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+    
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+ joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
 
   std::cout << "Parameters set!" << std::endl;
 }
@@ -1320,14 +1295,8 @@ void JointConfigurator::setProtectedParametersToJoint() {
     MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
     joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
 
-    MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-    joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-
     ClearTargetDistance_Parameter.setParameter(ClearTargetDistance_file);
     joint->setConfigurationParameter(ClearTargetDistance_Parameter);
-
-    PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-    joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
 
     PIDControlTime_Parameter.setParameter(PIDControlTime_file);
     joint->setConfigurationParameter(PIDControlTime_Parameter);
@@ -1337,9 +1306,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
 
     PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
     joint->setConfigurationParameter(PWMHysteresis_Parameter);
-
-    ClearISumIfPWMReachesMaximum_Parameter.setParameter(ClearISumIfPWMReachesMaximum_file);
-    joint->setConfigurationParameter(ClearISumIfPWMReachesMaximum_Parameter);
 
     SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
     joint->setConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
@@ -1386,12 +1352,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
     SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
     joint->setConfigurationParameter(SineCompensationFactor_Parameter);
 
-    EncoderNullPolarity_Parameter.setParameter(EncoderNullPolarity_file);
-    joint->setConfigurationParameter(EncoderNullPolarity_Parameter);
-
-    MotorContollerGearRatio_Parameter.setParameter(MotorContollerGearRatio_file);
-    joint->setConfigurationParameter(MotorContollerGearRatio_Parameter);
-
     CommutationMode_Parameter.setParameter(CommutationMode_file);
     joint->setConfigurationParameter(CommutationMode_Parameter);
 
@@ -1410,9 +1370,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
     MotorPoles_Parameter.setParameter(MotorPoles_file);
     joint->setConfigurationParameter(MotorPoles_Parameter);
 
-    PIDControllerState_Parameter.setParameter(PIDControllerState_file);
-    joint->setConfigurationParameter(PIDControllerState_Parameter);
-
     PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
     joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
 
@@ -1428,7 +1385,9 @@ void JointConfigurator::setProtectedParametersToJoint() {
     MotorControllerTimeout_Parameter.setParameter(MotorControllerTimeout_file);
     joint->setConfigurationParameter(MotorControllerTimeout_Parameter);
     
-
+    MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
+    joint->setConfigurationParameter(MotorHaltedVelocity_Parameter);
+    
     std::cout << "Protected Parameters set!" << std::endl;
 
   } catch (JointParameterException& e) {
@@ -1534,6 +1493,11 @@ void JointConfigurator::storeParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
 
+  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+    
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
 
   std::cout << "Parameters stored!" << std::endl;
 }
@@ -1552,14 +1516,8 @@ void JointConfigurator::storeProtectedParametersToJoint() {
     MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
     joint->storeConfigurationParameterPermanent(MaximumMotorCurrent_Parameter);
 
-    MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-    joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
-
     ClearTargetDistance_Parameter.setParameter(ClearTargetDistance_file);
     joint->storeConfigurationParameterPermanent(ClearTargetDistance_Parameter);
-
-    PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-    joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
 
     PIDControlTime_Parameter.setParameter(PIDControlTime_file);
     joint->storeConfigurationParameterPermanent(PIDControlTime_Parameter);
@@ -1569,9 +1527,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
     joint->storeConfigurationParameterPermanent(PWMHysteresis_Parameter);
-
-    ClearISumIfPWMReachesMaximum_Parameter.setParameter(ClearISumIfPWMReachesMaximum_file);
-    joint->storeConfigurationParameterPermanent(ClearISumIfPWMReachesMaximum_Parameter);
 
     SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
     joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroAtNextNChannel_Parameter);
@@ -1618,12 +1573,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
     SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
     joint->storeConfigurationParameterPermanent(SineCompensationFactor_Parameter);
 
-    EncoderNullPolarity_Parameter.setParameter(EncoderNullPolarity_file);
-    joint->storeConfigurationParameterPermanent(EncoderNullPolarity_Parameter);
-
-    MotorContollerGearRatio_Parameter.setParameter(MotorContollerGearRatio_file);
-    joint->storeConfigurationParameterPermanent(MotorContollerGearRatio_Parameter);
-
     CommutationMode_Parameter.setParameter(CommutationMode_file);
     joint->storeConfigurationParameterPermanent(CommutationMode_Parameter);
 
@@ -1642,9 +1591,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
     MotorPoles_Parameter.setParameter(MotorPoles_file);
     joint->storeConfigurationParameterPermanent(MotorPoles_Parameter);
 
-    PIDControllerState_Parameter.setParameter(PIDControllerState_file);
-    joint->storeConfigurationParameterPermanent(PIDControllerState_Parameter);
-
     PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
     joint->storeConfigurationParameterPermanent(PWMSchemeBlockCommutation_Parameter);
 
@@ -1656,6 +1602,11 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     I2tLimit_Parameter.setParameter(I2tLimit_file);
     joint->storeConfigurationParameterPermanent(I2tLimit_Parameter);
+    
+    MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
+    joint->storeConfigurationParameterPermanent(MotorHaltedVelocity_Parameter);
+    
+    
     
     std::cout << "Protected Parameters stored!" << std::endl;
   } catch (JointParameterException& e) {
