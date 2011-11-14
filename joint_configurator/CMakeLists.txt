@@ -1,6 +1,15 @@
 PROJECT(youBot_JointConfigurator)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+
+SET(ROS_ROOT_PATH $ENV{ROS_ROOT})
+
+IF(DEFINED ROS_ROOT_PATH)
+	include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+	rosbuild_find_ros_package(soem)
+  rosbuild_find_ros_package(youbot_driver)
+ENDIF(DEFINED ROS_ROOT_PATH)
+
 ## check required prerequisites
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/cmake_modules")
 SET(Boost_USE_STATIC_LIBS ON)
@@ -11,12 +20,15 @@ FIND_PACKAGE(OODL_YouBot REQUIRED)
 
 
 ## preprocessor definitions
+SET(CMAKE_C_FLAGS_DEBUG "-fPIC -Wall -g")
+SET(CMAKE_CXX_FLAGS_DEBUG "-fPIC -O0 -g")
+
 IF(NOT DEFINED JOINT_CONFIGURATOR_CONFIG_DIR)
-  SET(JOINT_CONFIGURATOR_CONFIG_DIR ${CMAKE_HOME_DIRECTORY}/config)
+  SET(JOINT_CONFIGURATOR_CONFIG_DIR ${CMAKE_HOME_DIRECTORY}/config/)
 ENDIF(NOT DEFINED JOINT_CONFIGURATOR_CONFIG_DIR)
 
-ADD_DEFINITIONS(-DYOUBOT_CONFIGURATIONS_DIR="${OODL_YOUBOT_CONFIG_DIR}/")
-ADD_DEFINITIONS(-DCONFIG_DIR="${JOINT_CONFIGURATOR_CONFIG_DIR}/")
+ADD_DEFINITIONS(-DYOUBOT_CONFIGURATIONS_DIR="${OODL_YOUBOT_CONFIG_DIR}")
+ADD_DEFINITIONS(-DCONFIG_DIR="${JOINT_CONFIGURATOR_CONFIG_DIR}")
 
 ## build parameters and paths
 SET(CMAKE_BUILD_TYPE DEBUG) #enable debug mode (e.g. for embedded gdb in eclipse )
@@ -33,18 +45,23 @@ INCLUDE_DIRECTORIES(
 ## Compile and link
 ADD_EXECUTABLE(youBot_JointConfigurator
   src/JointConfiguratorMain.cpp
-  src/JointConfigurator.cpp
 )
 
 ADD_EXECUTABLE(youBot_ArmConfigurator
   src/ArmConfigurator.cpp
-  src/JointConfigurator.cpp
 )
 
 ADD_EXECUTABLE(youBot_BaseConfigurator
   src/BaseConfigurator.cpp
+)
+
+ADD_LIBRARY(JointConfigurator
   src/JointConfigurator.cpp
 )
+
+ADD_LIBRARY(JointConfiguratorShared SHARED)
+SET_TARGET_PROPERTIES(JointConfiguratorShared PROPERTIES OUTPUT_NAME "JointConfigurator")
+TARGET_LINK_LIBRARIES(JointConfiguratorShared -Wl,-whole-archive JointConfigurator -Wl,-no-whole-archive)
 
 SET(YOUBOT_DRIVER_CONFIG
 ${CMAKE_HOME_DIRECTORY}/config/arm.cfg
@@ -63,6 +80,7 @@ TARGET_LINK_LIBRARIES(youBot_JointConfigurator
 	${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
+  JointConfigurator
 )
 
 TARGET_LINK_LIBRARIES(youBot_ArmConfigurator
@@ -70,6 +88,7 @@ TARGET_LINK_LIBRARIES(youBot_ArmConfigurator
 	${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
+  JointConfigurator
 )
 
 TARGET_LINK_LIBRARIES(youBot_BaseConfigurator
@@ -77,6 +96,7 @@ TARGET_LINK_LIBRARIES(youBot_BaseConfigurator
 	${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
+  JointConfigurator
 )
 
 MACRO(INSTALL_CONFIG_WITH_DIRECTORY CONFIG_LIST)

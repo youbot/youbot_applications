@@ -1,0 +1,13 @@
+<package>
+  <description brief="joint_configurator">
+
+     joint_configurator
+
+  </description>
+  <author>Jan Paulus</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>https://github.com/youbot/youbot_applications</url>
+</package>
+
+
