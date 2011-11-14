@@ -79,6 +79,7 @@ int YouBotJoypad::init(std::string joypadCfgName, std::string path)
 	try
 	{
 		youBotBase = new youbot::YouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);
+    youBotBase->doJointCommutation();
 		baseExisting = true;
 
 		quantity<angular_acceleration> angAcc;

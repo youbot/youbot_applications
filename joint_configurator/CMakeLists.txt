@@ -32,6 +32,17 @@ INCLUDE_DIRECTORIES(
 
 ## Compile and link
 ADD_EXECUTABLE(youBot_JointConfigurator
+  src/JointConfiguratorMain.cpp
+  src/JointConfigurator.cpp
+)
+
+ADD_EXECUTABLE(youBot_ArmConfigurator
+  src/ArmConfigurator.cpp
+  src/JointConfigurator.cpp
+)
+
+ADD_EXECUTABLE(youBot_BaseConfigurator
+  src/BaseConfigurator.cpp
   src/JointConfigurator.cpp
 )
 
@@ -54,6 +65,20 @@ TARGET_LINK_LIBRARIES(youBot_JointConfigurator
 	pthread
 )
 
+TARGET_LINK_LIBRARIES(youBot_ArmConfigurator
+	${OODL_YOUBOT_LIBRARIES}
+	${SOEM_LIBRARIES}
+	${Boost_LIBRARIES}
+	pthread
+)
+
+TARGET_LINK_LIBRARIES(youBot_BaseConfigurator
+	${OODL_YOUBOT_LIBRARIES}
+	${SOEM_LIBRARIES}
+	${Boost_LIBRARIES}
+	pthread
+)
+
 MACRO(INSTALL_CONFIG_WITH_DIRECTORY CONFIG_LIST)
   FOREACH(CONFIG ${${CONFIG_LIST}})
     STRING(REGEX MATCH "(.*)[/\\]" DIR ${CONFIG})
@@ -64,4 +89,4 @@ ENDMACRO(INSTALL_CONFIG_WITH_DIRECTORY)
 
 INSTALL_CONFIG_WITH_DIRECTORY(YOUBOT_DRIVER_CONFIG)
 
-INSTALL(TARGETS youBot_JointConfigurator RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+INSTALL(TARGETS youBot_JointConfigurator youBot_ArmConfigurator RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)

@@ -50,382 +50,29 @@
  ****************************************************************/
 
 
-#include <cmath>
-#include <limits>
-#include <iostream>
-#include <vector>
-#include <signal.h>
-#include "youbot/YouBotJointParameter.hpp"
-#include "youbot/YouBotGripper.hpp"
-#include "youbot/YouBotBase.hpp"
-#include "youbot/YouBotManipulator.hpp"
-#include "boost/date_time/posix_time/posix_time.hpp"
-#include <vector>
-#include <sstream>
-#include <boost/limits.hpp>
-#include "generic/Logger.hpp"
-#include "generic/Units.hpp"
-#include "generic/Time.hpp"
-#include "generic/Exceptions.hpp"
-#include "generic-joint/JointParameter.hpp"
-#include "youbot/YouBotJointParameterReadOnly.hpp"
+#include "JointConfigurator.hpp"
 
-enum part {
-  BASE,
-  ARM
-};
 
-
-using namespace std;
-using namespace youbot;
-
-class JointConfigurator {
-public:
-
-  JointConfigurator(part baseOrArm, int jointNumber, std::string configname = "joint-parameter.cfg", std::string configNameProtected = "protected-joint-parameter.cfg");
-
-  ~JointConfigurator();
-  void readParameters();
-  void readPasswordProtectedParameters();
-  void readReadOnlyParameters();
-  void setParametersToJoint();
-  void storeParametersToJoint();
-  void setProtectedParametersToJoint();
-  void storeProtectedParametersToJoint();
-  void getPassword();
-  void menu();
-
-private:
-
-  bool AreSame(double A, double B);
-  YouBotJoint* joint;
-  ConfigFile* configfile;
-  ConfigFile* configfilePP;
-  bool ParameterRead;
-  bool ProtectedParameterRead;
-  part ArmOrBase;
-  int jointNumber;
-  int controllerType;
-  double version;
-  std::string jointName;
-  YouBotManipulator* myYouBotManipulator;
-  YouBotBase* myYouBotBase;
-
-  MaximumPositioningVelocity MaximumPositioningVelocity_Parameter;
-  quantity<angular_velocity> MaximumPositioningVelocity_actual;
-  quantity<angular_velocity> MaximumPositioningVelocity_file;
-
-  PWMLimit PWMLimit_Parameter;
-  unsigned int PWMLimit_actual;
-  unsigned int PWMLimit_file;
-
-  MaximumMotorCurrent MaximumMotorCurrent_Parameter;
-  quantity<current> MaximumMotorCurrent_actual;
-  quantity<current> MaximumMotorCurrent_file;
-
-  MaximumVelocityToSetPosition MaximumVelocityToSetPosition_Parameter;
-  quantity<angular_velocity> MaximumVelocityToSetPosition_actual;
-  quantity<angular_velocity> MaximumVelocityToSetPosition_file;
-
-  SpeedControlSwitchingThreshold SpeedControlSwitchingThreshold_Parameter;
-  quantity<angular_velocity> SpeedControlSwitchingThreshold_actual;
-  quantity<angular_velocity> SpeedControlSwitchingThreshold_file;
-
-  ClearTargetDistance ClearTargetDistance_Parameter;
-  int ClearTargetDistance_actual;
-  int ClearTargetDistance_file;
-
-  PositionTargetReachedDistance PositionTargetReachedDistance_Parameter;
-  int PositionTargetReachedDistance_actual;
-  int PositionTargetReachedDistance_file;
-
-  MotorAcceleration MotorAcceleration_Parameter;
-  quantity<angular_acceleration> MotorAcceleration_actual;
-  quantity<angular_acceleration> MotorAcceleration_file;
-
-  PositionControlSwitchingThreshold PositionControlSwitchingThreshold_Parameter;
-  quantity<angular_velocity> PositionControlSwitchingThreshold_actual;
-  quantity<angular_velocity> PositionControlSwitchingThreshold_file;
-
-  PParameterFirstParametersPositionControl PParameterFirstParametersPositionControl_Parameter;
-  int PParameterFirstParametersPositionControl_actual;
-  int PParameterFirstParametersPositionControl_file;
-
-  IParameterFirstParametersPositionControl IParameterFirstParametersPositionControl_Parameter;
-  int IParameterFirstParametersPositionControl_actual;
-  int IParameterFirstParametersPositionControl_file;
-
-  DParameterFirstParametersPositionControl DParameterFirstParametersPositionControl_Parameter;
-  int DParameterFirstParametersPositionControl_actual;
-  int DParameterFirstParametersPositionControl_file;
-
-  PIDControlTime PIDControlTime_Parameter;
-  quantity<si::time> PIDControlTime_actual;
-  quantity<si::time> PIDControlTime_file;
-
-  CurrentControlLoopDelay CurrentControlLoopDelay_Parameter;
-  quantity<si::time> CurrentControlLoopDelay_actual;
-  quantity<si::time> CurrentControlLoopDelay_file;
-
-  IClippingParameterFirstParametersPositionControl IClippingParameterFirstParametersPositionControl_Parameter;
-  int IClippingParameterFirstParametersPositionControl_actual;
-  int IClippingParameterFirstParametersPositionControl_file;
-
-  PWMHysteresis PWMHysteresis_Parameter;
-  int PWMHysteresis_actual;
-  int PWMHysteresis_file;
-
-  PParameterFirstParametersSpeedControl PParameterFirstParametersSpeedControl_Parameter;
-  int PParameterFirstParametersSpeedControl_actual;
-  int PParameterFirstParametersSpeedControl_file;
-
-  IParameterFirstParametersSpeedControl IParameterFirstParametersSpeedControl_Parameter;
-  int IParameterFirstParametersSpeedControl_actual;
-  int IParameterFirstParametersSpeedControl_file;
-
-  DParameterFirstParametersSpeedControl DParameterFirstParametersSpeedControl_Parameter;
-  int DParameterFirstParametersSpeedControl_actual;
-  int DParameterFirstParametersSpeedControl_file;
-
-  IClippingParameterFirstParametersSpeedControl IClippingParameterFirstParametersSpeedControl_Parameter;
-  int IClippingParameterFirstParametersSpeedControl_actual;
-  int IClippingParameterFirstParametersSpeedControl_file;
-
-  RampGeneratorSpeedAndPositionControl RampGeneratorSpeedAndPositionControl_Parameter;
-  bool RampGeneratorSpeedAndPositionControl_actual;
-  bool RampGeneratorSpeedAndPositionControl_file;
-
-  SetEncoderCounterZeroAtNextNChannel SetEncoderCounterZeroAtNextNChannel_Parameter;
-  bool SetEncoderCounterZeroAtNextNChannel_actual;
-  bool SetEncoderCounterZeroAtNextNChannel_file;
-
-  SetEncoderCounterZeroAtNextSwitch SetEncoderCounterZeroAtNextSwitch_Parameter;
-  bool SetEncoderCounterZeroAtNextSwitch_actual;
-  bool SetEncoderCounterZeroAtNextSwitch_file;
-
-  SetEncoderCounterZeroOnlyOnce SetEncoderCounterZeroOnlyOnce_Parameter;
-  bool SetEncoderCounterZeroOnlyOnce_actual;
-  bool SetEncoderCounterZeroOnlyOnce_file;
-
-  EncoderStopSwitch EncoderStopSwitch_Parameter;
-  unsigned int EncoderStopSwitch_actual;
-  unsigned int EncoderStopSwitch_file;
-
-  ActualCommutationOffset ActualCommutationOffset_Parameter;
-  int ActualCommutationOffset_actual;
-  int ActualCommutationOffset_file;
-
-  StopSwitchPolarity StopSwitchPolarity_Parameter;
-  unsigned int StopSwitchPolarity_actual;
-  unsigned int StopSwitchPolarity_file;
-
-  PParameterFirstParametersCurrentControl PParameterFirstParametersCurrentControl_Parameter;
-  int PParameterFirstParametersCurrentControl_actual;
-  int PParameterFirstParametersCurrentControl_file;
-
-  IParameterFirstParametersCurrentControl IParameterFirstParametersCurrentControl_Parameter;
-  int IParameterFirstParametersCurrentControl_actual;
-  int IParameterFirstParametersCurrentControl_file;
-
-  DParameterFirstParametersCurrentControl DParameterFirstParametersCurrentControl_Parameter;
-  int DParameterFirstParametersCurrentControl_actual;
-  int DParameterFirstParametersCurrentControl_file;
-
-  IClippingParameterFirstParametersCurrentControl IClippingParameterFirstParametersCurrentControl_Parameter;
-  int IClippingParameterFirstParametersCurrentControl_actual;
-  int IClippingParameterFirstParametersCurrentControl_file;
-
-  PParameterSecondParametersCurrentControl PParameterSecondParametersCurrentControl_Parameter;
-  int PParameterSecondParametersCurrentControl_actual;
-  int PParameterSecondParametersCurrentControl_file;
-
-  IParameterSecondParametersCurrentControl IParameterSecondParametersCurrentControl_Parameter;
-  int IParameterSecondParametersCurrentControl_actual;
-  int IParameterSecondParametersCurrentControl_file;
-
-  DParameterSecondParametersCurrentControl DParameterSecondParametersCurrentControl_Parameter;
-  int DParameterSecondParametersCurrentControl_actual;
-  int DParameterSecondParametersCurrentControl_file;
-
-  IClippingParameterSecondParametersCurrentControl IClippingParameterSecondParametersCurrentControl_Parameter;
-  int IClippingParameterSecondParametersCurrentControl_actual;
-  int IClippingParameterSecondParametersCurrentControl_file;
-
-  CurrentControlSwitchingThreshold CurrentControlSwitchingThreshold_Parameter;
-  quantity<angular_velocity> CurrentControlSwitchingThreshold_actual;
-  quantity<angular_velocity> CurrentControlSwitchingThreshold_file;
-
-  CommutationMotorCurrent CommutationMotorCurrent_Parameter;
-  quantity<current> CommutationMotorCurrent_actual;
-  quantity<current> CommutationMotorCurrent_file;
-
-  PParameterSecondParametersPositionControl PParameterSecondParametersPositionControl_Parameter;
-  int PParameterSecondParametersPositionControl_actual;
-  int PParameterSecondParametersPositionControl_file;
-
-  IParameterSecondParametersPositionControl IParameterSecondParametersPositionControl_Parameter;
-  int IParameterSecondParametersPositionControl_actual;
-  int IParameterSecondParametersPositionControl_file;
-
-  DParameterSecondParametersPositionControl DParameterSecondParametersPositionControl_Parameter;
-  int DParameterSecondParametersPositionControl_actual;
-  int DParameterSecondParametersPositionControl_file;
-
-  IClippingParameterSecondParametersPositionControl IClippingParameterSecondParametersPositionControl_Parameter;
-  int IClippingParameterSecondParametersPositionControl_actual;
-  int IClippingParameterSecondParametersPositionControl_file;
-
-  PParameterSecondParametersSpeedControl PParameterSecondParametersSpeedControl_Parameter;
-  int PParameterSecondParametersSpeedControl_actual;
-  int PParameterSecondParametersSpeedControl_file;
-
-  IParameterSecondParametersSpeedControl IParameterSecondParametersSpeedControl_Parameter;
-  int IParameterSecondParametersSpeedControl_actual;
-  int IParameterSecondParametersSpeedControl_file;
-
-  DParameterSecondParametersSpeedControl DParameterSecondParametersSpeedControl_Parameter;
-  int DParameterSecondParametersSpeedControl_actual;
-  int DParameterSecondParametersSpeedControl_file;
-
-  IClippingParameterSecondParametersSpeedControl IClippingParameterSecondParametersSpeedControl_Parameter;
-  int IClippingParameterSecondParametersSpeedControl_actual;
-  int IClippingParameterSecondParametersSpeedControl_file;
-
-  MassInertiaConstant MassInertiaConstant_Parameter;
-  int MassInertiaConstant_actual;
-  int MassInertiaConstant_file;
-
-  BEMFConstant BEMFConstant_Parameter;
-  int BEMFConstant_actual;
-  int BEMFConstant_file;
-
-  SineInitializationVelocity SineInitializationVelocity_Parameter;
-  int SineInitializationVelocity_actual;
-  int SineInitializationVelocity_file;
-
-  CommutationCompensationClockwise CommutationCompensationClockwise_Parameter;
-  int CommutationCompensationClockwise_actual;
-  int CommutationCompensationClockwise_file;
-
-  CommutationCompensationCounterClockwise CommutationCompensationCounterClockwise_Parameter;
-  int CommutationCompensationCounterClockwise_actual;
-  int CommutationCompensationCounterClockwise_file;
-
-  InitSineDelay InitSineDelay_Parameter;
-  quantity<si::time> InitSineDelay_actual;
-  quantity<si::time> InitSineDelay_file;
-
-  ActivateOvervoltageProtection ActivateOvervoltageProtection_Parameter;
-  bool ActivateOvervoltageProtection_actual;
-  bool ActivateOvervoltageProtection_file;
-
-  MaximumPWMChangePerPIDInterval MaximumPWMChangePerPIDInterval_Parameter;
-  int MaximumPWMChangePerPIDInterval_actual;
-  int MaximumPWMChangePerPIDInterval_file;
-
-  SineCompensationFactor SineCompensationFactor_Parameter;
-  int SineCompensationFactor_actual;
-  int SineCompensationFactor_file;
-
-  CommutationMode CommutationMode_Parameter;
-  unsigned int CommutationMode_actual;
-  unsigned int CommutationMode_file;
-
-  EncoderResolution EncoderResolution_Parameter;
-  unsigned int EncoderResolution_actual;
-  unsigned int EncoderResolution_file;
-
-  HallSensorPolarityReversal HallSensorPolarityReversal_Parameter;
-  bool HallSensorPolarityReversal_actual;
-  bool HallSensorPolarityReversal_file;
-
-  InitializationMode InitializationMode_Parameter;
-  int InitializationMode_actual;
-  int InitializationMode_file;
-
-  MotorCoilResistance MotorCoilResistance_Parameter;
-  quantity<resistance> MotorCoilResistance_actual;
-  quantity<resistance> MotorCoilResistance_file;
-
-  MotorPoles MotorPoles_Parameter;
-  unsigned int MotorPoles_actual;
-  unsigned int MotorPoles_file;
-
-  PWMSchemeBlockCommutation PWMSchemeBlockCommutation_Parameter;
-  unsigned int PWMSchemeBlockCommutation_actual;
-  unsigned int PWMSchemeBlockCommutation_file;
-
-  ReversingEncoderDirection ReversingEncoderDirection_Parameter;
-  bool ReversingEncoderDirection_actual;
-  bool ReversingEncoderDirection_file;
-
-  OperationalTime OperationalTime_Parameter;
-  quantity<si::time> OperationalTime_actual;
-  quantity<si::time> OperationalTime_file;
-
-  ThermalWindingTimeConstant ThermalWindingTimeConstant_Parameter;
-  quantity<si::time> ThermalWindingTimeConstant_actual;
-  quantity<si::time> ThermalWindingTimeConstant_file;
-
-  I2tLimit I2tLimit_Parameter;
-  unsigned int I2tLimit_actual;
-  unsigned int I2tLimit_file;
-
-  I2tExceedCounter I2tExceedCounter_Parameter;
-  unsigned int I2tExceedCounter_actual;
-  unsigned int I2tExceedCounter_file;
-  
-  MotorHaltedVelocity MotorHaltedVelocity_Parameter;
-  int MotorHaltedVelocity_actual;
-  int MotorHaltedVelocity_file;
-
-  ActualMotorVoltage ActualMotorVoltage_Parameter;
-  unsigned int ActualMotorVoltage_actual;
-  ActualPWMDutyCycle ActualPWMDutyCycle_Parameter;
-  unsigned int ActualPWMDutyCycle_actual;
-  PositionError PositionError_Parameter;
- quantity<plane_angle> PositionError_actual;
-  PositionErrorSum PositionErrorSum_Parameter;
-  quantity<plane_angle> PositionErrorSum_actual;
-  VelocityError VelocityError_Parameter;
-  quantity<si::angular_velocity> VelocityError_actual;
-  VelocityErrorSum VelocityErrorSum_Parameter;
-  quantity<si::angular_velocity> VelocityErrorSum_actual;
-  RampGeneratorSpeed RampGeneratorSpeed_Parameter;
-  quantity<si::angular_velocity> RampGeneratorSpeed_actual;
-  I2tSum I2tSum_Parameter;
-  unsigned int I2tSum_actual;
-  ActualMotorDriverTemperature ActualMotorDriverTemperature_Parameter;
-  quantity<celsius::temperature> ActualMotorDriverTemperature_actual;
-  
-  ActualModuleSupplyCurrent ActualModuleSupplyCurrent_Parameter;
-  quantity<si::current> ActualModuleSupplyCurrent_actual;
-  
-  MotorControllerTimeout MotorControllerTimeout_Parameter;
-  quantity<si::time> MotorControllerTimeout_actual;
-  quantity<si::time> MotorControllerTimeout_file;
-
-};
-
-JointConfigurator::JointConfigurator(part baseOrArm, int jointNumber, std::string configname, std::string configNameProtected) {
+JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string configpath, std::string configname, std::string configNameProtected) {
 
   ParameterRead = false;
   ProtectedParameterRead = false;
-  configfile = new ConfigFile(configname, std::string(CONFIG_DIR));
-  configfilePP = new ConfigFile(configNameProtected, std::string(CONFIG_DIR));
-  this->ArmOrBase = baseOrArm;
-  this->jointNumber = jointNumber;
-
-  if (baseOrArm == ARM) {
-    myYouBotManipulator = new YouBotManipulator("youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
-    joint = &(myYouBotManipulator->getArmJoint(jointNumber));
-  } else if (baseOrArm == BASE) {
-    myYouBotBase = new YouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);
-    joint = &(myYouBotBase->getBaseJoint(jointNumber));
-  } else {
-    throw "unable to create joint";
+  
+  if(configname == ""){
+    UseParameter = false;
+  }else{
+    configfile = new ConfigFile(configname, configpath);
+    UseParameter = true;
+  }
+  
+  if(configNameProtected == ""){
+    UseProtectedParameter = false;
+  }else{
+    configfilePP = new ConfigFile(configNameProtected, configpath);
+    UseProtectedParameter = true;
   }
 
+  this->joint = youbotjoint;
   FirmwareVersion firmwareVersion;
 
   joint->getConfigurationParameter(firmwareVersion);
@@ -449,8 +96,15 @@ bool JointConfigurator::AreSame(double A, double B) {
 
 void JointConfigurator::readParameters() {
   double dummy;
+  
+  if (!UseParameter) {
+    std::cout << "There is no configuration file provided for the parameters!" << std::endl;
+    return;
+  }
 
-  std::cout << std::endl;
+  std::cout << std::endl << "===========================================================" << std::endl;
+  std::cout << "Joint: "  << jointName  << std::endl;
+  std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   joint->getConfigurationParameter(MaximumPositioningVelocity_Parameter);
   MaximumPositioningVelocity_Parameter.getParameter(MaximumPositioningVelocity_actual);
@@ -752,31 +406,39 @@ void JointConfigurator::readParameters() {
     std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << std::endl;
   }
   
-  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
-  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
-  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
-    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
-  } else {
-    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
-  }
+//  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+//  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
+//  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
+//  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
+//  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
+//  } else {
+//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
+//  }
   
-  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
-  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
-  PositionTargetReachedDistance_file = dummy;
-  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
-    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
-  } else {
-    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
-  }
+//  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
+//  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
+//  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
+//  PositionTargetReachedDistance_file = dummy;
+//  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
+//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
+//  } else {
+//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
+//  }
   
   ParameterRead = true;
 }
 
 void JointConfigurator::readPasswordProtectedParameters() {
+  
+  if (!UseProtectedParameter) {
+    std::cout << "There is no configuration file provided for the protected parameters!" << std::endl;
+    return;
+  }
+  
   std::cout << "===================== Password Protected Parameters =====================" << std::endl;
+  std::cout << "Joint: "  << jointName  << std::endl;
+  std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   double dummy;
 
@@ -1122,6 +784,8 @@ void JointConfigurator::readPasswordProtectedParameters() {
 void JointConfigurator::readReadOnlyParameters() {
   
   std::cout << "===================== Read Only Parameters =====================" << std::endl;
+  std::cout << "Joint: "  << jointName  << std::endl;
+  std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   joint->getConfigurationParameter(OperationalTime_Parameter);
   OperationalTime_Parameter.getParameter(OperationalTime_actual);
@@ -1273,13 +937,14 @@ void JointConfigurator::setParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+//  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
     
-  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
- joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+//  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+//  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
 
-  std::cout << "Parameters set!" << std::endl;
+  std::cout << "Parameters set for Joint: "<< jointName << std::endl;
+  
 }
 
 void JointConfigurator::setProtectedParametersToJoint() {
@@ -1388,7 +1053,7 @@ void JointConfigurator::setProtectedParametersToJoint() {
     MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
     joint->setConfigurationParameter(MotorHaltedVelocity_Parameter);
     
-    std::cout << "Protected Parameters set!" << std::endl;
+    std::cout << "Protected Parameters set for Joint: "<< jointName << std::endl;
 
   } catch (JointParameterException& e) {
 
@@ -1493,13 +1158,13 @@ void JointConfigurator::storeParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+//  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
     
   PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+//  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
 
-  std::cout << "Parameters stored!" << std::endl;
+  std::cout << "Parameters stored for Joint: "<< jointName << std::endl;
 }
 
 void JointConfigurator::storeProtectedParametersToJoint() {
@@ -1608,7 +1273,7 @@ void JointConfigurator::storeProtectedParametersToJoint() {
     
     
     
-    std::cout << "Protected Parameters stored!" << std::endl;
+    std::cout << "Protected Parameters stored for Joint: "<< jointName << std::endl;
   } catch (JointParameterException& e) {
 
   }
@@ -1623,141 +1288,4 @@ void JointConfigurator::getPassword() {
   approveParameters.setParameter(password);
   joint->setConfigurationParameter(approveParameters);
 
-}
-
-void JointConfigurator::menu() {
-
-  if (ArmOrBase == ARM) {
-    std::cout << std::endl << "Manipulator Joint " << jointNumber << " | " << jointName  << std::endl;
-    std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl;
-  } else if (ArmOrBase == BASE) {
-    std::cout << std::endl << "Base Joint " << jointNumber << " | " << jointName  << std::endl;
-    std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl;
-  }
-
-  std::cout << "===========================================================" << std::endl;
-  std::cout << "1 = show parameters from joint and config file" << std::endl;
-  std::cout << "2 = set config file values to joint" << std::endl;
-  std::cout << "3 = store config file values to joint" << std::endl;
-  std::cout << "===========================================================" << std::endl;
-  std::cout << "4 = show password protected parameters" << std::endl;
-  std::cout << "5 = enter password" << std::endl;
-  std::cout << "6 = set password protected parameters" << std::endl;
-  std::cout << "7 = store password protected parameters" << std::endl;
-  std::cout << "===========================================================" << std::endl;
-  std::cout << "8 = show read only parameters" << std::endl;
-  std::cout << "0 = quit" << std::endl;
-  std::cout << "===========================================================" << std::endl;
-  std::cout << ": " << std::flush;
-}
-
-
-bool running = true;
-
-void sigintHandler(int signal) {
-  running = false;
-
-  std::cout << std::endl << " Interrupt!" << std::endl;
-
-}
-
-int main(int argc, char *argv[]) {
-
-//  signal(SIGINT, sigintHandler);
-
-  try {
-
-    if (argc < 3 || argc > 5) {
-      std::cout << "Usage:   sudo ./JointConfigurator MODULE JOINTNUMBER [CONFIGFILE] " << std::endl;
-      std::cout << "Example: sudo ./JointConfigurator base 1" << std::endl;
-      std::cout << "         sudo ./JointConfigurator arm 1 joint-parameter.cfg" << std::endl;
-      return 0;
-    }
-
-    part baseOrArm;
-    std::string arg2 = argv[1];
-
-    if (arg2 == "base") {
-      baseOrArm = BASE;
-    } else if (arg2 == "arm") {
-      baseOrArm = ARM;
-    } else {
-      std::cout << "Usage:   sudo ./JointConfigurator MODULE JOINTNUMBER [CONFIGFILE] " << std::endl;
-      std::cout << "Example: sudo ./JointConfigurator base 1" << std::endl;
-      std::cout << "         sudo ./JointConfigurator arm 1 joint-parameter.cfg" << std::endl;
-      return 0;
-    }
-
-    int jointNo = 0;
-    jointNo = atoi(argv[2]);
-
-    std::string configfile = "joint-parameter.cfg";
-    std::string configfileProtected = "protected-joint-parameter.cfg";
-
-    if (argc >= 4) {
-      configfile = argv[3];
-    }
-
-    if (argc >= 5) {
-      configfileProtected = argv[4];
-    }
-
-    JointConfigurator helper(baseOrArm, jointNo, configfile, configfileProtected);
-
-
-    char ch = 'x';
-
-    helper.menu();
-
-    while (ch != '0') {
-
-      ch = cin.get();
-      switch (ch) {
-        case '1':
-          helper.readParameters();
-          helper.menu();
-          break;
-        case '2':
-          helper.setParametersToJoint();
-          helper.menu();
-          break;
-        case '3':
-          helper.storeParametersToJoint();
-          helper.menu();
-          break;
-        case '4':
-          helper.readPasswordProtectedParameters();
-          helper.menu();
-          break;
-        case '5':
-          helper.getPassword();
-          helper.menu();
-          break;
-        case '6':
-          helper.setProtectedParametersToJoint();
-          helper.menu();
-          break;
-        case '7':
-          helper.storeProtectedParametersToJoint();
-          helper.menu();
-          break;
-        case '8':
-          helper.readReadOnlyParameters();
-          helper.menu();
-          break;
-        default:
-          break;
-
-      }
-    }
-
-
-  } catch (std::exception& e) {
-    std::cout << e.what() << std::endl;
-  } catch (...) {
-    std::cout << "unhandled exception" << std::endl;
-  }
-
-
-  return 0;
 }
