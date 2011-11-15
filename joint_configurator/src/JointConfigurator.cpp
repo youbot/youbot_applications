@@ -52,22 +52,27 @@
 
 #include "JointConfigurator.hpp"
 
-
 JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string configpath, std::string configname, std::string configNameProtected) {
 
   ParameterRead = false;
   ProtectedParameterRead = false;
+  configfile = NULL;
+  configfilePP == NULL;
   
-  if(configname == ""){
+  if(configpath.at(configpath.length()-1) != '/'){
+    configpath.append("/");
+  }
+
+  if (configname == "") {
     UseParameter = false;
-  }else{
+  } else {
     configfile = new ConfigFile(configname, configpath);
     UseParameter = true;
   }
-  
-  if(configNameProtected == ""){
+
+  if (configNameProtected == "") {
     UseProtectedParameter = false;
-  }else{
+  } else {
     configfilePP = new ConfigFile(configNameProtected, configpath);
     UseProtectedParameter = true;
   }
@@ -77,17 +82,35 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
 
   joint->getConfigurationParameter(firmwareVersion);
   firmwareVersion.getParameter(controllerType, version);
-  
+
   JointName jName;
   joint->getConfigurationParameter(jName);
   jName.getParameter(jointName);
+
+
+  double firmwareVer;
+  int controller;
+  if (UseParameter) {
+    configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
+    configfile->readInto(controller, "Joint_Type", "ControllerType");
+    if (!( AreSame(version,firmwareVer) && controller == controllerType)) {
+      UseParameter = false;
+    }
+  }
+
+  if (UseProtectedParameter) {
+    configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
+    configfile->readInto(controller, "Joint_Type", "ControllerType");
+    if (!( AreSame(version,firmwareVer) && controller == controllerType)) {
+      UseProtectedParameter = false;
+    }
+  }
 
 }
 
 JointConfigurator::~JointConfigurator() {
   delete configfile;
-  delete myYouBotManipulator;
-  delete myYouBotBase;
+  delete configfilePP;
 }
 
 bool JointConfigurator::AreSame(double A, double B) {
@@ -96,14 +119,14 @@ bool JointConfigurator::AreSame(double A, double B) {
 
 void JointConfigurator::readParameters() {
   double dummy;
-  
+
   if (!UseParameter) {
     std::cout << "There is no configuration file provided for the parameters!" << std::endl;
     return;
   }
 
   std::cout << std::endl << "===========================================================" << std::endl;
-  std::cout << "Joint: "  << jointName  << std::endl;
+  std::cout << "Joint: " << jointName << std::endl;
   std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   joint->getConfigurationParameter(MaximumPositioningVelocity_Parameter);
@@ -405,39 +428,39 @@ void JointConfigurator::readParameters() {
   } else {
     std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << std::endl;
   }
-  
-//  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-//  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
-//  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
-//  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
-//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
-//  } else {
-//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
-//  }
-  
-//  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
-//  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
-//  PositionTargetReachedDistance_file = dummy;
-//  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
-//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
-//  } else {
-//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
-//  }
-  
+
+  //  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+  //  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
+  //  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
+  //  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
+  //  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+  //    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
+  //  } else {
+  //    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
+  //  }
+
+  //  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
+  //  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
+  //  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
+  //  PositionTargetReachedDistance_file = dummy;
+  //  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
+  //    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
+  //  } else {
+  //    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
+  //  }
+
   ParameterRead = true;
 }
 
 void JointConfigurator::readPasswordProtectedParameters() {
-  
+
   if (!UseProtectedParameter) {
     std::cout << "There is no configuration file provided for the protected parameters!" << std::endl;
     return;
   }
-  
+
   std::cout << "===================== Password Protected Parameters =====================" << std::endl;
-  std::cout << "Joint: "  << jointName  << std::endl;
+  std::cout << "Joint: " << jointName << std::endl;
   std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   double dummy;
@@ -753,7 +776,7 @@ void JointConfigurator::readPasswordProtectedParameters() {
   } else {
     std::cout << "ReversingEncoderDirection \t\t\t\tactual: " << ReversingEncoderDirection_actual << std::endl;
   }
-  
+
   joint->getConfigurationParameter(MotorControllerTimeout_Parameter);
   MotorControllerTimeout_Parameter.getParameter(MotorControllerTimeout_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "MotorControllerTimeout");
@@ -773,18 +796,18 @@ void JointConfigurator::readPasswordProtectedParameters() {
   } else {
     std::cout << "MotorHaltedVelocity \t\t\t\t\tactual: " << MotorHaltedVelocity_actual << std::endl;
   }
-  
-  
-  
+
+
+
   ProtectedParameterRead = true;
 }
 
 //=======================READ ONLY =============================
 
 void JointConfigurator::readReadOnlyParameters() {
-  
+
   std::cout << "===================== Read Only Parameters =====================" << std::endl;
-  std::cout << "Joint: "  << jointName  << std::endl;
+  std::cout << "Joint: " << jointName << std::endl;
   std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   joint->getConfigurationParameter(OperationalTime_Parameter);
@@ -794,51 +817,51 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(ActualMotorVoltage_Parameter);
   ActualMotorVoltage_Parameter.getParameter(ActualMotorVoltage_actual);
   std::cout << "ActualMotorVoltage \t\t\t\t\tactual: " << ActualMotorVoltage_actual << std::endl;
-  
+
   joint->getConfigurationParameter(ActualPWMDutyCycle_Parameter);
   ActualPWMDutyCycle_Parameter.getParameter(ActualPWMDutyCycle_actual);
   std::cout << "ActualPWMDutyCycle \t\t\t\t\tactual: " << ActualPWMDutyCycle_actual << std::endl;
-  
+
   joint->getConfigurationParameter(ActualCommutationOffset_Parameter);
   ActualCommutationOffset_Parameter.getParameter(ActualCommutationOffset_actual);
   std::cout << "ActualCommutationOffset \t\t\t\tactual: " << ActualCommutationOffset_actual << std::endl;
-  
+
   joint->getConfigurationParameter(PositionError_Parameter);
   PositionError_Parameter.getParameter(PositionError_actual);
   std::cout << "PositionError \t\t\t\t\t\tactual: " << PositionError_actual << std::endl;
-  
+
   joint->getConfigurationParameter(PositionErrorSum_Parameter);
   PositionErrorSum_Parameter.getParameter(PositionErrorSum_actual);
   std::cout << "PositionErrorSum \t\t\t\t\tactual: " << PositionErrorSum_actual << std::endl;
-  
+
   joint->getConfigurationParameter(VelocityError_Parameter);
   VelocityError_Parameter.getParameter(VelocityError_actual);
   std::cout << "VelocityError \t\t\t\t\t\tactual: " << VelocityError_actual << std::endl;
-  
+
   joint->getConfigurationParameter(VelocityErrorSum_Parameter);
   VelocityErrorSum_Parameter.getParameter(VelocityErrorSum_actual);
   std::cout << "VelocityErrorSum \t\t\t\t\tactual: " << VelocityErrorSum_actual << std::endl;
-  
+
   joint->getConfigurationParameter(RampGeneratorSpeed_Parameter);
   RampGeneratorSpeed_Parameter.getParameter(RampGeneratorSpeed_actual);
   std::cout << "RampGeneratorSpeed \t\t\t\t\tactual: " << RampGeneratorSpeed_actual << std::endl;
-  
+
   joint->getConfigurationParameter(I2tSum_Parameter);
   I2tSum_Parameter.getParameter(I2tSum_actual);
   std::cout << "I2tSum \t\t\t\t\t\t\tactual: " << I2tSum_actual << std::endl;
-  
+
   joint->getConfigurationParameter(I2tExceedCounter_Parameter);
   I2tExceedCounter_Parameter.getParameter(I2tExceedCounter_actual);
   std::cout << "I2tExceedCounter \t\t\t\t\tactual: " << I2tExceedCounter_actual << std::endl;
-  
+
   joint->getConfigurationParameter(ActualMotorDriverTemperature_Parameter);
   ActualMotorDriverTemperature_Parameter.getParameter(ActualMotorDriverTemperature_actual);
   std::cout << "ActualMotorDriverTemperature \t\t\t\tactual: " << ActualMotorDriverTemperature_actual << std::endl;
-  
-//  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
-//  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
-//  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
-  
+
+  //  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
+  //  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
+  //  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
+
 
 }
 
@@ -937,14 +960,14 @@ void JointConfigurator::setParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-//  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-    
-//  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-//  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+  //  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  //  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
 
-  std::cout << "Parameters set for Joint: "<< jointName << std::endl;
-  
+  //  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  //  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+
+  std::cout << "Parameters set for Joint: " << jointName << std::endl;
+
 }
 
 void JointConfigurator::setProtectedParametersToJoint() {
@@ -1046,14 +1069,14 @@ void JointConfigurator::setProtectedParametersToJoint() {
 
     I2tLimit_Parameter.setParameter(I2tLimit_file);
     joint->setConfigurationParameter(I2tLimit_Parameter);
-    
+
     MotorControllerTimeout_Parameter.setParameter(MotorControllerTimeout_file);
     joint->setConfigurationParameter(MotorControllerTimeout_Parameter);
-    
+
     MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
     joint->setConfigurationParameter(MotorHaltedVelocity_Parameter);
-    
-    std::cout << "Protected Parameters set for Joint: "<< jointName << std::endl;
+
+    std::cout << "Protected Parameters set for Joint: " << jointName << std::endl;
 
   } catch (JointParameterException& e) {
 
@@ -1158,13 +1181,13 @@ void JointConfigurator::storeParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-//  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
-    
-  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-//  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+  //  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  //  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
 
-  std::cout << "Parameters stored for Joint: "<< jointName << std::endl;
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  //  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+
+  std::cout << "Parameters stored for Joint: " << jointName << std::endl;
 }
 
 void JointConfigurator::storeProtectedParametersToJoint() {
@@ -1267,13 +1290,13 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     I2tLimit_Parameter.setParameter(I2tLimit_file);
     joint->storeConfigurationParameterPermanent(I2tLimit_Parameter);
-    
+
     MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
     joint->storeConfigurationParameterPermanent(MotorHaltedVelocity_Parameter);
-    
-    
-    
-    std::cout << "Protected Parameters stored for Joint: "<< jointName << std::endl;
+
+
+
+    std::cout << "Protected Parameters stored for Joint: " << jointName << std::endl;
   } catch (JointParameterException& e) {
 
   }

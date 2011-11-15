@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    std::string configfilepath = "../config/";
+    std::string configfilepath = "../config";
 
     configfilepath = std::string(CONFIG_DIR);
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    YouBotManipulator myYouBotManipulator("youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
+    YouBotManipulator myYouBotManipulator("/youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
 
 
     JointConfigurator joint1(&(myYouBotManipulator.getArmJoint(1)), configfilepath, "arm.cfg", "");

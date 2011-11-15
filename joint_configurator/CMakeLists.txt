@@ -32,8 +32,8 @@ ADD_DEFINITIONS(-DCONFIG_DIR="${JOINT_CONFIGURATOR_CONFIG_DIR}")
 
 ## build parameters and paths
 SET(CMAKE_BUILD_TYPE DEBUG) #enable debug mode (e.g. for embedded gdb in eclipse )
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin/ CACHE PATH "Configure the executable output path.")
-SET(LIBRARY_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/lib/ CACHE PATH "Configure the library output path.")
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/bin CACHE PATH "Configure the executable output path.")
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/lib CACHE PATH "Configure the library output path.")
 
 ## Set include directories
 INCLUDE_DIRECTORIES(

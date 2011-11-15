@@ -86,12 +86,12 @@ int main(int argc, char *argv[]) {
 
     if (argc < 1 || argc > 2) {
       std::cout << "Usage:   sudo ./JointConfigurator CONFIGFILE PATH " << std::endl;
-      std::cout << "Example: sudo ./JointConfigurator ../config/" << std::endl;
+      std::cout << "Example: sudo ./JointConfigurator ../config" << std::endl;
       return 0;
     }
 
 
-    std::string configfilepath = "../config/";
+    std::string configfilepath = "../config";
 
     configfilepath = std::string(CONFIG_DIR);
 
@@ -100,13 +100,13 @@ int main(int argc, char *argv[]) {
     }
 
 
-    YouBotBase myYouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);
+    YouBotBase myYouBotBase("/youbot-base", YOUBOT_CONFIGURATIONS_DIR);
 
 
-    JointConfigurator joint1(&(myYouBotBase.getBaseJoint(1)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint2(&(myYouBotBase.getBaseJoint(2)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint3(&(myYouBotBase.getBaseJoint(3)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint4(&(myYouBotBase.getBaseJoint(4)), configfilepath, "arm.cfg", "");
+    JointConfigurator joint1(&(myYouBotBase.getBaseJoint(1)), configfilepath, "base.cfg", "");
+    JointConfigurator joint2(&(myYouBotBase.getBaseJoint(2)), configfilepath, "base.cfg", "");
+    JointConfigurator joint3(&(myYouBotBase.getBaseJoint(3)), configfilepath, "base.cfg", "");
+    JointConfigurator joint4(&(myYouBotBase.getBaseJoint(4)), configfilepath, "base.cfg", "");
     
 
 

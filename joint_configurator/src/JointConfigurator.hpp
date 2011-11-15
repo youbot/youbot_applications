@@ -109,8 +109,6 @@ private:
   int controllerType;
   double version;
   std::string jointName;
-  YouBotManipulator* myYouBotManipulator;
-  YouBotBase* myYouBotBase;
 
   MaximumPositioningVelocity MaximumPositioningVelocity_Parameter;
   quantity<angular_velocity> MaximumPositioningVelocity_actual;
