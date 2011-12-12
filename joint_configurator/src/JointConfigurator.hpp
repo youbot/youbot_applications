@@ -318,10 +318,6 @@ private:
   bool ActivateOvervoltageProtection_actual;
   bool ActivateOvervoltageProtection_file;
 
-  MaximumPWMChangePerPIDInterval MaximumPWMChangePerPIDInterval_Parameter;
-  int MaximumPWMChangePerPIDInterval_actual;
-  int MaximumPWMChangePerPIDInterval_file;
-
   SineCompensationFactor SineCompensationFactor_Parameter;
   int SineCompensationFactor_actual;
   int SineCompensationFactor_file;
@@ -403,6 +399,12 @@ private:
   MotorControllerTimeout MotorControllerTimeout_Parameter;
   quantity<si::time> MotorControllerTimeout_actual;
   quantity<si::time> MotorControllerTimeout_file;
+  
+  CurrentError CurrentError_Parameter;
+  quantity<si::current> CurrentError_actual;
+          
+  CurrentErrorSum CurrentErrorSum_Parameter;
+  quantity<si::current> CurrentErrorSum_actual;
 
 };
 

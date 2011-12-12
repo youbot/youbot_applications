@@ -95,14 +95,19 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
     configfile->readInto(controller, "Joint_Type", "ControllerType");
     if (!( AreSame(version,firmwareVer) && controller == controllerType)) {
       UseParameter = false;
+      throw std::runtime_error("The configuration file for the joint parameter contain the wrong controller type or firmware version!");
+      delete configfile;
     }
   }
 
   if (UseProtectedParameter) {
-    configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
-    configfile->readInto(controller, "Joint_Type", "ControllerType");
+    configfilePP->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
+    configfilePP->readInto(controller, "Joint_Type", "ControllerType");
     if (!( AreSame(version,firmwareVer) && controller == controllerType)) {
       UseProtectedParameter = false;
+      throw std::runtime_error("The configuration file for the protected joint parameter contain the wrong controller type or firmware version!");
+      delete configfile;
+      delete configfilePP;
     }
   }
 
@@ -687,16 +692,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(MaximumPWMChangePerPIDInterval_Parameter);
-  MaximumPWMChangePerPIDInterval_Parameter.getParameter(MaximumPWMChangePerPIDInterval_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "MaximumPWMChangePerPIDInterval");
-  MaximumPWMChangePerPIDInterval_file = dummy;
-  if (!AreSame(MaximumPWMChangePerPIDInterval_actual, MaximumPWMChangePerPIDInterval_file)) {
-    std::cout << "MaximumPWMChangePerPIDInterval \t\t\t\tactual: " << MaximumPWMChangePerPIDInterval_actual << " \tNEW VALUE: " << MaximumPWMChangePerPIDInterval_file << std::endl;
-  } else {
-    std::cout << "MaximumPWMChangePerPIDInterval \t\t\t\tactual: " << MaximumPWMChangePerPIDInterval_actual << std::endl;
-  }
-
   joint->getConfigurationParameter(SineCompensationFactor_Parameter);
   SineCompensationFactor_Parameter.getParameter(SineCompensationFactor_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "SineCompensationFactor");
@@ -841,6 +836,14 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(VelocityErrorSum_Parameter);
   VelocityErrorSum_Parameter.getParameter(VelocityErrorSum_actual);
   std::cout << "VelocityErrorSum \t\t\t\t\tactual: " << VelocityErrorSum_actual << std::endl;
+  
+  joint->getConfigurationParameter(CurrentError_Parameter);
+  CurrentError_Parameter.getParameter(CurrentError_actual);
+  std::cout << "CurrentError \t\t\t\t\t\tactual: " << CurrentError_actual << std::endl;
+  
+  joint->getConfigurationParameter(CurrentErrorSum_Parameter);
+  CurrentErrorSum_Parameter.getParameter(CurrentErrorSum_actual);
+  std::cout << "CurrentErrorSum \t\t\t\t\tactual: " << CurrentErrorSum_actual << std::endl;
 
   joint->getConfigurationParameter(RampGeneratorSpeed_Parameter);
   RampGeneratorSpeed_Parameter.getParameter(RampGeneratorSpeed_actual);
@@ -857,6 +860,8 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(ActualMotorDriverTemperature_Parameter);
   ActualMotorDriverTemperature_Parameter.getParameter(ActualMotorDriverTemperature_actual);
   std::cout << "ActualMotorDriverTemperature \t\t\t\tactual: " << ActualMotorDriverTemperature_actual << std::endl;
+  
+
 
   //  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
   //  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
@@ -1033,9 +1038,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
 
     ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
     joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
-
-    MaximumPWMChangePerPIDInterval_Parameter.setParameter(MaximumPWMChangePerPIDInterval_file);
-    joint->setConfigurationParameter(MaximumPWMChangePerPIDInterval_Parameter);
 
     SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
     joint->setConfigurationParameter(SineCompensationFactor_Parameter);
@@ -1254,9 +1256,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
     joint->storeConfigurationParameterPermanent(ActivateOvervoltageProtection_Parameter);
-
-    MaximumPWMChangePerPIDInterval_Parameter.setParameter(MaximumPWMChangePerPIDInterval_file);
-    joint->storeConfigurationParameterPermanent(MaximumPWMChangePerPIDInterval_Parameter);
 
     SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
     joint->storeConfigurationParameterPermanent(SineCompensationFactor_Parameter);
