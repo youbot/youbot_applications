@@ -130,10 +130,6 @@ private:
   quantity<angular_velocity> SpeedControlSwitchingThreshold_actual;
   quantity<angular_velocity> SpeedControlSwitchingThreshold_file;
 
-  ClearTargetDistance ClearTargetDistance_Parameter;
-  int ClearTargetDistance_actual;
-  int ClearTargetDistance_file;
-
   PositionTargetReachedDistance PositionTargetReachedDistance_Parameter;
   int PositionTargetReachedDistance_actual;
   int PositionTargetReachedDistance_file;
@@ -347,8 +343,8 @@ private:
   unsigned int MotorPoles_file;
 
   PWMSchemeBlockCommutation PWMSchemeBlockCommutation_Parameter;
-  unsigned int PWMSchemeBlockCommutation_actual;
-  unsigned int PWMSchemeBlockCommutation_file;
+  int PWMSchemeBlockCommutation_actual;
+  int PWMSchemeBlockCommutation_file;
 
   ReversingEncoderDirection ReversingEncoderDirection_Parameter;
   bool ReversingEncoderDirection_actual;
@@ -375,11 +371,11 @@ private:
   int MotorHaltedVelocity_file;
 
   ActualMotorVoltage ActualMotorVoltage_Parameter;
-  unsigned int ActualMotorVoltage_actual;
+  quantity<electric_potential> ActualMotorVoltage_actual;
   ActualPWMDutyCycle ActualPWMDutyCycle_Parameter;
-  unsigned int ActualPWMDutyCycle_actual;
+  int ActualPWMDutyCycle_actual;
   PositionError PositionError_Parameter;
- quantity<plane_angle> PositionError_actual;
+  quantity<plane_angle> PositionError_actual;
   PositionErrorSum PositionErrorSum_Parameter;
   quantity<plane_angle> PositionErrorSum_actual;
   VelocityError VelocityError_Parameter;

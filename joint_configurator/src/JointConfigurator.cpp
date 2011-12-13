@@ -58,8 +58,8 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   ProtectedParameterRead = false;
   configfile = NULL;
   configfilePP == NULL;
-  
-  if(configpath.at(configpath.length()-1) != '/'){
+
+  if (configpath.at(configpath.length() - 1) != '/') {
     configpath.append("/");
   }
 
@@ -93,7 +93,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   if (UseParameter) {
     configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
     configfile->readInto(controller, "Joint_Type", "ControllerType");
-    if (!( AreSame(version,firmwareVer) && controller == controllerType)) {
+    if (!(AreSame(version, firmwareVer) && controller == controllerType)) {
       UseParameter = false;
       throw std::runtime_error("The configuration file for the joint parameter contain the wrong controller type or firmware version!");
       delete configfile;
@@ -103,7 +103,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   if (UseProtectedParameter) {
     configfilePP->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
     configfilePP->readInto(controller, "Joint_Type", "ControllerType");
-    if (!( AreSame(version,firmwareVer) && controller == controllerType)) {
+    if (!(AreSame(version, firmwareVer) && controller == controllerType)) {
       UseProtectedParameter = false;
       throw std::runtime_error("The configuration file for the protected joint parameter contain the wrong controller type or firmware version!");
       delete configfile;
@@ -434,25 +434,25 @@ void JointConfigurator::readParameters() {
     std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << std::endl;
   }
 
-  //  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-  //  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
-  //  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
-  //  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
-  //  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
-  //    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
-  //  } else {
-  //    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
-  //  }
-
-  //  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
-  //  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
-  //  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
-  //  PositionTargetReachedDistance_file = dummy;
-  //  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
-  //    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
-  //  } else {
-  //    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
-  //  }
+//  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+//  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
+//  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
+//  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
+//  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
+//  } else {
+//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
+//  }
+//
+//  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
+//  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
+//  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
+//  PositionTargetReachedDistance_file = dummy;
+//  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
+//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
+//  } else {
+//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
+//  }
 
   ParameterRead = true;
 }
@@ -488,16 +488,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "MaximumMotorCurrent      \t\t\t\tactual: " << MaximumMotorCurrent_actual << " \tNEW VALUE: " << MaximumMotorCurrent_file << std::endl;
   } else {
     std::cout << "MaximumMotorCurrent      \t\t\t\tactual: " << MaximumMotorCurrent_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(ClearTargetDistance_Parameter);
-  ClearTargetDistance_Parameter.getParameter(ClearTargetDistance_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "ClearTargetDistance");
-  ClearTargetDistance_file = dummy;
-  if (ClearTargetDistance_actual != ClearTargetDistance_file) {
-    std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << " \tNEW VALUE: " << ClearTargetDistance_file << std::endl;
-  } else {
-    std::cout << "ClearTargetDistance         \t\t\t\tactual: " << ClearTargetDistance_actual << std::endl;
   }
 
   joint->getConfigurationParameter(ThermalWindingTimeConstant_Parameter);
@@ -836,11 +826,11 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(VelocityErrorSum_Parameter);
   VelocityErrorSum_Parameter.getParameter(VelocityErrorSum_actual);
   std::cout << "VelocityErrorSum \t\t\t\t\tactual: " << VelocityErrorSum_actual << std::endl;
-  
+
   joint->getConfigurationParameter(CurrentError_Parameter);
   CurrentError_Parameter.getParameter(CurrentError_actual);
   std::cout << "CurrentError \t\t\t\t\t\tactual: " << CurrentError_actual << std::endl;
-  
+
   joint->getConfigurationParameter(CurrentErrorSum_Parameter);
   CurrentErrorSum_Parameter.getParameter(CurrentErrorSum_actual);
   std::cout << "CurrentErrorSum \t\t\t\t\tactual: " << CurrentErrorSum_actual << std::endl;
@@ -860,8 +850,6 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(ActualMotorDriverTemperature_Parameter);
   ActualMotorDriverTemperature_Parameter.getParameter(ActualMotorDriverTemperature_actual);
   std::cout << "ActualMotorDriverTemperature \t\t\t\tactual: " << ActualMotorDriverTemperature_actual << std::endl;
-  
-
 
   //  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
   //  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
@@ -965,11 +953,11 @@ void JointConfigurator::setParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-  //  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-  //  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-
-  //  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-  //  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+//  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+//
+//  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+//  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
 
   std::cout << "Parameters set for Joint: " << jointName << std::endl;
 
@@ -987,9 +975,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
 
     MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
     joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
-
-    ClearTargetDistance_Parameter.setParameter(ClearTargetDistance_file);
-    joint->setConfigurationParameter(ClearTargetDistance_Parameter);
 
     PIDControlTime_Parameter.setParameter(PIDControlTime_file);
     joint->setConfigurationParameter(PIDControlTime_Parameter);
@@ -1183,11 +1168,11 @@ void JointConfigurator::storeParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-  //  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-  //  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
-
-  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-  //  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+//  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+//
+//  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+//  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
 
   std::cout << "Parameters stored for Joint: " << jointName << std::endl;
 }
@@ -1205,9 +1190,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
     joint->storeConfigurationParameterPermanent(MaximumMotorCurrent_Parameter);
-
-    ClearTargetDistance_Parameter.setParameter(ClearTargetDistance_file);
-    joint->storeConfigurationParameterPermanent(ClearTargetDistance_Parameter);
 
     PIDControlTime_Parameter.setParameter(PIDControlTime_file);
     joint->storeConfigurationParameterPermanent(PIDControlTime_Parameter);
