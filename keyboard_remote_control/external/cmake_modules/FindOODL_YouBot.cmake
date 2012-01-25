@@ -15,6 +15,7 @@
 
 FIND_PATH(OODL_YOUBOT_INCLUDE_DIR NAMES youbot/YouBotBase.hpp
   PATHS
+  ${youbot_driver_PACKAGE_PATH}/
   $ENV{YOUBOTDIR}
   $ENV{ROBOTPKG_BASE}/include/youbot/ 
   ENV CPATH
@@ -26,6 +27,7 @@ FIND_PATH(OODL_YOUBOT_INCLUDE_DIR NAMES youbot/YouBotBase.hpp
 
 FIND_LIBRARY(OODL_YOUBOT_LIBRARIES NAMES "YouBotDriver"
   PATHS
+  ${youbot_driver_PACKAGE_PATH}/lib
   $ENV{YOUBOTDIR}/lib 
   $ENV{ROBOTPKG_BASE}/lib
   ENV LD_LIBRARY_PATH
@@ -38,9 +40,10 @@ FIND_LIBRARY(OODL_YOUBOT_LIBRARIES NAMES "YouBotDriver"
 
 FIND_PATH(OODL_YOUBOT_CONFIG_DIR NAMES youbot-ethercat.cfg
   PATHS
-  $ENV{YOUBOTDIR}/config
-  $ENV{ROBOTPKG_BASE}/config
-  /etc/youbot
+  $ENV{YOUBOTDIR}/config/
+  $ENV{ROBOTPKG_BASE}/config/
+  ${youbot_driver_PACKAGE_PATH}/config/
+  /etc/youbot/
   NO_DEFAULT_PATH
 )
 

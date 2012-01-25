@@ -1,5 +1,14 @@
 PROJECT(youBot_JoypadControl)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+SET(ROS_ROOT_PATH $ENV{ROS_ROOT})
+
+IF(DEFINED ROS_ROOT_PATH)
+	include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+	rosbuild_find_ros_package(soem)
+  rosbuild_find_ros_package(youbot_driver)
+ENDIF(DEFINED ROS_ROOT_PATH)
+
 
 ## check required prerequisites
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/cmake_modules")

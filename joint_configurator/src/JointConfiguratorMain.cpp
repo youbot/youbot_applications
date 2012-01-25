@@ -146,10 +146,10 @@ int main(int argc, char *argv[]) {
     YouBotManipulator* myYouBotManipulator = NULL;
 
     if (baseOrArm == ARM) {
-       myYouBotManipulator = new YouBotManipulator("/youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
+       myYouBotManipulator = new YouBotManipulator("youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
       joint = &(myYouBotManipulator->getArmJoint(jointNo));
     } else if (baseOrArm == BASE) {
-       myYouBotBase = new YouBotBase("/youbot-base", YOUBOT_CONFIGURATIONS_DIR);
+       myYouBotBase = new YouBotBase("youbot-base", YOUBOT_CONFIGURATIONS_DIR);
       joint = &(myYouBotBase->getBaseJoint(jointNo));
     } else {
       throw "unable to create joint";

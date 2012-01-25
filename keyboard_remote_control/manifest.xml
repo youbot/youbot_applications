@@ -1,0 +1,15 @@
+<package>
+  <description brief="keyboard_remote_control">
+
+     keyboard_remote_control
+
+  </description>
+  <author>Özgür Sen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>https://github.com/youbot/youbot_applications</url>
+  <depend package="soem"/>
+  <depend package="youbot_driver"/>
+</package>
+
+
