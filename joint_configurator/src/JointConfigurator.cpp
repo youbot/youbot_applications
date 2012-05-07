@@ -434,25 +434,25 @@ void JointConfigurator::readParameters() {
     std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << std::endl;
   }
 
-//  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-//  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
-//  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
-//  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
-//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
-//  } else {
-//    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
-//  }
-//
-//  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
-//  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
-//  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
-//  PositionTargetReachedDistance_file = dummy;
-//  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
-//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
-//  } else {
-//    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
-//  }
+  joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+  MaximumVelocityToSetPosition_Parameter.getParameter(MaximumVelocityToSetPosition_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "MaximumVelocityToSetPosition");
+  MaximumVelocityToSetPosition_file = dummy * radian_per_second;
+  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << " \tNEW VALUE: " << MaximumVelocityToSetPosition_file << std::endl;
+  } else {
+    std::cout << "MaximumVelocityToSetPosition \t\t\t\tactual: " << MaximumVelocityToSetPosition_actual << std::endl;
+  }
+
+  joint->getConfigurationParameter(PositionTargetReachedDistance_Parameter);
+  PositionTargetReachedDistance_Parameter.getParameter(PositionTargetReachedDistance_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "PositionTargetReachedDistance");
+  PositionTargetReachedDistance_file = dummy;
+  if (PositionTargetReachedDistance_actual != PositionTargetReachedDistance_file) {
+    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
+  } else {
+    std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
+  }
 
   ParameterRead = true;
 }
@@ -851,9 +851,9 @@ void JointConfigurator::readReadOnlyParameters() {
   ActualMotorDriverTemperature_Parameter.getParameter(ActualMotorDriverTemperature_actual);
   std::cout << "ActualMotorDriverTemperature \t\t\t\tactual: " << ActualMotorDriverTemperature_actual << std::endl;
 
-  //  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
-  //  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
-  //  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
+//  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
+//  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
+//  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
 
 
 }
@@ -953,11 +953,11 @@ void JointConfigurator::setParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-//  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-//
-//  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-//  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
 
   std::cout << "Parameters set for Joint: " << jointName << std::endl;
 
@@ -1168,11 +1168,11 @@ void JointConfigurator::storeParametersToJoint() {
   IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
   joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
 
-//  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-//  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
-//
-//  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-//  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+
+  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
 
   std::cout << "Parameters stored for Joint: " << jointName << std::endl;
 }

@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
     if(myYouBotBase != NULL)
       delete myYouBotBase;
     
-    EthercatMaster::getInstance().destroy();
+   // EthercatMasterFactory::destroy();
 
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;

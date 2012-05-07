@@ -103,11 +103,11 @@ int main(int argc, char *argv[]) {
     YouBotManipulator myYouBotManipulator("/youbot-manipulator", YOUBOT_CONFIGURATIONS_DIR);
 
 
-    JointConfigurator joint1(&(myYouBotManipulator.getArmJoint(1)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint2(&(myYouBotManipulator.getArmJoint(2)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint3(&(myYouBotManipulator.getArmJoint(3)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint4(&(myYouBotManipulator.getArmJoint(4)), configfilepath, "arm.cfg", "");
-    JointConfigurator joint5(&(myYouBotManipulator.getArmJoint(5)), configfilepath, "arm.cfg", "");
+    JointConfigurator joint1(&(myYouBotManipulator.getArmJoint(1)), configfilepath, "arm-1.cfg", "");
+    JointConfigurator joint2(&(myYouBotManipulator.getArmJoint(2)), configfilepath, "arm-2.cfg", "");
+    JointConfigurator joint3(&(myYouBotManipulator.getArmJoint(3)), configfilepath, "arm-3.cfg", "");
+    JointConfigurator joint4(&(myYouBotManipulator.getArmJoint(4)), configfilepath, "arm-4.cfg", "");
+    JointConfigurator joint5(&(myYouBotManipulator.getArmJoint(5)), configfilepath, "arm-5.cfg", "");
 
 
     char ch = 'x';
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    EthercatMaster::getInstance().destroy();
+//    EthercatMasterFactory::destroy();
 
   } catch (std::exception& e) {
     std::cout << e.what() << std::endl;
