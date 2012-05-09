@@ -8,7 +8,6 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>https://github.com/youbot/youbot_applications</url>
-  <depend package="soem"/>
   <depend package="youbot_driver"/>
 </package>
 

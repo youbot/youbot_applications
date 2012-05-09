@@ -6,7 +6,6 @@ SET(ROS_ROOT_PATH $ENV{ROS_ROOT})
 
 IF(DEFINED ROS_ROOT_PATH)
 	include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-	rosbuild_find_ros_package(soem)
   rosbuild_find_ros_package(youbot_driver)
 ENDIF(DEFINED ROS_ROOT_PATH)
 
@@ -17,6 +16,7 @@ SET(Boost_ADDITIONAL_VERSIONS "1.39" "1.39.0" "1.40" "1.40.0" "1.41" "1.41.0" "1
 FIND_PACKAGE(Boost REQUIRED COMPONENTS thread date_time filesystem system)
 FIND_PACKAGE(Soem REQUIRED)
 FIND_PACKAGE(OODL_YouBot REQUIRED)
+
 
 
 ## preprocessor definitions
@@ -38,7 +38,7 @@ SET(LIBRARY_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/lib CACHE PATH "Configure the li
 ## Set include directories
 INCLUDE_DIRECTORIES(
 	${OODL_YOUBOT_INCLUDE_DIR}
-	${SOEM_INCLUDE_DIR}
+  ${SOEM_INCLUDE_DIR}
 	${Boost_INCLUDE_DIR}
 )
 
@@ -64,7 +64,11 @@ SET_TARGET_PROPERTIES(JointConfiguratorShared PROPERTIES OUTPUT_NAME "JointConfi
 TARGET_LINK_LIBRARIES(JointConfiguratorShared -Wl,-whole-archive JointConfigurator -Wl,-no-whole-archive)
 
 SET(YOUBOT_DRIVER_CONFIG
-${CMAKE_HOME_DIRECTORY}/config/arm.cfg
+${CMAKE_HOME_DIRECTORY}/config/arm-1.cfg
+${CMAKE_HOME_DIRECTORY}/config/arm-2.cfg
+${CMAKE_HOME_DIRECTORY}/config/arm-3.cfg
+${CMAKE_HOME_DIRECTORY}/config/arm-4.cfg
+${CMAKE_HOME_DIRECTORY}/config/arm-5.cfg
 ${CMAKE_HOME_DIRECTORY}/config/arm-1-protected.cfg
 ${CMAKE_HOME_DIRECTORY}/config/arm-2-protected.cfg
 ${CMAKE_HOME_DIRECTORY}/config/arm-3-protected.cfg
@@ -77,7 +81,7 @@ ${CMAKE_HOME_DIRECTORY}/config/base-protected.cfg
 
 TARGET_LINK_LIBRARIES(youBot_JointConfigurator
 	${OODL_YOUBOT_LIBRARIES}
-	${SOEM_LIBRARIES}
+  ${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
   JointConfigurator
@@ -85,7 +89,7 @@ TARGET_LINK_LIBRARIES(youBot_JointConfigurator
 
 TARGET_LINK_LIBRARIES(youBot_ArmConfigurator
 	${OODL_YOUBOT_LIBRARIES}
-	${SOEM_LIBRARIES}
+  ${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
   JointConfigurator
@@ -93,7 +97,7 @@ TARGET_LINK_LIBRARIES(youBot_ArmConfigurator
 
 TARGET_LINK_LIBRARIES(youBot_BaseConfigurator
 	${OODL_YOUBOT_LIBRARIES}
-	${SOEM_LIBRARIES}
+  ${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
   JointConfigurator

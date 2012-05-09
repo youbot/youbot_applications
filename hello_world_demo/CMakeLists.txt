@@ -5,7 +5,6 @@ SET(ROS_ROOT_PATH $ENV{ROS_ROOT})
 
 IF(DEFINED ROS_ROOT_PATH)
 	include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-	rosbuild_find_ros_package(soem)
   rosbuild_find_ros_package(youbot_driver)
 ENDIF(DEFINED ROS_ROOT_PATH)
 

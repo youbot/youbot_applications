@@ -8,7 +8,6 @@
   <license>LGPL</license>
   <review status="unreviewed" notes=""/>
   <url>https://github.com/garinkid/youBotApp</url>
-  <depend package="soem"/>
   <depend package="youbot_driver"/>
 </package>
 

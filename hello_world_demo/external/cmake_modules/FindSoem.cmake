@@ -12,7 +12,7 @@ FIND_PATH(SOEM_INCLUDE_DIR NAMES ethercatmain.h
   PATHS
   $ENV{ROBOTPKG_BASE}/include/soem/src 
   ${SOEM_PATH}/include/soem/src
-	${soem_PACKAGE_PATH}/src
+	${youbot_driver_PACKAGE_PATH}/soem/src
   ENV CPATH
   /usr/include/
   /usr/include/soem/src
@@ -25,11 +25,11 @@ FIND_PATH(SOEM_INCLUDE_DIR NAMES ethercatmain.h
 
 #MARK_AS_ADVANCED("SOEM_INCLUDE_DIR: "${SOEM_INCLUDE_DIR})
 
-FIND_LIBRARY(SOEM_LIBRARY_TMP NAMES ${SOEMLIB} "SoemLibraries"
+FIND_LIBRARY(SOEM_LIBRARIES NAMES ${SOEMLIB} "SoemLibraries"
   PATHS
   $ENV{ROBOTPKG_BASE}/lib
   ${SOEM_PATH}/lib
-	${soem_PACKAGE_PATH}/lib
+	${youbot_driver_PACKAGE_PATH}/lib
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -38,17 +38,14 @@ FIND_LIBRARY(SOEM_LIBRARY_TMP NAMES ${SOEMLIB} "SoemLibraries"
   NO_DEFAULT_PATH
 )
 
-IF(SOEM_LIBRARY_TMP)
-  GET_FILENAME_COMPONENT( SOEM_LIBRARY_DIR ${SOEM_LIBRARY_TMP} PATH )
-ENDIF(SOEM_LIBRARY_TMP)
+include(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set SOEM_FOUND to TRUE
+# if all listed variables are TRUE
+find_package_handle_standard_args(SOEM  DEFAULT_MSG
+                                  SOEM_INCLUDE_DIR SOEM_LIBRARIES)
 
-IF(SOEM_INCLUDE_DIR AND SOEM_LIBRARY_DIR)
-  SET(SOEM_FOUND TRUE)
-ENDIF(SOEM_INCLUDE_DIR AND SOEM_LIBRARY_DIR)
-
-# show the SOEM_INCLUDE_DIR and SOEM_LIBRARY_DIR variables only in the advanced view
 IF(SOEM_FOUND)
-  MARK_AS_ADVANCED(SOEM_INCLUDE_DIR SOEM_LIBRARY_DIR )
+  MARK_AS_ADVANCED(SOEM_INCLUDE_DIR SOEM_LIBRARIES)
 ENDIF(SOEM_FOUND)
 
 
