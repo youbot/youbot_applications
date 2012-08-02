@@ -25,7 +25,7 @@ FIND_PATH(OODL_YOUBOT_INCLUDE_DIR NAMES youbot/YouBotBase.hpp
   NO_DEFAULT_PATH
 )
 
-FIND_LIBRARY(OODL_YOUBOT_LIBRARIES NAMES "YouBotDriver"
+FIND_LIBRARY(OODL_YOUBOT_LIBRARIES NAMES "YouBotDriver" "soem"
   PATHS
   ${youbot_driver_PACKAGE_PATH}/lib
   $ENV{YOUBOTDIR}/lib 
@@ -46,6 +46,8 @@ FIND_PATH(OODL_YOUBOT_CONFIG_DIR NAMES youbot-ethercat.cfg
   /etc/youbot/
   NO_DEFAULT_PATH
 )
+
+SET(OODL_YOUBOT_INCLUDE_DIR ${OODL_YOUBOT_INCLUDE_DIR} ${OODL_YOUBOT_INCLUDE_DIR}/soem/src/)
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set OODL_YOUBOT_FOUND to TRUE

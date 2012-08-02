@@ -1,23 +1,23 @@
 PROJECT(youBot_JointConfigurator)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-
-SET(ROS_ROOT_PATH $ENV{ROS_ROOT})
-
-IF(DEFINED ROS_ROOT_PATH)
-	include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-  rosbuild_find_ros_package(youbot_driver)
-ENDIF(DEFINED ROS_ROOT_PATH)
-
 ## check required prerequisites
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/cmake_modules")
 SET(Boost_USE_STATIC_LIBS ON)
 SET(Boost_ADDITIONAL_VERSIONS "1.39" "1.39.0" "1.40" "1.40.0" "1.41" "1.41.0" "1.42" "1.42.0" "1.43" "1.43.0" "1.44" "1.44.0" "1.45" "1.45.0" "1.46" "1.46.0")
 FIND_PACKAGE(Boost REQUIRED COMPONENTS thread date_time filesystem system)
-FIND_PACKAGE(Soem REQUIRED)
-FIND_PACKAGE(OODL_YouBot REQUIRED)
 
-
+SET(ROS_ROOT_PATH $ENV{ROS_ROOT})
+IF(DEFINED ROS_ROOT_PATH)
+	include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+    rosbuild_init()
+    rosbuild_find_ros_package(youbot_driver)
+    SET(OODL_YOUBOT_LIBRARIES YouBotDriver)
+    SET(OODL_YOUBOT_CONFIG_DIR ${youbot_driver_PACKAGE_PATH}/config/)
+ELSE(DEFINED ROS_ROOT_PATH)
+    FIND_PACKAGE(OODL_YouBot REQUIRED)
+ENDIF(DEFINED ROS_ROOT_PATH)
+   
 
 ## preprocessor definitions
 SET(CMAKE_C_FLAGS_DEBUG "-fPIC -Wall -g")
@@ -38,7 +38,6 @@ SET(LIBRARY_OUTPUT_PATH ${CMAKE_HOME_DIRECTORY}/lib CACHE PATH "Configure the li
 ## Set include directories
 INCLUDE_DIRECTORIES(
 	${OODL_YOUBOT_INCLUDE_DIR}
-  ${SOEM_INCLUDE_DIR}
 	${Boost_INCLUDE_DIR}
 )
 
@@ -59,9 +58,9 @@ ADD_LIBRARY(JointConfigurator
   src/JointConfigurator.cpp
 )
 
-ADD_LIBRARY(JointConfiguratorShared SHARED)
-SET_TARGET_PROPERTIES(JointConfiguratorShared PROPERTIES OUTPUT_NAME "JointConfigurator")
-TARGET_LINK_LIBRARIES(JointConfiguratorShared -Wl,-whole-archive JointConfigurator -Wl,-no-whole-archive)
+#ADD_LIBRARY(JointConfiguratorShared SHARED)
+#SET_TARGET_PROPERTIES(JointConfiguratorShared PROPERTIES OUTPUT_NAME "JointConfigurator")
+#TARGET_LINK_LIBRARIES(JointConfiguratorShared -Wl,-whole-archive JointConfigurator -Wl,-no-whole-archive)
 
 SET(YOUBOT_DRIVER_CONFIG
 ${CMAKE_HOME_DIRECTORY}/config/arm-1.cfg
@@ -80,27 +79,24 @@ ${CMAKE_HOME_DIRECTORY}/config/base-protected.cfg
 
 
 TARGET_LINK_LIBRARIES(youBot_JointConfigurator
-	${OODL_YOUBOT_LIBRARIES}
-  ${SOEM_LIBRARIES}
+    ${OODL_YOUBOT_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
-  JointConfigurator
+    JointConfigurator
 )
 
 TARGET_LINK_LIBRARIES(youBot_ArmConfigurator
 	${OODL_YOUBOT_LIBRARIES}
-  ${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
-  JointConfigurator
+    JointConfigurator
 )
 
 TARGET_LINK_LIBRARIES(youBot_BaseConfigurator
 	${OODL_YOUBOT_LIBRARIES}
-  ${SOEM_LIBRARIES}
 	${Boost_LIBRARIES}
 	pthread
-  JointConfigurator
+    JointConfigurator
 )
 
 MACRO(INSTALL_CONFIG_WITH_DIRECTORY CONFIG_LIST)
