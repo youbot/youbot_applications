@@ -62,9 +62,11 @@ typedef struct {
 	string relatedUnit;          // manipulator or base part
 	string relatedMasterBoard;   // ARM_MASTER_BOARD or BASE_MASTER_BOARD
 	string controllerTyp;        // ARM_CONTROLLER   or BASE_CONTROLLER
+	double firmwareVersion;
+	bool   isInitilized;
 	int masterBoardNo;
-	int slaveNo;
-	int jointTopologyNo;
+	int slaveNo;				 // All slaves
+	int jointTopologyNo;		 // only slaves with input/output buffer
 	int jointConfigNo;           // Configuration number of a joint according to one Arm or Base; i.e. wheel number from 1 to 4 or axis number from 1 to 5
 	youbot::YouBotJoint * joint;
 
@@ -98,6 +100,9 @@ private:
 	// Check if the number of found controller is correct
 	void checkNumberOfControllerboards();
 
+	// Test if commutation and initialisation is possible
+	void testInitialization();
+	
 	// Test the functionality of the controller boards and motors
 	void testFunctionOfControllerboards();
 
@@ -116,6 +121,8 @@ private:
 	void stdOutputAndFile(std::stringstream & stream);
 
 	std::string makeLowerCase(string & convert);
+	
+	bool checkHomepositionOfArm(void);
 
 private:
 	// these are the slaves of the youBot connected with a motor (= youBot joint); i.e. input and output is available
@@ -131,6 +138,7 @@ private:
 	bool statusOK;
 	bool checkMasterboards;
 	bool quickRestartTestOK;
+	bool checkControllerboards;
 
 	int inputNumberOfBase;
 	int inputNumberOfArm;

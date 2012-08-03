@@ -12,9 +12,10 @@ YouBotDiagnostics::YouBotDiagnostics(std::fstream * file, int noOfBase, int noOf
 
 	ethercatMaster = 0;
 
-	statusOK           = true;
-	checkMasterboards  = true;
-	quickRestartTestOK = true;
+	statusOK			  = true;
+	checkMasterboards	  = true;
+	quickRestartTestOK	  = true;
+	checkControllerboards = true;
 
 	inputNumberOfBase = noOfBase;
 	inputNumberOfArm  = noOfArm;
@@ -46,6 +47,7 @@ void YouBotDiagnostics::startDiagnostics()
 	checkNumberOfMasterboards();
 	checkNumberOfControllerboards();
 
+	testInitialization();
 	testFunctionOfControllerboards();
 	testFunctionManually();
 
@@ -58,40 +60,17 @@ void YouBotDiagnostics::startDiagnostics()
 void YouBotDiagnostics::init()
 {
 	//check if the arm is in home position
-	bool   checkInput = false;
-	string askStartposition;
-
 	if (inputNumberOfArm > 0)
-	{
-		cout << "Does the ARM stand at startposition? [Y]es/[N]o: ";
-
-		while ( !checkInput )
-		{
-			cin  >> askStartposition;
-			cin.get(); //to delete the last ENTER from the buffer
-			makeLowerCase(askStartposition);
-
-			if ( (askStartposition == "n") || (askStartposition == "no")  )
-			{
-				cout << "Move arm to startposition and press ENTER" << endl;
-				cout << "If the arm is blocking, repower it!" << endl;
-				cin.get();
-
-				checkInput = true;
-			}
-			else
-			{
-				if ( (askStartposition != "yes") && (askStartposition != "y") )
-					cout << "Please type (Y)ES or (N)O" << endl;
-				else
-					checkInput = true;
-			}
-		}
-	}
+		checkHomepositionOfArm();
 
 	// check if an EthercatMaster is available
 	try
 	{
+		string path(YOUBOT_CONFIGURATIONS_DIR);
+		
+		if ( path.at(path.length() - 1 ) != '/')
+			configFileName = "/" + configFileName;
+		
 		ethercatMaster = &EthercatMaster::getInstance(configFileName, YOUBOT_CONFIGURATIONS_DIR);
 	}
 	catch(exception& ex)
@@ -159,10 +138,11 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 	EncoderTicksPerRound ticksPerRound;
 	InverseMovementDirection inverseDir;
 	JointLimits jLimits;
-	MotorContollerGearRatio contollerGearRatio;
+	FirmwareVersion firmwareTypeVersion;
     
-	ticksPerRound.setParameter(4096);
-	contollerGearRatio.setParameter(1);
+	ticksPerRound.setParameter(4000);
+	int controllerType;
+    double firmwareVersion;
 
 	*outputFile << "----- Topological Information of all slaves: -----" << endl;
 
@@ -189,7 +169,7 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 			jointCfg = 1;
 		else
 			jointCfg++;
-
+		
 		if ( !strcmp( etherCATSlaves[i].name, BASE_MASTER_BOARD) )
 		{
 			reset = true;
@@ -219,6 +199,10 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 			it->second.jointConfigNo        = jointCfg;
 			it->second.joint                = new YouBotJoint(jointNo);
 
+			it->second.joint->getConfigurationParameter(firmwareTypeVersion);
+			firmwareTypeVersion.getParameter(controllerType, firmwareVersion);
+			it->second.firmwareVersion = firmwareVersion;
+			
 			stringstream name;
 			name << "joint_" << jointNo;
 			jName.setParameter( name.str() );
@@ -230,7 +214,6 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 			it->second.joint->setConfigurationParameter(gearRatio);
 			it->second.joint->setConfigurationParameter(ticksPerRound);
 			it->second.joint->setConfigurationParameter(inverseDir);
-			it->second.joint->setConfigurationParameter(contollerGearRatio);
 		}
 
 		if( !strcmp( etherCATSlaves[i].name, ARM_CONTROLLER   ) )
@@ -249,6 +232,10 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 			it->second.jointConfigNo      = jointCfg;
 			it->second.joint		      = new YouBotJoint(jointNo);
 
+			it->second.joint->getConfigurationParameter(firmwareTypeVersion);
+			firmwareTypeVersion.getParameter(controllerType, firmwareVersion);
+			it->second.firmwareVersion = firmwareVersion;
+			
 			stringstream name;
 			name << "joint_" << jointNo;
 			jName.setParameter( name.str() );
@@ -259,48 +246,40 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 				case 1:
 					gearRatio.setParameter(1.0/156.0);
 					inverseDir.setParameter(true);
-					jLimits.setParameter(1000,580000, true);
+					jLimits.setParameter(-580000, -1000, true);
 					break;
 
 				case 2:
 					gearRatio.setParameter(1.0/156.0);
 					inverseDir.setParameter(true);
-					jLimits.setParameter(1000,260000, true);
+					jLimits.setParameter(-260000, -1000, true);
 					break;
 
 				case 3:
 					gearRatio.setParameter(1.0/100.0);
 					inverseDir.setParameter(true);
-					jLimits.setParameter(0,320000, true);
+					jLimits.setParameter(-320000, -1000, true);
 					break;
 
 				case 4:
 					gearRatio.setParameter(1.0/ 71.0);
 					inverseDir.setParameter(true);
-					jLimits.setParameter(0,155000, true);
+					jLimits.setParameter(-155000, -1000, true);
 					break;
 
 				case 5:
 					gearRatio.setParameter(1.0/ 71.0);
 					inverseDir.setParameter(true);
-					jLimits.setParameter(1000,255000, true);
+					jLimits.setParameter(-255000, -1000, true);
 					break;
 			}
-//			gearRatio.setParameter(1.0/1.0);
+
 
 			it->second.joint->setConfigurationParameter(jName);
 			it->second.joint->setConfigurationParameter(ticksPerRound);
 			it->second.joint->setConfigurationParameter(inverseDir);
-			//it->second.joint->setConfigurationParameter(jLimits);
+			it->second.joint->setConfigurationParameter(jLimits);
 			it->second.joint->setConfigurationParameter(gearRatio);
-			it->second.joint->setConfigurationParameter(contollerGearRatio);
-
-			if (jointCfg == 5)
-			{
-				MotorPoles motorPole;
-				motorPole.setParameter(8);
-				it->second.joint->setConfigurationParameter(motorPole);
-			}
 		}
 	}
 
@@ -327,6 +306,7 @@ void YouBotDiagnostics::showJointsTopologicalInformation()
 		*outputFile << "MasterBoardNo:  " << it->second.masterBoardNo   << endl;
 		*outputFile << "SlaveNo:        " << it->second.slaveNo         << endl;
 		*outputFile << "JointNo:        " << it->second.jointTopologyNo << endl;
+		*outputFile << "Firmware:       " << it->second.firmwareVersion << endl;
 
 		TopologyMap::iterator tmpIt = it;
 
@@ -341,19 +321,19 @@ void YouBotDiagnostics::showJointsTopologicalInformation()
 void YouBotDiagnostics::checkNumberOfMasterboards()
 {
 	*outputFile << "----- Compare number of found base-/arm-masterboard(s) with users input -----" << endl;
-	if (noOfArmMasterBoards != inputNumberOfArm)
+	if (noOfArmMasterBoards < inputNumberOfArm)
 	{
 		outputStream << "Not all ARM-MASTER-BOARDS according to users input could be found" << endl;
 		outputStream << "Found  ARM(S): " << noOfArmMasterBoards << endl;
 		outputStream << "Stated ARM(S): " << inputNumberOfArm << endl;
-		outputStream << "Check if the ethernet cable for the arm(s) is (are) connected!" << endl;
+		outputStream << "Check if the ethernet cable for the arm(s) is (are) connected or the input value is correct" << endl;
 		stdOutputAndFile(outputStream);
 
 		checkMasterboards = false;
 		sleep(3);
 	}
 
-	if (noOfBaseMasterBoards != inputNumberOfBase)
+	if (noOfBaseMasterBoards < inputNumberOfBase)
 	{
 		if(!checkMasterboards)
 			outputStream << separator_;
@@ -361,32 +341,45 @@ void YouBotDiagnostics::checkNumberOfMasterboards()
 		outputStream << "Not all BASE-MASTER-BOARDS according to users input could be found" << endl;
 		outputStream << "Found  BASE(S): " << noOfBaseMasterBoards << endl;
 		outputStream << "Stated BASE(S): " << inputNumberOfBase << endl;
-		outputStream << "Check if the ethernet cable for the base(s) is (are) connected!" << endl;
+		outputStream << "Check if the ethernet cable for the base(s) is (are) connected or the input value is correct!" << endl;
 		stdOutputAndFile(outputStream);
 
 		checkMasterboards = false;
 		sleep(3);
 	}
 
+	if (noOfArmMasterBoards > inputNumberOfArm || noOfBaseMasterBoards > inputNumberOfBase)
+	{
+		outputStream << " --> More Masterboards found than specified. Check your input value\n";
+		checkMasterboards = false;
+	}
+	
 	if (checkMasterboards)
 		outputStream << " --> Number of masterboards equates to user input\n";
 
 	outputStream << separator;
 	stdOutputAndFile(outputStream);
+	
+	if (noOfArmMasterBoards > inputNumberOfArm)
+		checkHomepositionOfArm();
 }
 
 
 void YouBotDiagnostics::checkNumberOfControllerboards()
 {
+	*outputFile << "----- Compare number of controllerboards -----" << endl;
+	
 	// check if all controllers could be found
 	if ( ( (noOfBaseMasterBoards*NUMBER_OF_BASE_JOINTS) != noOfBaseSlaveControllers ) || ( (noOfArmMasterBoards*NUMBER_OF_ARM_JOINTS) != noOfArmSlaveControllers ) )
 	{
+		checkControllerboards = false;
+		
 		if ( (noOfBaseMasterBoards*NUMBER_OF_BASE_JOINTS) != noOfBaseSlaveControllers )
 			outputStream << "Not all slave controller for the base could be found" << endl;
 		if ( (noOfArmMasterBoards*NUMBER_OF_ARM_JOINTS) != noOfArmSlaveControllers )
 			outputStream << "Not all slave controller for the arm could be found" << endl;
 
-		outputStream << separator;
+		outputStream << separator_;
 		outputStream << "----- Check, which controllers couldn't be found: -----" << endl;
 
 		stdOutputAndFile(outputStream);
@@ -431,6 +424,70 @@ void YouBotDiagnostics::checkNumberOfControllerboards()
 	}
 }
 
+void YouBotDiagnostics::testInitialization()
+{
+    InitializeJoint doInitialization;
+    bool isInitialized = false;
+    int noInitialization = 0;
+	
+	YouBotJoint *activeJoint;
+
+	for (TopologyMap::iterator it = youBotJointMap.begin(); it != youBotJointMap.end(); it++ )
+	{
+		activeJoint = it->second.joint;
+		
+		ClearMotorControllerTimeoutFlag clearTimeoutFlag;
+		activeJoint->setConfigurationParameter(clearTimeoutFlag);
+
+		doInitialization.setParameter(false);
+		activeJoint->getConfigurationParameter(doInitialization);
+		doInitialization.getParameter(isInitialized);
+
+		if (!isInitialized) 
+		{
+			doInitialization.setParameter(true);
+
+			ethercatMaster->AutomaticReceiveOn(false);
+			activeJoint->setConfigurationParameter(doInitialization);
+			ethercatMaster->AutomaticReceiveOn(true);
+
+			unsigned int statusFlags = 0;
+
+			// check for the next 5 sec if the joints are commutated
+			for (unsigned int u = 1; u <= 5000; u++) 
+			{
+				activeJoint->getStatus(statusFlags);
+
+				if (statusFlags & INITIALIZED)
+				{
+					SLEEP_MILLISEC(1000);
+					break;
+				}
+				
+				SLEEP_MILLISEC(1);
+			}
+		}
+
+		// the controller likes it
+		SLEEP_MILLISEC(10);
+			
+		doInitialization.setParameter(false);
+		ethercatMaster->AutomaticReceiveOn(false);
+		activeJoint->getConfigurationParameter(doInitialization);
+		ethercatMaster->AutomaticReceiveOn(true);
+		doInitialization.getParameter(isInitialized);
+		
+		it->second.isInitilized = isInitialized;
+	
+		//show initialization status
+		*outputFile  << "Commutation Status of joint #" << it->second.jointConfigNo << " of " 
+				      << it->second.masterBoardNo << "." << it->second.relatedUnit << ": " 
+					  << it->second.isInitilized << endl;
+		
+	}
+	
+	*outputFile << separator << endl;
+}
 
 void YouBotDiagnostics::testFunctionOfControllerboards()
 {
@@ -450,7 +507,11 @@ void YouBotDiagnostics::testFunctionOfControllerboards()
 		JointSensedCurrent	  msrCurrent;
 		JointAngleSetpoint	  cmdAngle;
 		JointVelocitySetpoint cmdSpeed;
-
+		JointCurrentSetpoint  cmdCurrent;
+	
+		
+		cmdCurrent.current = 0 * ampere;
+		unsigned int statusAndError = 0;
 
 		if( !strcmp(it->name, BASE_CONTROLLER) )
 		{
@@ -465,59 +526,48 @@ void YouBotDiagnostics::testFunctionOfControllerboards()
 			cmdSpeed.angularVelocity = 3 * radian_per_second;
 			activeJoint->setData(cmdSpeed);
 
+			activeJoint->getData(msrAngle);
+			oldAngle = msrAngle.angle.value();
+			
 			//check functionality for 5 seconds;
 			for(int i = 0; i < 5; i++)
 			{
 				sleep(1);
+				ethercatMaster->AutomaticReceiveOn(false);
 				activeJoint->getData(msrAngle);
-				newAngle = msrAngle.angle.value();
-				difAngle = newAngle - oldAngle;
-				oldAngle = newAngle;
-
-				*outputFile << "difference of position: " << difAngle << endl;
-
-				if (difAngle == 0)
-					motorActivity[slvCtr] = false;
-				else
-					motorActivity[slvCtr] = true;
+				ethercatMaster->AutomaticReceiveOn(true);
 			}
 
+			newAngle = msrAngle.angle.value();
+			difAngle = newAngle - oldAngle;
+			
+			*outputFile << "difference of position: " << difAngle << endl;
+			
 			// same procedure backward
 			cmdSpeed.angularVelocity = -3 * radian_per_second;
 			activeJoint->setData(cmdSpeed);
 
+			activeJoint->getData(msrAngle);
+			oldAngle = msrAngle.angle.value();
+			
 			for(int i = 0; i < 5; i++)
 			{
 				sleep(1);
+				ethercatMaster->AutomaticReceiveOn(false);
 				activeJoint->getData(msrAngle);
-				newAngle = msrAngle.angle.value();
-				difAngle = newAngle - oldAngle;
-				oldAngle = newAngle;
-
-				*outputFile << "difference of position: " << difAngle << endl;
-
-				if (difAngle == 0)
-					motorActivity[slvCtr] = false;
-				else
-					motorActivity[slvCtr] = true;
+				ethercatMaster->AutomaticReceiveOn(true);
 
 				if ( i == 4 )
 				{
 					//make motor movable
-					cmdSpeed.angularVelocity = 0 * radian_per_second;
-					activeJoint->setData(cmdSpeed);
+					activeJoint->setData(cmdCurrent);
 				}
 			}
-			cout << "DONE\n";
-
-			if (motorActivity[slvCtr])
-				outputStream << "STATUS: OK\n";
-			else
-				outputStream << "STATUS: ERROR\n";
-			stdOutputAndFile(outputStream);
-
-			cout << separator_;
-			*outputFile << separator;
+			
+			newAngle = msrAngle.angle.value();
+			difAngle = newAngle - oldAngle;
+			
+			*outputFile << "difference of position: " << difAngle << endl;
 		}
 
 		if( !strcmp(it->name, ARM_CONTROLLER) )
@@ -529,53 +579,66 @@ void YouBotDiagnostics::testFunctionOfControllerboards()
 			*outputFile << separator_;
 
 			activeJoint = youBotJointMap[slvCtr].joint;
-			activeJoint->getData(msrAngle);
-
-			float startPos = msrAngle.angle.value();
-
+			
 			//now set velocity mode and check position changes
 			cmdSpeed.angularVelocity = 0.2 * radian_per_second;
 			activeJoint->setData(cmdSpeed);
 
+			activeJoint->getData(msrAngle);
+			oldAngle = msrAngle.angle.value();
+			
 			//run velocitiy mode for "repeatLimit" seconds;
 			int repeatLimit = 3;
 			for (int i = 0; i < repeatLimit; i++)
 			{
 				sleep(1);
+				ethercatMaster->AutomaticReceiveOn(false);
 				activeJoint->getData(msrAngle);
 				activeJoint->getData(msrCurrent);
+				ethercatMaster->AutomaticReceiveOn(true);
+				
 				newAngle = msrAngle.angle.value();
 				difAngle = newAngle - oldAngle;
 				oldAngle = newAngle;
 
-//				cout << "newAngle >>> " << newAngle << " <<<"<< endl;
-				if (i == 0) *outputFile << "StartPosition: " << startPos << endl;
 				*outputFile << "difference of position: "  << setw(6) << difAngle << " and current: " << msrCurrent.current.value() <<endl;
+				
 				//set axis back to homeposition
-
-				if (difAngle == 0)
-					motorActivity[slvCtr] = false;
-				else
-					motorActivity[slvCtr] = true;
-
 				if ( i == (repeatLimit-1) )
 				{
-					cmdAngle.angle = 0.0 * radian;
+					cmdAngle.angle = 0.025 * radian;
 					activeJoint->setData(cmdAngle);
 				}
 			}
+		}
+		
+		if( !strcmp(it->name, BASE_CONTROLLER) || !strcmp(it->name, ARM_CONTROLLER) )
+		{
+			if (difAngle == 0)
+			{
+				motorActivity[slvCtr] = false;
+				//make the non working joint moveable
+				activeJoint->setData(cmdCurrent);
+				outputStream << "STATUS: ERROR\n";
+			}
+			else
+			{
+				motorActivity[slvCtr] = true;
+				outputStream << "STATUS: OK\n";
+			}
+
+			activeJoint->getStatus(statusAndError);
+			outputStream << "STATUSCODE: " << statusAndError << endl;
 
 			cout << "DONE\n";
-
-			if (motorActivity[slvCtr])
-				outputStream << "STATUS: OK\n";
-			else
-				outputStream << "STATUS: ERROR\n";
 			stdOutputAndFile(outputStream);
-
 			cout << separator_;
 			*outputFile << separator;
 		}
+		
+		//give the last joint the chance to drive back
+		if( slvCtr == etherCATSlaves.size() )
+			sleep(3);
 	}
 }
 
@@ -714,13 +777,17 @@ void YouBotDiagnostics::quickRestartTest()
 void YouBotDiagnostics::showSummary()
 {
 		outputStream << separator << "Diagnoses-test finished" << endl;
-	if (statusOK && quickRestartTestOK && checkMasterboards)
+	if (statusOK && quickRestartTestOK && checkMasterboards && checkControllerboards)
 		outputStream << "STATUS SUMMARY: Everything looks OK\n";
 	else if (!quickRestartTestOK)
 		outputStream << "STATUS SUMMARY: Quickstart failed\n";
 	else if (!checkMasterboards)
 		outputStream << "STATUS SUMMARY: Not all Masterboard(s) could be found\n"
-					 << "Check ethernet(-cable) connection from masterboard to masterboard\n";
+					 << "Check ethernet(-cable) connection from masterboard to masterboard\n"
+					 << "Or the specified value was wrong\n";
+	else if (!checkControllerboards)
+		outputStream << "STATUS SUMMARY: Not all Controllerboard(s) could be found\n" 
+					 << "See output-file for more informations\n";
 	else
 		outputStream << "STATUS SUMMARY: Errors occured\n";
 
@@ -786,3 +853,33 @@ void YouBotDiagnostics::stdOutputAndFile(stringstream & stream)
 	clrStream(stream);
 }
 
+bool YouBotDiagnostics::checkHomepositionOfArm(void)
+{
+	bool   checkInput = false;
+	string askStartposition;
+
+	cout << "Does the ARM stand at startposition? [Y]es/[N]o: ";
+
+	while ( !checkInput )
+	{
+		cin  >> askStartposition;
+		cin.get(); //to delete the last ENTER from the buffer
+		makeLowerCase(askStartposition);
+
+		if ( (askStartposition == "n") || (askStartposition == "no")  )
+		{
+			cout << "Move arm to startposition and press ENTER" << endl;
+			cout << "If the arm is blocking, repower it and restart the program!" << endl;
+			cin.get();
+
+			checkInput = true;
+		}
+		else
+		{
+			if ( (askStartposition != "yes") && (askStartposition != "y") )
+				cout << "Please type (Y)ES or (N)O" << endl;
+			else
+				checkInput = true;
+		}
+	}
+}
