@@ -32,7 +32,7 @@ YouBotDiagnostics::YouBotDiagnostics(std::fstream * file, int noOfBase, int noOf
 
 YouBotDiagnostics::~YouBotDiagnostics() {
 	if (ethercatMaster) {
-		ethercatMaster->destroy();
+		EthercatMaster::destroy();
 		ethercatMaster = 0;
 	}
 }
@@ -757,7 +757,7 @@ void YouBotDiagnostics::quickRestartTest()
 	{
 		*outputFile << "Number of all slaves before "<< i+1 <<". restart: " << noOfAllEtherCATSlaves << endl;
 		if (ethercatMaster) {
-			ethercatMaster->destroy();
+			EthercatMaster::destroy();
 			ethercatMaster = 0;
 		}
 		ethercatMaster = &EthercatMaster::getInstance(configFileName, YOUBOT_CONFIGURATIONS_DIR);

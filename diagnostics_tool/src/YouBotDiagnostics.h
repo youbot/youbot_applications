@@ -147,7 +147,7 @@ private:
 
 	// instance of the EthercatMaster.
 	// It is a pointer because multiple instances are created and destroyed for testing purposes
-	youbot::EthercatMaster* ethercatMaster;
+	youbot::EthercatMasterInterface* ethercatMaster;
 
 	// save the slave types in a map
 	map<string, string> slaveTypMap;
