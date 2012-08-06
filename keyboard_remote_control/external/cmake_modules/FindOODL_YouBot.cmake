@@ -44,6 +44,8 @@ FIND_PATH(OODL_YOUBOT_CONFIG_DIR NAMES youbot-ethercat.cfg
   $ENV{ROBOTPKG_BASE}/config/
   ${youbot_driver_PACKAGE_PATH}/config/
   /etc/youbot/
+  /usr/config
+  /usr/local/config
   NO_DEFAULT_PATH
 )
 
