@@ -86,16 +86,16 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   JointName jName;
   joint->getConfigurationParameter(jName);
   jName.getParameter(jointName);
-  
+
   std::cout << std::setprecision(15);
 
 
-  double firmwareVer;
-  int controller;
+  double firmwareVer = 0;
+  int controller = 0;
   if (UseParameter) {
     configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
     configfile->readInto(controller, "Joint_Type", "ControllerType");
-    if ((version == firmwareVer) && (controller == controllerType)) {
+    if ((version != firmwareVer) || (controller != controllerType)) {
       UseParameter = false;
       throw std::runtime_error("The configuration file for the joint parameter contain the wrong controller type or firmware version!");
       delete configfile;
@@ -112,7 +112,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
       delete configfilePP;
     }
   }
- 
+
 }
 
 JointConfigurator::~JointConfigurator() {
@@ -135,7 +135,7 @@ void JointConfigurator::readParameters() {
   std::cout << std::endl << "===========================================================" << std::endl;
   std::cout << "Joint: " << jointName << std::endl;
   std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
-  
+
   joint->getConfigurationParameter(MaximumPositioningVelocity_Parameter);
   MaximumPositioningVelocity_Parameter.getParameter(MaximumPositioningVelocity_actual);
   configfile->readInto(dummy, "Joint_Parameter", "MaximumPositioningVelocity");
@@ -455,7 +455,7 @@ void JointConfigurator::readParameters() {
   } else {
     std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
   }
-  
+
   joint->getConfigurationParameter(VelocityThresholdForHallFX_Parameter);
   VelocityThresholdForHallFX_Parameter.getParameter(VelocityThresholdForHallFX_actual);
   configfile->readInto(dummy, "Joint_Parameter", "VelocityThresholdForHallFX");
@@ -863,9 +863,9 @@ void JointConfigurator::readReadOnlyParameters() {
   ActualMotorDriverTemperature_Parameter.getParameter(ActualMotorDriverTemperature_actual);
   std::cout << "ActualMotorDriverTemperature \t\t\t\tactual: " << ActualMotorDriverTemperature_actual << std::endl;
 
-//  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
-//  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
-//  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
+  //  joint->getConfigurationParameter(ActualModuleSupplyCurrent_Parameter);
+  //  ActualModuleSupplyCurrent_Parameter.getParameter(ActualModuleSupplyCurrent_actual);
+  //  std::cout << "ActualModuleSupplyCurrent \t\t\t\tactual: " << ActualModuleSupplyCurrent_actual << std::endl;
 
 
 }
@@ -875,106 +875,211 @@ void JointConfigurator::setParametersToJoint() {
     std::cout << "The Joint Parameters have to been read before hand!" << std::endl;
     return;
   }
-  MaximumPositioningVelocity_Parameter.setParameter(MaximumPositioningVelocity_file);
-  joint->setConfigurationParameter(MaximumPositioningVelocity_Parameter);
-
-  MotorAcceleration_Parameter.setParameter(MotorAcceleration_file);
-  joint->setConfigurationParameter(MotorAcceleration_Parameter);
-
-  PositionControlSwitchingThreshold_Parameter.setParameter(PositionControlSwitchingThreshold_file);
-  joint->setConfigurationParameter(PositionControlSwitchingThreshold_Parameter);
-
-  SpeedControlSwitchingThreshold_Parameter.setParameter(SpeedControlSwitchingThreshold_file);
-  joint->setConfigurationParameter(SpeedControlSwitchingThreshold_Parameter);
-
-  CurrentControlSwitchingThreshold_Parameter.setParameter(CurrentControlSwitchingThreshold_file);
-  joint->setConfigurationParameter(CurrentControlSwitchingThreshold_Parameter);
-
-  RampGeneratorSpeedAndPositionControl_Parameter.setParameter(RampGeneratorSpeedAndPositionControl_file);
-  joint->setConfigurationParameter(RampGeneratorSpeedAndPositionControl_Parameter);
-
-  PParameterFirstParametersPositionControl_Parameter.setParameter(PParameterFirstParametersPositionControl_file);
-  joint->setConfigurationParameter(PParameterFirstParametersPositionControl_Parameter);
-
-  IParameterFirstParametersPositionControl_Parameter.setParameter(IParameterFirstParametersPositionControl_file);
-  joint->setConfigurationParameter(IParameterFirstParametersPositionControl_Parameter);
-
-  DParameterFirstParametersPositionControl_Parameter.setParameter(DParameterFirstParametersPositionControl_file);
-  joint->setConfigurationParameter(DParameterFirstParametersPositionControl_Parameter);
-
-  IClippingParameterFirstParametersPositionControl_Parameter.setParameter(IClippingParameterFirstParametersPositionControl_file);
-  joint->setConfigurationParameter(IClippingParameterFirstParametersPositionControl_Parameter);
-
-  PParameterFirstParametersSpeedControl_Parameter.setParameter(PParameterFirstParametersSpeedControl_file);
-  joint->setConfigurationParameter(PParameterFirstParametersSpeedControl_Parameter);
-
-  IParameterFirstParametersSpeedControl_Parameter.setParameter(IParameterFirstParametersSpeedControl_file);
-  joint->setConfigurationParameter(IParameterFirstParametersSpeedControl_Parameter);
-
-  DParameterFirstParametersSpeedControl_Parameter.setParameter(DParameterFirstParametersSpeedControl_file);
-  joint->setConfigurationParameter(DParameterFirstParametersSpeedControl_Parameter);
-
-  IClippingParameterFirstParametersSpeedControl_Parameter.setParameter(IClippingParameterFirstParametersSpeedControl_file);
-  joint->setConfigurationParameter(IClippingParameterFirstParametersSpeedControl_Parameter);
-
-  PParameterFirstParametersCurrentControl_Parameter.setParameter(PParameterFirstParametersCurrentControl_file);
-  joint->setConfigurationParameter(PParameterFirstParametersCurrentControl_Parameter);
-
-  IParameterFirstParametersCurrentControl_Parameter.setParameter(IParameterFirstParametersCurrentControl_file);
-  joint->setConfigurationParameter(IParameterFirstParametersCurrentControl_Parameter);
-
-  DParameterFirstParametersCurrentControl_Parameter.setParameter(DParameterFirstParametersCurrentControl_file);
-  joint->setConfigurationParameter(DParameterFirstParametersCurrentControl_Parameter);
-
-  IClippingParameterFirstParametersCurrentControl_Parameter.setParameter(IClippingParameterFirstParametersCurrentControl_file);
-  joint->setConfigurationParameter(IClippingParameterFirstParametersCurrentControl_Parameter);
-
-  PParameterSecondParametersPositionControl_Parameter.setParameter(PParameterSecondParametersPositionControl_file);
-  joint->setConfigurationParameter(PParameterSecondParametersPositionControl_Parameter);
-
-  IParameterSecondParametersPositionControl_Parameter.setParameter(IParameterSecondParametersPositionControl_file);
-  joint->setConfigurationParameter(IParameterSecondParametersPositionControl_Parameter);
-
-  DParameterSecondParametersPositionControl_Parameter.setParameter(DParameterSecondParametersPositionControl_file);
-  joint->setConfigurationParameter(DParameterSecondParametersPositionControl_Parameter);
-
-  IClippingParameterSecondParametersPositionControl_Parameter.setParameter(IClippingParameterSecondParametersPositionControl_file);
-  joint->setConfigurationParameter(IClippingParameterSecondParametersPositionControl_Parameter);
-
-  PParameterSecondParametersSpeedControl_Parameter.setParameter(PParameterSecondParametersSpeedControl_file);
-  joint->setConfigurationParameter(PParameterSecondParametersSpeedControl_Parameter);
-
-  IParameterSecondParametersSpeedControl_Parameter.setParameter(IParameterSecondParametersSpeedControl_file);
-  joint->setConfigurationParameter(IParameterSecondParametersSpeedControl_Parameter);
-
-  DParameterSecondParametersSpeedControl_Parameter.setParameter(DParameterSecondParametersSpeedControl_file);
-  joint->setConfigurationParameter(DParameterSecondParametersSpeedControl_Parameter);
-
-  IClippingParameterSecondParametersSpeedControl_Parameter.setParameter(IClippingParameterSecondParametersSpeedControl_file);
-  joint->setConfigurationParameter(IClippingParameterSecondParametersSpeedControl_Parameter);
-
-  PParameterSecondParametersCurrentControl_Parameter.setParameter(PParameterSecondParametersCurrentControl_file);
-  joint->setConfigurationParameter(PParameterSecondParametersCurrentControl_Parameter);
-
-  IParameterSecondParametersCurrentControl_Parameter.setParameter(IParameterSecondParametersCurrentControl_file);
-  joint->setConfigurationParameter(IParameterSecondParametersCurrentControl_Parameter);
-
-  DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
-  joint->setConfigurationParameter(DParameterSecondParametersCurrentControl_Parameter);
-
-  IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
-  joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
-
-  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-  joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
-
-  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-  joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
-
-  VelocityThresholdForHallFX_Parameter.setParameter(VelocityThresholdForHallFX_file);
-  joint->setConfigurationParameter(VelocityThresholdForHallFX_Parameter);
   
-  std::cout << "Parameters set for Joint: " << jointName << std::endl;
+  std::cout << "Setting parameters for Joint: " << jointName << std::endl;
+
+  if (!AreSame(MaximumPositioningVelocity_actual.value(), MaximumPositioningVelocity_file.value())) {
+    MaximumPositioningVelocity_Parameter.setParameter(MaximumPositioningVelocity_file);
+    joint->setConfigurationParameter(MaximumPositioningVelocity_Parameter);
+    std::cout << "MaximumPositioningVelocity set to: " << MaximumPositioningVelocity_file << std::endl;
+  }
+
+  if (!AreSame(MotorAcceleration_actual.value(), MotorAcceleration_file.value())) {
+    MotorAcceleration_Parameter.setParameter(MotorAcceleration_file);
+    joint->setConfigurationParameter(MotorAcceleration_Parameter);
+    std::cout << "MotorAcceleration set to: " << MotorAcceleration_file << std::endl;
+  }
+
+  if (!AreSame(PositionControlSwitchingThreshold_actual.value(), PositionControlSwitchingThreshold_file.value())) {
+    PositionControlSwitchingThreshold_Parameter.setParameter(PositionControlSwitchingThreshold_file);
+    joint->setConfigurationParameter(PositionControlSwitchingThreshold_Parameter);
+    std::cout << "PositionControlSwitchingThreshold set to: " << PositionControlSwitchingThreshold_file << std::endl;
+  }
+
+  if (!AreSame(SpeedControlSwitchingThreshold_actual.value(), SpeedControlSwitchingThreshold_file.value())) {
+    SpeedControlSwitchingThreshold_Parameter.setParameter(SpeedControlSwitchingThreshold_file);
+    joint->setConfigurationParameter(SpeedControlSwitchingThreshold_Parameter);
+    std::cout << "SpeedControlSwitchingThreshold set to: " << SpeedControlSwitchingThreshold_file << std::endl;
+  }
+
+  if (!AreSame(CurrentControlSwitchingThreshold_actual.value(), CurrentControlSwitchingThreshold_file.value())) {
+    CurrentControlSwitchingThreshold_Parameter.setParameter(CurrentControlSwitchingThreshold_file);
+    joint->setConfigurationParameter(CurrentControlSwitchingThreshold_Parameter);
+    std::cout << "CurrentControlSwitchingThreshold set to: " << CurrentControlSwitchingThreshold_file << std::endl;
+  }
+
+  if (!AreSame(RampGeneratorSpeedAndPositionControl_actual, RampGeneratorSpeedAndPositionControl_file)) {
+    RampGeneratorSpeedAndPositionControl_Parameter.setParameter(RampGeneratorSpeedAndPositionControl_file);
+    joint->setConfigurationParameter(RampGeneratorSpeedAndPositionControl_Parameter);
+    std::cout << "RampGeneratorSpeedAndPositionControl set to: " << RampGeneratorSpeedAndPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(PParameterFirstParametersPositionControl_actual, PParameterFirstParametersPositionControl_file)) {
+    PParameterFirstParametersPositionControl_Parameter.setParameter(PParameterFirstParametersPositionControl_file);
+    joint->setConfigurationParameter(PParameterFirstParametersPositionControl_Parameter);
+    std::cout << "PParameterFirstParametersPositionControl set to: " << PParameterFirstParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(IParameterFirstParametersPositionControl_actual, IParameterFirstParametersPositionControl_file)) {
+    IParameterFirstParametersPositionControl_Parameter.setParameter(IParameterFirstParametersPositionControl_file);
+    joint->setConfigurationParameter(IParameterFirstParametersPositionControl_Parameter);
+    std::cout << "IParameterFirstParametersPositionControl set to: " << IParameterFirstParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(DParameterFirstParametersPositionControl_actual, DParameterFirstParametersPositionControl_file)) {
+    DParameterFirstParametersPositionControl_Parameter.setParameter(DParameterFirstParametersPositionControl_file);
+    joint->setConfigurationParameter(DParameterFirstParametersPositionControl_Parameter);
+    std::cout << "DParameterFirstParametersPositionControl set to: " << DParameterFirstParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(IClippingParameterFirstParametersPositionControl_actual, IClippingParameterFirstParametersPositionControl_file)) {
+    IClippingParameterFirstParametersPositionControl_Parameter.setParameter(IClippingParameterFirstParametersPositionControl_file);
+    joint->setConfigurationParameter(IClippingParameterFirstParametersPositionControl_Parameter);
+    std::cout << "IClippingParameterFirstParametersPositionControl set to: " << IClippingParameterFirstParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(PParameterFirstParametersSpeedControl_actual, PParameterFirstParametersSpeedControl_file)) {
+    PParameterFirstParametersSpeedControl_Parameter.setParameter(PParameterFirstParametersSpeedControl_file);
+    joint->setConfigurationParameter(PParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "PParameterFirstParametersSpeedControl set to: " << PParameterFirstParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(IParameterFirstParametersSpeedControl_actual, IParameterFirstParametersSpeedControl_file)) {
+    IParameterFirstParametersSpeedControl_Parameter.setParameter(IParameterFirstParametersSpeedControl_file);
+    joint->setConfigurationParameter(IParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "IParameterFirstParametersSpeedControl set to: " << IParameterFirstParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(DParameterFirstParametersSpeedControl_actual, DParameterFirstParametersSpeedControl_file)) {
+    DParameterFirstParametersSpeedControl_Parameter.setParameter(DParameterFirstParametersSpeedControl_file);
+    joint->setConfigurationParameter(DParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "DParameterFirstParametersSpeedControl set to: " << DParameterFirstParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(IClippingParameterFirstParametersSpeedControl_actual, IClippingParameterFirstParametersSpeedControl_file)) {
+    IClippingParameterFirstParametersSpeedControl_Parameter.setParameter(IClippingParameterFirstParametersSpeedControl_file);
+    joint->setConfigurationParameter(IClippingParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "IClippingParameterFirstParametersSpeedControl set to: " << IClippingParameterFirstParametersSpeedControl_file << std::endl;
+  }
+
+
+  if (!AreSame(PParameterFirstParametersCurrentControl_actual, PParameterFirstParametersCurrentControl_file)) {
+    PParameterFirstParametersCurrentControl_Parameter.setParameter(PParameterFirstParametersCurrentControl_file);
+    joint->setConfigurationParameter(PParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "PParameterFirstParametersCurrentControl set to: " << PParameterFirstParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(IParameterFirstParametersCurrentControl_actual, IParameterFirstParametersCurrentControl_file)) {
+    IParameterFirstParametersCurrentControl_Parameter.setParameter(IParameterFirstParametersCurrentControl_file);
+    joint->setConfigurationParameter(IParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "IParameterFirstParametersCurrentControl set to: " << IParameterFirstParametersCurrentControl_file << std::endl;
+  }
+
+
+  if (!AreSame(DParameterFirstParametersCurrentControl_actual, DParameterFirstParametersCurrentControl_file)) {
+    DParameterFirstParametersCurrentControl_Parameter.setParameter(DParameterFirstParametersCurrentControl_file);
+    joint->setConfigurationParameter(DParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "DParameterFirstParametersCurrentControl set to: " << DParameterFirstParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(IClippingParameterFirstParametersCurrentControl_actual, IClippingParameterFirstParametersCurrentControl_file)) {
+    IClippingParameterFirstParametersCurrentControl_Parameter.setParameter(IClippingParameterFirstParametersCurrentControl_file);
+    joint->setConfigurationParameter(IClippingParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "IClippingParameterFirstParametersCurrentControl set to: " << IClippingParameterFirstParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(PParameterSecondParametersPositionControl_actual, PParameterSecondParametersPositionControl_file)) {
+    PParameterSecondParametersPositionControl_Parameter.setParameter(PParameterSecondParametersPositionControl_file);
+    joint->setConfigurationParameter(PParameterSecondParametersPositionControl_Parameter);
+    std::cout << "PParameterSecondParametersPositionControl set to: " << PParameterSecondParametersPositionControl_file << std::endl;
+  }
+
+
+  if (!AreSame(IParameterSecondParametersPositionControl_actual, IParameterSecondParametersPositionControl_file)) {
+    IParameterSecondParametersPositionControl_Parameter.setParameter(IParameterSecondParametersPositionControl_file);
+    joint->setConfigurationParameter(IParameterSecondParametersPositionControl_Parameter);
+    std::cout << "IParameterSecondParametersPositionControl set to: " << IParameterSecondParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(DParameterSecondParametersPositionControl_actual, DParameterSecondParametersPositionControl_file)) {
+    DParameterSecondParametersPositionControl_Parameter.setParameter(DParameterSecondParametersPositionControl_file);
+    joint->setConfigurationParameter(DParameterSecondParametersPositionControl_Parameter);
+    std::cout << "DParameterSecondParametersPositionControl set to: " << DParameterSecondParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(IClippingParameterSecondParametersPositionControl_actual, IClippingParameterSecondParametersPositionControl_file)) {
+    IClippingParameterSecondParametersPositionControl_Parameter.setParameter(IClippingParameterSecondParametersPositionControl_file);
+    joint->setConfigurationParameter(IClippingParameterSecondParametersPositionControl_Parameter);
+    std::cout << "IClippingParameterSecondParametersPositionControl set to: " << IClippingParameterSecondParametersPositionControl_file << std::endl;
+  }
+
+  if (!AreSame(PParameterSecondParametersSpeedControl_actual, PParameterSecondParametersSpeedControl_file)) {
+    PParameterSecondParametersSpeedControl_Parameter.setParameter(PParameterSecondParametersSpeedControl_file);
+    joint->setConfigurationParameter(PParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "PParameterSecondParametersSpeedControl set to: " << PParameterSecondParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(IParameterSecondParametersSpeedControl_actual, IParameterSecondParametersSpeedControl_file)) {
+    IParameterSecondParametersSpeedControl_Parameter.setParameter(IParameterSecondParametersSpeedControl_file);
+    joint->setConfigurationParameter(IParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "IParameterSecondParametersSpeedControl set to: " << IParameterSecondParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(DParameterSecondParametersSpeedControl_actual, DParameterSecondParametersSpeedControl_file)) {
+    DParameterSecondParametersSpeedControl_Parameter.setParameter(DParameterSecondParametersSpeedControl_file);
+    joint->setConfigurationParameter(DParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "DParameterSecondParametersSpeedControl set to: " << DParameterSecondParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(IClippingParameterSecondParametersSpeedControl_actual, IClippingParameterSecondParametersSpeedControl_file)) {
+    IClippingParameterSecondParametersSpeedControl_Parameter.setParameter(IClippingParameterSecondParametersSpeedControl_file);
+    joint->setConfigurationParameter(IClippingParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "IClippingParameterSecondParametersSpeedControl set to: " << IClippingParameterSecondParametersSpeedControl_file << std::endl;
+  }
+
+  if (!AreSame(PParameterSecondParametersCurrentControl_actual, PParameterSecondParametersCurrentControl_file)) {
+    PParameterSecondParametersCurrentControl_Parameter.setParameter(PParameterSecondParametersCurrentControl_file);
+    joint->setConfigurationParameter(PParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "PParameterSecondParametersCurrentControl set to: " << PParameterSecondParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(IParameterSecondParametersCurrentControl_actual, IParameterSecondParametersCurrentControl_file)) {
+    IParameterSecondParametersCurrentControl_Parameter.setParameter(IParameterSecondParametersCurrentControl_file);
+    joint->setConfigurationParameter(IParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "IParameterSecondParametersCurrentControl set to: " << IParameterSecondParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(DParameterSecondParametersCurrentControl_actual, DParameterSecondParametersCurrentControl_file)) {
+    DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
+    joint->setConfigurationParameter(DParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "DParameterSecondParametersCurrentControl set to: " << DParameterSecondParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(IClippingParameterSecondParametersCurrentControl_actual, IClippingParameterSecondParametersCurrentControl_file)) {
+    IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
+    joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "IClippingParameterSecondParametersCurrentControl set to: " << IClippingParameterSecondParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+    MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+    joint->setConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
+    std::cout << "MaximumVelocityToSetPosition set to: " << MaximumVelocityToSetPosition_file << std::endl;
+  }
+
+  if (!AreSame(PositionTargetReachedDistance_actual, PositionTargetReachedDistance_file)) {
+    PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+    joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
+    std::cout << "PositionTargetReachedDistance set to: " << PositionTargetReachedDistance_file << std::endl;
+  }
+
+  if (!AreSame(VelocityThresholdForHallFX_actual.value(), VelocityThresholdForHallFX_file.value())) {
+    VelocityThresholdForHallFX_Parameter.setParameter(VelocityThresholdForHallFX_file);
+    joint->setConfigurationParameter(VelocityThresholdForHallFX_Parameter);
+    std::cout << "VelocityThresholdForHallFX set to: " << VelocityThresholdForHallFX_file << std::endl;
+  }
+
+  std::cout << "Parameters set for Joint: " << jointName << std::endl << std::endl;
 
 }
 
@@ -1092,107 +1197,210 @@ void JointConfigurator::storeParametersToJoint() {
     return;
   }
 
-  MaximumPositioningVelocity_Parameter.setParameter(MaximumPositioningVelocity_file);
-  joint->storeConfigurationParameterPermanent(MaximumPositioningVelocity_Parameter);
+    std::cout << "Storing parameters for Joint: " << jointName << std::endl;
 
-  MotorAcceleration_Parameter.setParameter(MotorAcceleration_file);
-  joint->storeConfigurationParameterPermanent(MotorAcceleration_Parameter);
+  if (!AreSame(MaximumPositioningVelocity_actual.value(), MaximumPositioningVelocity_file.value())) {
+    MaximumPositioningVelocity_Parameter.setParameter(MaximumPositioningVelocity_file);
+    joint->storeConfigurationParameterPermanent(MaximumPositioningVelocity_Parameter);
+    std::cout << "MaximumPositioningVelocity stored0 to: " << MaximumPositioningVelocity_file << std::endl;
+  }
 
-  PositionControlSwitchingThreshold_Parameter.setParameter(PositionControlSwitchingThreshold_file);
-  joint->storeConfigurationParameterPermanent(PositionControlSwitchingThreshold_Parameter);
+  if (!AreSame(MotorAcceleration_actual.value(), MotorAcceleration_file.value())) {
+    MotorAcceleration_Parameter.setParameter(MotorAcceleration_file);
+    joint->storeConfigurationParameterPermanent(MotorAcceleration_Parameter);
+    std::cout << "MotorAcceleration stored with: " << MotorAcceleration_file << std::endl;
+  }
 
-  SpeedControlSwitchingThreshold_Parameter.setParameter(SpeedControlSwitchingThreshold_file);
-  joint->storeConfigurationParameterPermanent(SpeedControlSwitchingThreshold_Parameter);
+  if (!AreSame(PositionControlSwitchingThreshold_actual.value(), PositionControlSwitchingThreshold_file.value())) {
+    PositionControlSwitchingThreshold_Parameter.setParameter(PositionControlSwitchingThreshold_file);
+    joint->storeConfigurationParameterPermanent(PositionControlSwitchingThreshold_Parameter);
+    std::cout << "PositionControlSwitchingThreshold stored with: " << PositionControlSwitchingThreshold_file << std::endl;
+  }
 
-  CurrentControlSwitchingThreshold_Parameter.setParameter(CurrentControlSwitchingThreshold_file);
-  joint->storeConfigurationParameterPermanent(CurrentControlSwitchingThreshold_Parameter);
+  if (!AreSame(SpeedControlSwitchingThreshold_actual.value(), SpeedControlSwitchingThreshold_file.value())) {
+    SpeedControlSwitchingThreshold_Parameter.setParameter(SpeedControlSwitchingThreshold_file);
+    joint->storeConfigurationParameterPermanent(SpeedControlSwitchingThreshold_Parameter);
+    std::cout << "SpeedControlSwitchingThreshold stored with: " << SpeedControlSwitchingThreshold_file << std::endl;
+  }
 
-  RampGeneratorSpeedAndPositionControl_Parameter.setParameter(RampGeneratorSpeedAndPositionControl_file);
-  joint->storeConfigurationParameterPermanent(RampGeneratorSpeedAndPositionControl_Parameter);
+  if (!AreSame(CurrentControlSwitchingThreshold_actual.value(), CurrentControlSwitchingThreshold_file.value())) {
+    CurrentControlSwitchingThreshold_Parameter.setParameter(CurrentControlSwitchingThreshold_file);
+    joint->storeConfigurationParameterPermanent(CurrentControlSwitchingThreshold_Parameter);
+    std::cout << "CurrentControlSwitchingThreshold stored with: " << CurrentControlSwitchingThreshold_file << std::endl;
+  }
 
-  PParameterFirstParametersPositionControl_Parameter.setParameter(PParameterFirstParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(PParameterFirstParametersPositionControl_Parameter);
+  if (!AreSame(RampGeneratorSpeedAndPositionControl_actual, RampGeneratorSpeedAndPositionControl_file)) {
+    RampGeneratorSpeedAndPositionControl_Parameter.setParameter(RampGeneratorSpeedAndPositionControl_file);
+    joint->storeConfigurationParameterPermanent(RampGeneratorSpeedAndPositionControl_Parameter);
+    std::cout << "RampGeneratorSpeedAndPositionControl stored with: " << RampGeneratorSpeedAndPositionControl_file << std::endl;
+  }
 
-  IParameterFirstParametersPositionControl_Parameter.setParameter(IParameterFirstParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(IParameterFirstParametersPositionControl_Parameter);
+  if (!AreSame(PParameterFirstParametersPositionControl_actual, PParameterFirstParametersPositionControl_file)) {
+    PParameterFirstParametersPositionControl_Parameter.setParameter(PParameterFirstParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterFirstParametersPositionControl_Parameter);
+    std::cout << "PParameterFirstParametersPositionControl stored with: " << PParameterFirstParametersPositionControl_file << std::endl;
+  }
 
-  DParameterFirstParametersPositionControl_Parameter.setParameter(DParameterFirstParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(DParameterFirstParametersPositionControl_Parameter);
+  if (!AreSame(IParameterFirstParametersPositionControl_actual, IParameterFirstParametersPositionControl_file)) {
+    IParameterFirstParametersPositionControl_Parameter.setParameter(IParameterFirstParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterFirstParametersPositionControl_Parameter);
+    std::cout << "IParameterFirstParametersPositionControl stored with: " << IParameterFirstParametersPositionControl_file << std::endl;
+  }
 
-  IClippingParameterFirstParametersPositionControl_Parameter.setParameter(IClippingParameterFirstParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersPositionControl_Parameter);
+  if (!AreSame(DParameterFirstParametersPositionControl_actual, DParameterFirstParametersPositionControl_file)) {
+    DParameterFirstParametersPositionControl_Parameter.setParameter(DParameterFirstParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterFirstParametersPositionControl_Parameter);
+    std::cout << "DParameterFirstParametersPositionControl stored with: " << DParameterFirstParametersPositionControl_file << std::endl;
+  }
 
-  PParameterFirstParametersSpeedControl_Parameter.setParameter(PParameterFirstParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(PParameterFirstParametersSpeedControl_Parameter);
+  if (!AreSame(IClippingParameterFirstParametersPositionControl_actual, IClippingParameterFirstParametersPositionControl_file)) {
+    IClippingParameterFirstParametersPositionControl_Parameter.setParameter(IClippingParameterFirstParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersPositionControl_Parameter);
+    std::cout << "IClippingParameterFirstParametersPositionControl stored with: " << IClippingParameterFirstParametersPositionControl_file << std::endl;
+  }
 
-  IParameterFirstParametersSpeedControl_Parameter.setParameter(IParameterFirstParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(IParameterFirstParametersSpeedControl_Parameter);
+  if (!AreSame(PParameterFirstParametersSpeedControl_actual, PParameterFirstParametersSpeedControl_file)) {
+    PParameterFirstParametersSpeedControl_Parameter.setParameter(PParameterFirstParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "PParameterFirstParametersSpeedControl stored with: " << PParameterFirstParametersSpeedControl_file << std::endl;
+  }
 
-  DParameterFirstParametersSpeedControl_Parameter.setParameter(DParameterFirstParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(DParameterFirstParametersSpeedControl_Parameter);
+  if (!AreSame(IParameterFirstParametersSpeedControl_actual, IParameterFirstParametersSpeedControl_file)) {
+    IParameterFirstParametersSpeedControl_Parameter.setParameter(IParameterFirstParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "IParameterFirstParametersSpeedControl stored with: " << IParameterFirstParametersSpeedControl_file << std::endl;
+  }
 
-  IClippingParameterFirstParametersSpeedControl_Parameter.setParameter(IClippingParameterFirstParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersSpeedControl_Parameter);
+  if (!AreSame(DParameterFirstParametersSpeedControl_actual, DParameterFirstParametersSpeedControl_file)) {
+    DParameterFirstParametersSpeedControl_Parameter.setParameter(DParameterFirstParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "DParameterFirstParametersSpeedControl stored with: " << DParameterFirstParametersSpeedControl_file << std::endl;
+  }
 
-  PParameterFirstParametersCurrentControl_Parameter.setParameter(PParameterFirstParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(PParameterFirstParametersCurrentControl_Parameter);
+  if (!AreSame(IClippingParameterFirstParametersSpeedControl_actual, IClippingParameterFirstParametersSpeedControl_file)) {
+    IClippingParameterFirstParametersSpeedControl_Parameter.setParameter(IClippingParameterFirstParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersSpeedControl_Parameter);
+    std::cout << "IClippingParameterFirstParametersSpeedControl stored with: " << IClippingParameterFirstParametersSpeedControl_file << std::endl;
+  }
 
-  IParameterFirstParametersCurrentControl_Parameter.setParameter(IParameterFirstParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(IParameterFirstParametersCurrentControl_Parameter);
 
-  DParameterFirstParametersCurrentControl_Parameter.setParameter(DParameterFirstParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(DParameterFirstParametersCurrentControl_Parameter);
+  if (!AreSame(PParameterFirstParametersCurrentControl_actual, PParameterFirstParametersCurrentControl_file)) {
+    PParameterFirstParametersCurrentControl_Parameter.setParameter(PParameterFirstParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "PParameterFirstParametersCurrentControl stored with: " << PParameterFirstParametersCurrentControl_file << std::endl;
+  }
 
-  IClippingParameterFirstParametersCurrentControl_Parameter.setParameter(IClippingParameterFirstParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersCurrentControl_Parameter);
+  if (!AreSame(IParameterFirstParametersCurrentControl_actual, IParameterFirstParametersCurrentControl_file)) {
+    IParameterFirstParametersCurrentControl_Parameter.setParameter(IParameterFirstParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "IParameterFirstParametersCurrentControl stored with: " << IParameterFirstParametersCurrentControl_file << std::endl;
+  }
 
-  PParameterSecondParametersPositionControl_Parameter.setParameter(PParameterSecondParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(PParameterSecondParametersPositionControl_Parameter);
 
-  IParameterSecondParametersPositionControl_Parameter.setParameter(IParameterSecondParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(IParameterSecondParametersPositionControl_Parameter);
+  if (!AreSame(DParameterFirstParametersCurrentControl_actual, DParameterFirstParametersCurrentControl_file)) {
+    DParameterFirstParametersCurrentControl_Parameter.setParameter(DParameterFirstParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "DParameterFirstParametersCurrentControl stored with: " << DParameterFirstParametersCurrentControl_file << std::endl;
+  }
 
-  DParameterSecondParametersPositionControl_Parameter.setParameter(DParameterSecondParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(DParameterSecondParametersPositionControl_Parameter);
+  if (!AreSame(IClippingParameterFirstParametersCurrentControl_actual, IClippingParameterFirstParametersCurrentControl_file)) {
+    IClippingParameterFirstParametersCurrentControl_Parameter.setParameter(IClippingParameterFirstParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersCurrentControl_Parameter);
+    std::cout << "IClippingParameterFirstParametersCurrentControl stored with: " << IClippingParameterFirstParametersCurrentControl_file << std::endl;
+  }
 
-  IClippingParameterSecondParametersPositionControl_Parameter.setParameter(IClippingParameterSecondParametersPositionControl_file);
-  joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersPositionControl_Parameter);
+  if (!AreSame(PParameterSecondParametersPositionControl_actual, PParameterSecondParametersPositionControl_file)) {
+    PParameterSecondParametersPositionControl_Parameter.setParameter(PParameterSecondParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterSecondParametersPositionControl_Parameter);
+    std::cout << "PParameterSecondParametersPositionControl stored with: " << PParameterSecondParametersPositionControl_file << std::endl;
+  }
 
-  PParameterSecondParametersSpeedControl_Parameter.setParameter(PParameterSecondParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(PParameterSecondParametersSpeedControl_Parameter);
 
-  IParameterSecondParametersSpeedControl_Parameter.setParameter(IParameterSecondParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(IParameterSecondParametersSpeedControl_Parameter);
+  if (!AreSame(IParameterSecondParametersPositionControl_actual, IParameterSecondParametersPositionControl_file)) {
+    IParameterSecondParametersPositionControl_Parameter.setParameter(IParameterSecondParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterSecondParametersPositionControl_Parameter);
+    std::cout << "IParameterSecondParametersPositionControl stored with: " << IParameterSecondParametersPositionControl_file << std::endl;
+  }
 
-  DParameterSecondParametersSpeedControl_Parameter.setParameter(DParameterSecondParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(DParameterSecondParametersSpeedControl_Parameter);
+  if (!AreSame(DParameterSecondParametersPositionControl_actual, DParameterSecondParametersPositionControl_file)) {
+    DParameterSecondParametersPositionControl_Parameter.setParameter(DParameterSecondParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterSecondParametersPositionControl_Parameter);
+    std::cout << "DParameterSecondParametersPositionControl stored with: " << DParameterSecondParametersPositionControl_file << std::endl;
+  }
 
-  IClippingParameterSecondParametersSpeedControl_Parameter.setParameter(IClippingParameterSecondParametersSpeedControl_file);
-  joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersSpeedControl_Parameter);
+  if (!AreSame(IClippingParameterSecondParametersPositionControl_actual, IClippingParameterSecondParametersPositionControl_file)) {
+    IClippingParameterSecondParametersPositionControl_Parameter.setParameter(IClippingParameterSecondParametersPositionControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersPositionControl_Parameter);
+    std::cout << "IClippingParameterSecondParametersPositionControl stored with: " << IClippingParameterSecondParametersPositionControl_file << std::endl;
+  }
 
-  PParameterSecondParametersCurrentControl_Parameter.setParameter(PParameterSecondParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(PParameterSecondParametersCurrentControl_Parameter);
+  if (!AreSame(PParameterSecondParametersSpeedControl_actual, PParameterSecondParametersSpeedControl_file)) {
+    PParameterSecondParametersSpeedControl_Parameter.setParameter(PParameterSecondParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "PParameterSecondParametersSpeedControl stored with: " << PParameterSecondParametersSpeedControl_file << std::endl;
+  }
 
-  IParameterSecondParametersCurrentControl_Parameter.setParameter(IParameterSecondParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(IParameterSecondParametersCurrentControl_Parameter);
+  if (!AreSame(IParameterSecondParametersSpeedControl_actual, IParameterSecondParametersSpeedControl_file)) {
+    IParameterSecondParametersSpeedControl_Parameter.setParameter(IParameterSecondParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "IParameterSecondParametersSpeedControl stored with: " << IParameterSecondParametersSpeedControl_file << std::endl;
+  }
 
-  DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
+  if (!AreSame(DParameterSecondParametersSpeedControl_actual, DParameterSecondParametersSpeedControl_file)) {
+    DParameterSecondParametersSpeedControl_Parameter.setParameter(DParameterSecondParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "DParameterSecondParametersSpeedControl stored with: " << DParameterSecondParametersSpeedControl_file << std::endl;
+  }
 
-  joint->storeConfigurationParameterPermanent(DParameterSecondParametersCurrentControl_Parameter);
+  if (!AreSame(IClippingParameterSecondParametersSpeedControl_actual, IClippingParameterSecondParametersSpeedControl_file)) {
+    IClippingParameterSecondParametersSpeedControl_Parameter.setParameter(IClippingParameterSecondParametersSpeedControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersSpeedControl_Parameter);
+    std::cout << "IClippingParameterSecondParametersSpeedControl stored with: " << IClippingParameterSecondParametersSpeedControl_file << std::endl;
+  }
 
-  IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
-  joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
+  if (!AreSame(PParameterSecondParametersCurrentControl_actual, PParameterSecondParametersCurrentControl_file)) {
+    PParameterSecondParametersCurrentControl_Parameter.setParameter(PParameterSecondParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "PParameterSecondParametersCurrentControl stored with: " << PParameterSecondParametersCurrentControl_file << std::endl;
+  }
 
-  MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
-  joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+  if (!AreSame(IParameterSecondParametersCurrentControl_actual, IParameterSecondParametersCurrentControl_file)) {
+    IParameterSecondParametersCurrentControl_Parameter.setParameter(IParameterSecondParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "IParameterSecondParametersCurrentControl stored with: " << IParameterSecondParametersCurrentControl_file << std::endl;
+  }
 
-  PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
-  joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
-  
-  VelocityThresholdForHallFX_Parameter.setParameter(VelocityThresholdForHallFX_file);
-  joint->storeConfigurationParameterPermanent(VelocityThresholdForHallFX_Parameter);
+  if (!AreSame(DParameterSecondParametersCurrentControl_actual, DParameterSecondParametersCurrentControl_file)) {
+    DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "DParameterSecondParametersCurrentControl stored with: " << DParameterSecondParametersCurrentControl_file << std::endl;
+  }
 
-  std::cout << "Parameters stored for Joint: " << jointName << std::endl;
+  if (!AreSame(IClippingParameterSecondParametersCurrentControl_actual, IClippingParameterSecondParametersCurrentControl_file)) {
+    IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
+    std::cout << "IClippingParameterSecondParametersCurrentControl stored with: " << IClippingParameterSecondParametersCurrentControl_file << std::endl;
+  }
+
+  if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
+    MaximumVelocityToSetPosition_Parameter.setParameter(MaximumVelocityToSetPosition_file);
+    joint->storeConfigurationParameterPermanent(MaximumVelocityToSetPosition_Parameter);
+    std::cout << "MaximumVelocityToSetPosition stored with: " << MaximumVelocityToSetPosition_file << std::endl;
+  }
+
+  if (!AreSame(PositionTargetReachedDistance_actual, PositionTargetReachedDistance_file)) {
+    PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
+    joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+    std::cout << "PositionTargetReachedDistance stored with: " << PositionTargetReachedDistance_file << std::endl;
+  }
+
+  if (!AreSame(VelocityThresholdForHallFX_actual.value(), VelocityThresholdForHallFX_file.value())) {
+    VelocityThresholdForHallFX_Parameter.setParameter(VelocityThresholdForHallFX_file);
+    joint->storeConfigurationParameterPermanent(VelocityThresholdForHallFX_Parameter);
+    std::cout << "VelocityThresholdForHallFX stored with: " << VelocityThresholdForHallFX_file << std::endl;
+  }
+
+  std::cout << "Parameters stored for Joint: " << jointName << std::endl << std::endl;
 }
 
 void JointConfigurator::storeProtectedParametersToJoint() {
