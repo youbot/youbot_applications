@@ -57,7 +57,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   ParameterRead = false;
   ProtectedParameterRead = false;
   configfile = NULL;
-  configfilePP == NULL;
+  configfilePP = NULL;
 
   if (configpath.at(configpath.length() - 1) != '/') {
     configpath.append("/");
@@ -86,6 +86,8 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   JointName jName;
   joint->getConfigurationParameter(jName);
   jName.getParameter(jointName);
+  
+  std::cout << std::setprecision(15);
 
 
   double firmwareVer;
@@ -93,7 +95,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   if (UseParameter) {
     configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
     configfile->readInto(controller, "Joint_Type", "ControllerType");
-    if (!(AreSame(version, firmwareVer) && controller == controllerType)) {
+    if ((version == firmwareVer) && (controller == controllerType)) {
       UseParameter = false;
       throw std::runtime_error("The configuration file for the joint parameter contain the wrong controller type or firmware version!");
       delete configfile;
@@ -110,7 +112,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
       delete configfilePP;
     }
   }
-
+ 
 }
 
 JointConfigurator::~JointConfigurator() {
@@ -119,7 +121,7 @@ JointConfigurator::~JointConfigurator() {
 }
 
 bool JointConfigurator::AreSame(double A, double B) {
-  return std::fabs(A - B) < 0.01;
+  return std::fabs(A - B) < 0.0000000000001;
 }
 
 void JointConfigurator::readParameters() {
@@ -133,7 +135,7 @@ void JointConfigurator::readParameters() {
   std::cout << std::endl << "===========================================================" << std::endl;
   std::cout << "Joint: " << jointName << std::endl;
   std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
-
+  
   joint->getConfigurationParameter(MaximumPositioningVelocity_Parameter);
   MaximumPositioningVelocity_Parameter.getParameter(MaximumPositioningVelocity_actual);
   configfile->readInto(dummy, "Joint_Parameter", "MaximumPositioningVelocity");
@@ -452,6 +454,16 @@ void JointConfigurator::readParameters() {
     std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << " \tNEW VALUE: " << PositionTargetReachedDistance_file << std::endl;
   } else {
     std::cout << "PositionTargetReachedDistance \t\t\t\tactual: " << PositionTargetReachedDistance_actual << std::endl;
+  }
+  
+  joint->getConfigurationParameter(VelocityThresholdForHallFX_Parameter);
+  VelocityThresholdForHallFX_Parameter.getParameter(VelocityThresholdForHallFX_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "VelocityThresholdForHallFX");
+  VelocityThresholdForHallFX_file = dummy * radian_per_second;
+  if (!AreSame(VelocityThresholdForHallFX_actual.value(), VelocityThresholdForHallFX_file.value())) {
+    std::cout << "VelocityThresholdForHallFX \t\t\t\tactual: " << VelocityThresholdForHallFX_actual << " \tNEW VALUE: " << VelocityThresholdForHallFX_file << std::endl;
+  } else {
+    std::cout << "VelocityThresholdForHallFX \t\t\t\tactual: " << VelocityThresholdForHallFX_actual << std::endl;
   }
 
   ParameterRead = true;
@@ -959,6 +971,9 @@ void JointConfigurator::setParametersToJoint() {
   PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
   joint->setConfigurationParameter(PositionTargetReachedDistance_Parameter);
 
+  VelocityThresholdForHallFX_Parameter.setParameter(VelocityThresholdForHallFX_file);
+  joint->setConfigurationParameter(VelocityThresholdForHallFX_Parameter);
+  
   std::cout << "Parameters set for Joint: " << jointName << std::endl;
 
 }
@@ -1173,6 +1188,9 @@ void JointConfigurator::storeParametersToJoint() {
 
   PositionTargetReachedDistance_Parameter.setParameter(PositionTargetReachedDistance_file);
   joint->storeConfigurationParameterPermanent(PositionTargetReachedDistance_Parameter);
+  
+  VelocityThresholdForHallFX_Parameter.setParameter(VelocityThresholdForHallFX_file);
+  joint->storeConfigurationParameterPermanent(VelocityThresholdForHallFX_Parameter);
 
   std::cout << "Parameters stored for Joint: " << jointName << std::endl;
 }

@@ -401,6 +401,10 @@ private:
           
   CurrentErrorSum CurrentErrorSum_Parameter;
   quantity<si::current> CurrentErrorSum_actual;
+  
+  quantity<si::angular_velocity> VelocityThresholdForHallFX_actual;
+  quantity<si::angular_velocity> VelocityThresholdForHallFX_file;
+  VelocityThresholdForHallFX VelocityThresholdForHallFX_Parameter;
 
 };
 
