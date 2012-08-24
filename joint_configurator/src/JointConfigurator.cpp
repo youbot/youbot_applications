@@ -121,7 +121,7 @@ JointConfigurator::~JointConfigurator() {
 }
 
 bool JointConfigurator::AreSame(double A, double B) {
-  return std::fabs(A - B) < 0.0000000000001;
+  return std::fabs(A - B) < 0.001;
 }
 
 void JointConfigurator::readParameters() {
@@ -875,7 +875,7 @@ void JointConfigurator::setParametersToJoint() {
     std::cout << "The Joint Parameters have to been read before hand!" << std::endl;
     return;
   }
-  
+
   std::cout << "Setting parameters for Joint: " << jointName << std::endl;
 
   if (!AreSame(MaximumPositioningVelocity_actual.value(), MaximumPositioningVelocity_file.value())) {
@@ -1090,100 +1090,196 @@ void JointConfigurator::setProtectedParametersToJoint() {
   }
   try {
 
-    PWMLimit_Parameter.setParameter(PWMLimit_file);
-    joint->setConfigurationParameter(PWMLimit_Parameter);
+    std::cout << "Setting parameters for Joint: " << jointName << std::endl;
 
-    MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
-    joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
+    if (!AreSame(PWMLimit_actual, PWMLimit_file)) {
+      PWMLimit_Parameter.setParameter(PWMLimit_file);
+      joint->setConfigurationParameter(PWMLimit_Parameter);
+      std::cout << "PWMLimit set to: " << PWMLimit_file << std::endl;
+    }
 
-    PIDControlTime_Parameter.setParameter(PIDControlTime_file);
-    joint->setConfigurationParameter(PIDControlTime_Parameter);
+    if (!AreSame(MaximumMotorCurrent_actual.value(), MaximumMotorCurrent_file.value())) {
+      MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
+      joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
+      std::cout << "MaximumMotorCurrent set to: " << MaximumMotorCurrent_file << std::endl;
+    }
 
-    CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
-    joint->setConfigurationParameter(CurrentControlLoopDelay_Parameter);
+    if (!AreSame(PIDControlTime_actual.value(), PIDControlTime_file.value())) {
+      PIDControlTime_Parameter.setParameter(PIDControlTime_file);
+      joint->setConfigurationParameter(PIDControlTime_Parameter);
+      std::cout << "PIDControlTime set to: " << PIDControlTime_file << std::endl;
+    }
 
-    PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
-    joint->setConfigurationParameter(PWMHysteresis_Parameter);
+    if (!AreSame(CurrentControlLoopDelay_actual.value(), CurrentControlLoopDelay_file.value())) {
+      CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
+      joint->setConfigurationParameter(CurrentControlLoopDelay_Parameter);
+      std::cout << "CurrentControlLoopDelay set to: " << CurrentControlLoopDelay_file << std::endl;
+    }
 
-    SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
-    joint->setConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
+    if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
+      PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
+      joint->setConfigurationParameter(PWMHysteresis_Parameter);
+      std::cout << "PWMHysteresis set to: " << PWMHysteresis_file << std::endl;
+    }
 
-    SetEncoderCounterZeroAtNextSwitch_Parameter.setParameter(SetEncoderCounterZeroAtNextSwitch_file);
-    joint->setConfigurationParameter(SetEncoderCounterZeroAtNextSwitch_Parameter);
+    if (!AreSame(SetEncoderCounterZeroAtNextNChannel_actual, SetEncoderCounterZeroAtNextNChannel_file)) {
+      SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
+      joint->setConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
+      std::cout << "SetEncoderCounterZeroAtNextNChannel set to: " << SetEncoderCounterZeroAtNextNChannel_file << std::endl;
+    }
 
-    SetEncoderCounterZeroOnlyOnce_Parameter.setParameter(SetEncoderCounterZeroOnlyOnce_file);
-    joint->setConfigurationParameter(SetEncoderCounterZeroOnlyOnce_Parameter);
+    if (!AreSame(SetEncoderCounterZeroAtNextSwitch_actual, SetEncoderCounterZeroAtNextSwitch_file)) {
+      SetEncoderCounterZeroAtNextSwitch_Parameter.setParameter(SetEncoderCounterZeroAtNextSwitch_file);
+      joint->setConfigurationParameter(SetEncoderCounterZeroAtNextSwitch_Parameter);
+      std::cout << "SetEncoderCounterZeroAtNextSwitch set to: " << SetEncoderCounterZeroAtNextSwitch_file << std::endl;
+    }
 
-    EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
-    joint->setConfigurationParameter(EncoderStopSwitch_Parameter);
+    if (!AreSame(SetEncoderCounterZeroOnlyOnce_actual, SetEncoderCounterZeroOnlyOnce_file)) {
+      SetEncoderCounterZeroOnlyOnce_Parameter.setParameter(SetEncoderCounterZeroOnlyOnce_file);
+      joint->setConfigurationParameter(SetEncoderCounterZeroOnlyOnce_Parameter);
+      std::cout << "SetEncoderCounterZeroOnlyOnce set to: " << SetEncoderCounterZeroOnlyOnce_file << std::endl;
+    }
 
-    StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
-    joint->setConfigurationParameter(StopSwitchPolarity_Parameter);
+    if (!AreSame(EncoderStopSwitch_actual, EncoderStopSwitch_file)) {
+      EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
+      joint->setConfigurationParameter(EncoderStopSwitch_Parameter);
+      std::cout << "EncoderStopSwitch set to: " << EncoderStopSwitch_file << std::endl;
+    }
 
-    CommutationMotorCurrent_Parameter.setParameter(CommutationMotorCurrent_file);
-    joint->setConfigurationParameter(CommutationMotorCurrent_Parameter);
+    if (!AreSame(StopSwitchPolarity_actual, StopSwitchPolarity_file)) {
+      StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
+      joint->setConfigurationParameter(StopSwitchPolarity_Parameter);
+      std::cout << "StopSwitchPolarity set to: " << StopSwitchPolarity_file << std::endl;
+    }
 
-    MassInertiaConstant_Parameter.setParameter(MassInertiaConstant_file);
-    joint->setConfigurationParameter(MassInertiaConstant_Parameter);
+    if (!AreSame(CommutationMotorCurrent_actual.value(), CommutationMotorCurrent_file.value())) {
+      CommutationMotorCurrent_Parameter.setParameter(CommutationMotorCurrent_file);
+      joint->setConfigurationParameter(CommutationMotorCurrent_Parameter);
+      std::cout << "CommutationMotorCurrent set to: " << CommutationMotorCurrent_file << std::endl;
+    }
 
-    BEMFConstant_Parameter.setParameter(BEMFConstant_file);
-    joint->setConfigurationParameter(BEMFConstant_Parameter);
+    if (!AreSame(MassInertiaConstant_actual, MassInertiaConstant_file)) {
+      MassInertiaConstant_Parameter.setParameter(MassInertiaConstant_file);
+      joint->setConfigurationParameter(MassInertiaConstant_Parameter);
+      std::cout << "MassInertiaConstant set to: " << MassInertiaConstant_file << std::endl;
+    }
 
-    SineInitializationVelocity_Parameter.setParameter(SineInitializationVelocity_file);
-    joint->setConfigurationParameter(SineInitializationVelocity_Parameter);
+    if (!AreSame(BEMFConstant_actual, BEMFConstant_file)) {
+      BEMFConstant_Parameter.setParameter(BEMFConstant_file);
+      joint->setConfigurationParameter(BEMFConstant_Parameter);
+      std::cout << "BEMFConstant set to: " << BEMFConstant_file << std::endl;
+    }
 
-    CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
-    joint->setConfigurationParameter(CommutationCompensationClockwise_Parameter);
+    if (!AreSame(SineInitializationVelocity_actual, SineInitializationVelocity_file)) {
+      SineInitializationVelocity_Parameter.setParameter(SineInitializationVelocity_file);
+      joint->setConfigurationParameter(SineInitializationVelocity_Parameter);
+      std::cout << "SineInitializationVelocity set to: " << SineInitializationVelocity_file << std::endl;
+    }
 
-    CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
-    joint->setConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
+    if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
+      CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
+      joint->setConfigurationParameter(CommutationCompensationClockwise_Parameter);
+      std::cout << "CommutationCompensationClockwise set to: " << CommutationCompensationClockwise_file << std::endl;
+    }
 
-    InitSineDelay_Parameter.setParameter(InitSineDelay_file);
-    joint->setConfigurationParameter(InitSineDelay_Parameter);
+    if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
+      CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
+      joint->setConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
+      std::cout << "CommutationCompensationCounterClockwise set to: " << CommutationCompensationCounterClockwise_file << std::endl;
+    }
 
-    ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
-    joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
+    if (!AreSame(InitSineDelay_actual.value(), InitSineDelay_file.value())) {
+      InitSineDelay_Parameter.setParameter(InitSineDelay_file);
+      joint->setConfigurationParameter(InitSineDelay_Parameter);
+      std::cout << "InitSineDelay set to: " << InitSineDelay_file << std::endl;
+    }
 
-    SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
-    joint->setConfigurationParameter(SineCompensationFactor_Parameter);
+    if (!AreSame(ActivateOvervoltageProtection_actual, ActivateOvervoltageProtection_file)) {
+      ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
+      joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
+      std::cout << "ActivateOvervoltageProtection set to: " << ActivateOvervoltageProtection_file << std::endl;
+    }
 
-    CommutationMode_Parameter.setParameter(CommutationMode_file);
-    joint->setConfigurationParameter(CommutationMode_Parameter);
+    if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
+      SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
+      joint->setConfigurationParameter(SineCompensationFactor_Parameter);
+      std::cout << "SineCompensationFactor set to: " << SineCompensationFactor_file << std::endl;
+    }
 
-    EncoderResolution_Parameter.setParameter(EncoderResolution_file);
-    joint->setConfigurationParameter(EncoderResolution_Parameter);
+    if (!AreSame(CommutationMode_actual, CommutationMode_file)) {
+      CommutationMode_Parameter.setParameter(CommutationMode_file);
+      joint->setConfigurationParameter(CommutationMode_Parameter);
+      std::cout << "CommutationMode set to: " << CommutationMode_file << std::endl;
+    }
 
-    HallSensorPolarityReversal_Parameter.setParameter(HallSensorPolarityReversal_file);
-    joint->setConfigurationParameter(HallSensorPolarityReversal_Parameter);
+    if (!AreSame(EncoderResolution_actual, EncoderResolution_file)) {
+      EncoderResolution_Parameter.setParameter(EncoderResolution_file);
+      joint->setConfigurationParameter(EncoderResolution_Parameter);
+      std::cout << "EncoderResolution set to: " << EncoderResolution_file << std::endl;
+    }
 
-    InitializationMode_Parameter.setParameter(InitializationMode_file);
-    joint->setConfigurationParameter(InitializationMode_Parameter);
+    if (!AreSame(HallSensorPolarityReversal_actual, HallSensorPolarityReversal_file)) {
+      HallSensorPolarityReversal_Parameter.setParameter(HallSensorPolarityReversal_file);
+      joint->setConfigurationParameter(HallSensorPolarityReversal_Parameter);
+      std::cout << "HallSensorPolarityReversal set to: " << HallSensorPolarityReversal_file << std::endl;
+    }
 
-    MotorCoilResistance_Parameter.setParameter(MotorCoilResistance_file);
-    joint->setConfigurationParameter(MotorCoilResistance_Parameter);
+    if (!AreSame(InitializationMode_actual, InitializationMode_file)) {
+      InitializationMode_Parameter.setParameter(InitializationMode_file);
+      joint->setConfigurationParameter(InitializationMode_Parameter);
+      std::cout << "InitializationMode set to: " << InitializationMode_file << std::endl;
+    }
 
-    MotorPoles_Parameter.setParameter(MotorPoles_file);
-    joint->setConfigurationParameter(MotorPoles_Parameter);
+    if (!AreSame(MotorCoilResistance_actual.value(), MotorCoilResistance_file.value())) {
+      MotorCoilResistance_Parameter.setParameter(MotorCoilResistance_file);
+      joint->setConfigurationParameter(MotorCoilResistance_Parameter);
+      std::cout << "MotorCoilResistance set to: " << MotorCoilResistance_file << std::endl;
+    }
 
-    PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
-    joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
+    if (!AreSame(MotorPoles_actual, MotorPoles_file)) {
+      MotorPoles_Parameter.setParameter(MotorPoles_file);
+      joint->setConfigurationParameter(MotorPoles_Parameter);
+      std::cout << "MotorPoles set to: " << MotorPoles_file << std::endl;
+    }
 
-    ReversingEncoderDirection_Parameter.setParameter(ReversingEncoderDirection_file);
-    joint->setConfigurationParameter(ReversingEncoderDirection_Parameter);
+    if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
+      PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
+      joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
+      std::cout << "PWMSchemeBlockCommutation set to: " << PWMSchemeBlockCommutation_file << std::endl;
+    }
 
-    ThermalWindingTimeConstant_Parameter.setParameter(ThermalWindingTimeConstant_file);
-    joint->setConfigurationParameter(ThermalWindingTimeConstant_Parameter);
+    if (!AreSame(ReversingEncoderDirection_actual, ReversingEncoderDirection_file)) {
+      ReversingEncoderDirection_Parameter.setParameter(ReversingEncoderDirection_file);
+      joint->setConfigurationParameter(ReversingEncoderDirection_Parameter);
+      std::cout << "ReversingEncoderDirection set to: " << ReversingEncoderDirection_file << std::endl;
+    }
 
-    I2tLimit_Parameter.setParameter(I2tLimit_file);
-    joint->setConfigurationParameter(I2tLimit_Parameter);
+    if (!AreSame(ThermalWindingTimeConstant_actual.value(), ThermalWindingTimeConstant_file.value())) {
+      ThermalWindingTimeConstant_Parameter.setParameter(ThermalWindingTimeConstant_file);
+      joint->setConfigurationParameter(ThermalWindingTimeConstant_Parameter);
+      std::cout << "ThermalWindingTimeConstant set to: " << ThermalWindingTimeConstant_file << std::endl;
+    }
 
-    MotorControllerTimeout_Parameter.setParameter(MotorControllerTimeout_file);
-    joint->setConfigurationParameter(MotorControllerTimeout_Parameter);
+    if (!AreSame(I2tLimit_actual, I2tLimit_file)) {
+      I2tLimit_Parameter.setParameter(I2tLimit_file);
+      joint->setConfigurationParameter(I2tLimit_Parameter);
+      std::cout << "I2tLimit set to: " << I2tLimit_file << std::endl;
+    }
 
-    MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
-    joint->setConfigurationParameter(MotorHaltedVelocity_Parameter);
+    if (!AreSame(MotorControllerTimeout_actual.value(), MotorControllerTimeout_file.value())) {
+      MotorControllerTimeout_Parameter.setParameter(MotorControllerTimeout_file);
+      joint->setConfigurationParameter(MotorControllerTimeout_Parameter);
+      std::cout << "MotorControllerTimeout set to: " << MotorControllerTimeout_file << std::endl;
+    }
 
-    std::cout << "Protected Parameters set for Joint: " << jointName << std::endl;
+    if (!AreSame(MotorHaltedVelocity_actual, MotorHaltedVelocity_file)) {
+      MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
+      joint->setConfigurationParameter(MotorHaltedVelocity_Parameter);
+      std::cout << "MotorHaltedVelocity set to: " << MotorHaltedVelocity_file << std::endl;
+    }
+
+
+    std::cout << "Protected Parameters set for Joint: " << jointName << std::endl << std::endl;
 
   } catch (JointParameterException& e) {
 
@@ -1197,7 +1293,7 @@ void JointConfigurator::storeParametersToJoint() {
     return;
   }
 
-    std::cout << "Storing parameters for Joint: " << jointName << std::endl;
+  std::cout << "Storing parameters for Joint: " << jointName << std::endl;
 
   if (!AreSame(MaximumPositioningVelocity_actual.value(), MaximumPositioningVelocity_file.value())) {
     MaximumPositioningVelocity_Parameter.setParameter(MaximumPositioningVelocity_file);
@@ -1411,99 +1507,197 @@ void JointConfigurator::storeProtectedParametersToJoint() {
   }
   try {
 
-    PWMLimit_Parameter.setParameter(PWMLimit_file);
-    joint->storeConfigurationParameterPermanent(PWMLimit_Parameter);
+    std::cout << "Storing parameters for Joint: " << jointName << std::endl;
 
-    MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
-    joint->storeConfigurationParameterPermanent(MaximumMotorCurrent_Parameter);
+    if (!AreSame(PWMLimit_actual, PWMLimit_file)) {
+      PWMLimit_Parameter.setParameter(PWMLimit_file);
+      joint->setConfigurationParameter(PWMLimit_Parameter);
+      std::cout << "PWMLimit set to: " << PWMLimit_file << std::endl;
+    }
 
-    PIDControlTime_Parameter.setParameter(PIDControlTime_file);
-    joint->storeConfigurationParameterPermanent(PIDControlTime_Parameter);
+    if (!AreSame(MaximumMotorCurrent_actual.value(), MaximumMotorCurrent_file.value())) {
+      MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
+      joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
+      std::cout << "MaximumMotorCurrent set to: " << MaximumMotorCurrent_file << std::endl;
+    }
 
-    CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
-    joint->storeConfigurationParameterPermanent(CurrentControlLoopDelay_Parameter);
+    if (!AreSame(PIDControlTime_actual.value(), PIDControlTime_file.value())) {
+      PIDControlTime_Parameter.setParameter(PIDControlTime_file);
+      joint->setConfigurationParameter(PIDControlTime_Parameter);
+      std::cout << "PIDControlTime set to: " << PIDControlTime_file << std::endl;
+    }
 
-    PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
-    joint->storeConfigurationParameterPermanent(PWMHysteresis_Parameter);
+    if (!AreSame(CurrentControlLoopDelay_actual.value(), CurrentControlLoopDelay_file.value())) {
+      CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
+      joint->setConfigurationParameter(CurrentControlLoopDelay_Parameter);
+      std::cout << "CurrentControlLoopDelay set to: " << CurrentControlLoopDelay_file << std::endl;
+    }
 
-    SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
-    joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroAtNextNChannel_Parameter);
+    if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
+      PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
+      joint->setConfigurationParameter(PWMHysteresis_Parameter);
+      std::cout << "PWMHysteresis set to: " << PWMHysteresis_file << std::endl;
+    }
 
-    SetEncoderCounterZeroAtNextSwitch_Parameter.setParameter(SetEncoderCounterZeroAtNextSwitch_file);
-    joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroAtNextSwitch_Parameter);
+    if (!AreSame(SetEncoderCounterZeroAtNextNChannel_actual, SetEncoderCounterZeroAtNextNChannel_file)) {
+      SetEncoderCounterZeroAtNextNChannel_Parameter.setParameter(SetEncoderCounterZeroAtNextNChannel_file);
+      joint->setConfigurationParameter(SetEncoderCounterZeroAtNextNChannel_Parameter);
+      std::cout << "SetEncoderCounterZeroAtNextNChannel set to: " << SetEncoderCounterZeroAtNextNChannel_file << std::endl;
+    }
 
-    SetEncoderCounterZeroOnlyOnce_Parameter.setParameter(SetEncoderCounterZeroOnlyOnce_file);
-    joint->storeConfigurationParameterPermanent(SetEncoderCounterZeroOnlyOnce_Parameter);
+    if (!AreSame(SetEncoderCounterZeroAtNextSwitch_actual, SetEncoderCounterZeroAtNextSwitch_file)) {
+      SetEncoderCounterZeroAtNextSwitch_Parameter.setParameter(SetEncoderCounterZeroAtNextSwitch_file);
+      joint->setConfigurationParameter(SetEncoderCounterZeroAtNextSwitch_Parameter);
+      std::cout << "SetEncoderCounterZeroAtNextSwitch set to: " << SetEncoderCounterZeroAtNextSwitch_file << std::endl;
+    }
 
-    EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
-    joint->storeConfigurationParameterPermanent(EncoderStopSwitch_Parameter);
+    if (!AreSame(SetEncoderCounterZeroOnlyOnce_actual, SetEncoderCounterZeroOnlyOnce_file)) {
+      SetEncoderCounterZeroOnlyOnce_Parameter.setParameter(SetEncoderCounterZeroOnlyOnce_file);
+      joint->setConfigurationParameter(SetEncoderCounterZeroOnlyOnce_Parameter);
+      std::cout << "SetEncoderCounterZeroOnlyOnce set to: " << SetEncoderCounterZeroOnlyOnce_file << std::endl;
+    }
 
-    StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
-    joint->storeConfigurationParameterPermanent(StopSwitchPolarity_Parameter);
+    if (!AreSame(EncoderStopSwitch_actual, EncoderStopSwitch_file)) {
+      EncoderStopSwitch_Parameter.setParameter(EncoderStopSwitch_file);
+      joint->setConfigurationParameter(EncoderStopSwitch_Parameter);
+      std::cout << "EncoderStopSwitch set to: " << EncoderStopSwitch_file << std::endl;
+    }
 
-    CommutationMotorCurrent_Parameter.setParameter(CommutationMotorCurrent_file);
-    joint->storeConfigurationParameterPermanent(CommutationMotorCurrent_Parameter);
+    if (!AreSame(StopSwitchPolarity_actual, StopSwitchPolarity_file)) {
+      StopSwitchPolarity_Parameter.setParameter(StopSwitchPolarity_file);
+      joint->setConfigurationParameter(StopSwitchPolarity_Parameter);
+      std::cout << "StopSwitchPolarity set to: " << StopSwitchPolarity_file << std::endl;
+    }
 
-    MassInertiaConstant_Parameter.setParameter(MassInertiaConstant_file);
-    joint->storeConfigurationParameterPermanent(MassInertiaConstant_Parameter);
+    if (!AreSame(CommutationMotorCurrent_actual.value(), CommutationMotorCurrent_file.value())) {
+      CommutationMotorCurrent_Parameter.setParameter(CommutationMotorCurrent_file);
+      joint->setConfigurationParameter(CommutationMotorCurrent_Parameter);
+      std::cout << "CommutationMotorCurrent set to: " << CommutationMotorCurrent_file << std::endl;
+    }
 
-    BEMFConstant_Parameter.setParameter(BEMFConstant_file);
-    joint->storeConfigurationParameterPermanent(BEMFConstant_Parameter);
+    if (!AreSame(MassInertiaConstant_actual, MassInertiaConstant_file)) {
+      MassInertiaConstant_Parameter.setParameter(MassInertiaConstant_file);
+      joint->setConfigurationParameter(MassInertiaConstant_Parameter);
+      std::cout << "MassInertiaConstant set to: " << MassInertiaConstant_file << std::endl;
+    }
 
-    SineInitializationVelocity_Parameter.setParameter(SineInitializationVelocity_file);
-    joint->storeConfigurationParameterPermanent(SineInitializationVelocity_Parameter);
+    if (!AreSame(BEMFConstant_actual, BEMFConstant_file)) {
+      BEMFConstant_Parameter.setParameter(BEMFConstant_file);
+      joint->setConfigurationParameter(BEMFConstant_Parameter);
+      std::cout << "BEMFConstant set to: " << BEMFConstant_file << std::endl;
+    }
 
-    CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
-    joint->storeConfigurationParameterPermanent(CommutationCompensationClockwise_Parameter);
+    if (!AreSame(SineInitializationVelocity_actual, SineInitializationVelocity_file)) {
+      SineInitializationVelocity_Parameter.setParameter(SineInitializationVelocity_file);
+      joint->setConfigurationParameter(SineInitializationVelocity_Parameter);
+      std::cout << "SineInitializationVelocity set to: " << SineInitializationVelocity_file << std::endl;
+    }
 
-    CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
-    joint->storeConfigurationParameterPermanent(CommutationCompensationCounterClockwise_Parameter);
+    if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
+      CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
+      joint->setConfigurationParameter(CommutationCompensationClockwise_Parameter);
+      std::cout << "CommutationCompensationClockwise set to: " << CommutationCompensationClockwise_file << std::endl;
+    }
 
-    InitSineDelay_Parameter.setParameter(InitSineDelay_file);
-    joint->storeConfigurationParameterPermanent(InitSineDelay_Parameter);
+    if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
+      CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
+      joint->setConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
+      std::cout << "CommutationCompensationCounterClockwise set to: " << CommutationCompensationCounterClockwise_file << std::endl;
+    }
 
-    ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
-    joint->storeConfigurationParameterPermanent(ActivateOvervoltageProtection_Parameter);
+    if (!AreSame(InitSineDelay_actual.value(), InitSineDelay_file.value())) {
+      InitSineDelay_Parameter.setParameter(InitSineDelay_file);
+      joint->setConfigurationParameter(InitSineDelay_Parameter);
+      std::cout << "InitSineDelay set to: " << InitSineDelay_file << std::endl;
+    }
 
-    SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
-    joint->storeConfigurationParameterPermanent(SineCompensationFactor_Parameter);
+    if (!AreSame(ActivateOvervoltageProtection_actual, ActivateOvervoltageProtection_file)) {
+      ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
+      joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
+      std::cout << "ActivateOvervoltageProtection set to: " << ActivateOvervoltageProtection_file << std::endl;
+    }
 
-    CommutationMode_Parameter.setParameter(CommutationMode_file);
-    joint->storeConfigurationParameterPermanent(CommutationMode_Parameter);
+    if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
+      SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
+      joint->setConfigurationParameter(SineCompensationFactor_Parameter);
+      std::cout << "SineCompensationFactor set to: " << SineCompensationFactor_file << std::endl;
+    }
 
-    EncoderResolution_Parameter.setParameter(EncoderResolution_file);
-    joint->storeConfigurationParameterPermanent(EncoderResolution_Parameter);
+    if (!AreSame(CommutationMode_actual, CommutationMode_file)) {
+      CommutationMode_Parameter.setParameter(CommutationMode_file);
+      joint->setConfigurationParameter(CommutationMode_Parameter);
+      std::cout << "CommutationMode set to: " << CommutationMode_file << std::endl;
+    }
 
-    HallSensorPolarityReversal_Parameter.setParameter(HallSensorPolarityReversal_file);
-    joint->storeConfigurationParameterPermanent(HallSensorPolarityReversal_Parameter);
+    if (!AreSame(EncoderResolution_actual, EncoderResolution_file)) {
+      EncoderResolution_Parameter.setParameter(EncoderResolution_file);
+      joint->setConfigurationParameter(EncoderResolution_Parameter);
+      std::cout << "EncoderResolution set to: " << EncoderResolution_file << std::endl;
+    }
 
-    InitializationMode_Parameter.setParameter(InitializationMode_file);
-    joint->storeConfigurationParameterPermanent(InitializationMode_Parameter);
+    if (!AreSame(HallSensorPolarityReversal_actual, HallSensorPolarityReversal_file)) {
+      HallSensorPolarityReversal_Parameter.setParameter(HallSensorPolarityReversal_file);
+      joint->setConfigurationParameter(HallSensorPolarityReversal_Parameter);
+      std::cout << "HallSensorPolarityReversal set to: " << HallSensorPolarityReversal_file << std::endl;
+    }
 
-    MotorCoilResistance_Parameter.setParameter(MotorCoilResistance_file);
-    joint->storeConfigurationParameterPermanent(MotorCoilResistance_Parameter);
+    if (!AreSame(InitializationMode_actual, InitializationMode_file)) {
+      InitializationMode_Parameter.setParameter(InitializationMode_file);
+      joint->setConfigurationParameter(InitializationMode_Parameter);
+      std::cout << "InitializationMode set to: " << InitializationMode_file << std::endl;
+    }
 
-    MotorPoles_Parameter.setParameter(MotorPoles_file);
-    joint->storeConfigurationParameterPermanent(MotorPoles_Parameter);
+    if (!AreSame(MotorCoilResistance_actual.value(), MotorCoilResistance_file.value())) {
+      MotorCoilResistance_Parameter.setParameter(MotorCoilResistance_file);
+      joint->setConfigurationParameter(MotorCoilResistance_Parameter);
+      std::cout << "MotorCoilResistance set to: " << MotorCoilResistance_file << std::endl;
+    }
 
-    PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
-    joint->storeConfigurationParameterPermanent(PWMSchemeBlockCommutation_Parameter);
+    if (!AreSame(MotorPoles_actual, MotorPoles_file)) {
+      MotorPoles_Parameter.setParameter(MotorPoles_file);
+      joint->setConfigurationParameter(MotorPoles_Parameter);
+      std::cout << "MotorPoles set to: " << MotorPoles_file << std::endl;
+    }
 
-    ReversingEncoderDirection_Parameter.setParameter(ReversingEncoderDirection_file);
-    joint->storeConfigurationParameterPermanent(ReversingEncoderDirection_Parameter);
+    if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
+      PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
+      joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
+      std::cout << "PWMSchemeBlockCommutation set to: " << PWMSchemeBlockCommutation_file << std::endl;
+    }
 
-    ThermalWindingTimeConstant_Parameter.setParameter(ThermalWindingTimeConstant_file);
-    joint->storeConfigurationParameterPermanent(ThermalWindingTimeConstant_Parameter);
+    if (!AreSame(ReversingEncoderDirection_actual, ReversingEncoderDirection_file)) {
+      ReversingEncoderDirection_Parameter.setParameter(ReversingEncoderDirection_file);
+      joint->setConfigurationParameter(ReversingEncoderDirection_Parameter);
+      std::cout << "ReversingEncoderDirection set to: " << ReversingEncoderDirection_file << std::endl;
+    }
 
-    I2tLimit_Parameter.setParameter(I2tLimit_file);
-    joint->storeConfigurationParameterPermanent(I2tLimit_Parameter);
+    if (!AreSame(ThermalWindingTimeConstant_actual.value(), ThermalWindingTimeConstant_file.value())) {
+      ThermalWindingTimeConstant_Parameter.setParameter(ThermalWindingTimeConstant_file);
+      joint->setConfigurationParameter(ThermalWindingTimeConstant_Parameter);
+      std::cout << "ThermalWindingTimeConstant set to: " << ThermalWindingTimeConstant_file << std::endl;
+    }
 
-    MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
-    joint->storeConfigurationParameterPermanent(MotorHaltedVelocity_Parameter);
+    if (!AreSame(I2tLimit_actual, I2tLimit_file)) {
+      I2tLimit_Parameter.setParameter(I2tLimit_file);
+      joint->setConfigurationParameter(I2tLimit_Parameter);
+      std::cout << "I2tLimit set to: " << I2tLimit_file << std::endl;
+    }
+
+    if (!AreSame(MotorControllerTimeout_actual.value(), MotorControllerTimeout_file.value())) {
+      MotorControllerTimeout_Parameter.setParameter(MotorControllerTimeout_file);
+      joint->setConfigurationParameter(MotorControllerTimeout_Parameter);
+      std::cout << "MotorControllerTimeout set to: " << MotorControllerTimeout_file << std::endl;
+    }
+
+    if (!AreSame(MotorHaltedVelocity_actual, MotorHaltedVelocity_file)) {
+      MotorHaltedVelocity_Parameter.setParameter(MotorHaltedVelocity_file);
+      joint->setConfigurationParameter(MotorHaltedVelocity_Parameter);
+      std::cout << "MotorHaltedVelocity set to: " << MotorHaltedVelocity_file << std::endl;
+    }
 
 
 
-    std::cout << "Protected Parameters stored for Joint: " << jointName << std::endl;
+    std::cout << "Protected Parameters stored for Joint: " << jointName << std::endl << std::endl;
   } catch (JointParameterException& e) {
 
   }
