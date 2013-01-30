@@ -351,9 +351,9 @@ void JointConfigurator::readParameters() {
   configfile->readInto(dummy, "Joint_Parameter", "PParameterCurrentControl");
   PParameterCurrentControl_file = dummy;
   if (!AreSame(PParameterCurrentControl_actual, PParameterCurrentControl_file)) {
-    std::cout << "PParameterCurrentControl     \t\tactual: " << PParameterCurrentControl_actual << " \tNEW VALUE: " << PParameterCurrentControl_file << std::endl;
+    std::cout << "PParameterCurrentControl     \t\t\t\tactual: " << PParameterCurrentControl_actual << " \tNEW VALUE: " << PParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "PParameterCurrentControl     \t\tactual: " << PParameterCurrentControl_actual << std::endl;
+    std::cout << "PParameterCurrentControl     \t\t\t\tactual: " << PParameterCurrentControl_actual << std::endl;
   }
 
   joint->getConfigurationParameter(IParameterCurrentControl_Parameter);
@@ -361,9 +361,9 @@ void JointConfigurator::readParameters() {
   configfile->readInto(dummy, "Joint_Parameter", "IParameterCurrentControl");
   IParameterCurrentControl_file = dummy;
   if (!AreSame(IParameterCurrentControl_actual, IParameterCurrentControl_file)) {
-    std::cout << "IParameterCurrentControl \t\tactual: " << IParameterCurrentControl_actual << " \tNEW VALUE: " << IParameterCurrentControl_file << std::endl;
+    std::cout << "IParameterCurrentControl \t\t\t\tactual: " << IParameterCurrentControl_actual << " \tNEW VALUE: " << IParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "IParameterCurrentControl \t\tactual: " << IParameterCurrentControl_actual << std::endl;
+    std::cout << "IParameterCurrentControl \t\t\t\tactual: " << IParameterCurrentControl_actual << std::endl;
   }
 
   joint->getConfigurationParameter(DParameterCurrentControl_Parameter);
@@ -371,9 +371,9 @@ void JointConfigurator::readParameters() {
   configfile->readInto(dummy, "Joint_Parameter", "DParameterCurrentControl");
   DParameterCurrentControl_file = dummy;
   if (!AreSame(DParameterCurrentControl_actual, DParameterCurrentControl_file)) {
-    std::cout << "DParameterCurrentControl \t\tactual: " << DParameterCurrentControl_actual << " \tNEW VALUE: " << DParameterCurrentControl_file << std::endl;
+    std::cout << "DParameterCurrentControl \t\t\t\tactual: " << DParameterCurrentControl_actual << " \tNEW VALUE: " << DParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "DParameterCurrentControl \t\tactual: " << DParameterCurrentControl_actual << std::endl;
+    std::cout << "DParameterCurrentControl \t\t\t\tactual: " << DParameterCurrentControl_actual << std::endl;
   }
 
   joint->getConfigurationParameter(IClippingParameterCurrentControl_Parameter);
@@ -381,9 +381,9 @@ void JointConfigurator::readParameters() {
   configfile->readInto(dummy, "Joint_Parameter", "IClippingParameterCurrentControl");
   IClippingParameterCurrentControl_file = dummy;
   if (!AreSame(IClippingParameterCurrentControl_actual, IClippingParameterCurrentControl_file)) {
-    std::cout << "IClippingParameterCurrentControl \tactual: " << IClippingParameterCurrentControl_actual << " \tNEW VALUE: " << IClippingParameterCurrentControl_file << std::endl;
+    std::cout << "IClippingParameterCurrentControl \t\t\tactual: " << IClippingParameterCurrentControl_actual << " \tNEW VALUE: " << IClippingParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "IClippingParameterCurrentControl \tactual: " << IClippingParameterCurrentControl_actual << std::endl;
+    std::cout << "IClippingParameterCurrentControl \t\t\tactual: " << IClippingParameterCurrentControl_actual << std::endl;
   }
 
   joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
