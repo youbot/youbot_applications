@@ -107,16 +107,12 @@ private:
   bool UseProtectedParameter;
   bool UseParameter;
   int controllerType;
-  double version;
+  std::string version;
   std::string jointName;
 
   MaximumPositioningVelocity MaximumPositioningVelocity_Parameter;
   quantity<angular_velocity> MaximumPositioningVelocity_actual;
   quantity<angular_velocity> MaximumPositioningVelocity_file;
-
-  PWMLimit PWMLimit_Parameter;
-  unsigned int PWMLimit_actual;
-  unsigned int PWMLimit_file;
 
   MaximumMotorCurrent MaximumMotorCurrent_Parameter;
   quantity<current> MaximumMotorCurrent_actual;
@@ -166,10 +162,6 @@ private:
   int IClippingParameterFirstParametersPositionControl_actual;
   int IClippingParameterFirstParametersPositionControl_file;
 
-  PWMHysteresis PWMHysteresis_Parameter;
-  int PWMHysteresis_actual;
-  int PWMHysteresis_file;
-
   PParameterFirstParametersSpeedControl PParameterFirstParametersSpeedControl_Parameter;
   int PParameterFirstParametersSpeedControl_actual;
   int PParameterFirstParametersSpeedControl_file;
@@ -214,41 +206,21 @@ private:
   unsigned int StopSwitchPolarity_actual;
   unsigned int StopSwitchPolarity_file;
 
-  PParameterFirstParametersCurrentControl PParameterFirstParametersCurrentControl_Parameter;
-  int PParameterFirstParametersCurrentControl_actual;
-  int PParameterFirstParametersCurrentControl_file;
+  PParameterCurrentControl PParameterCurrentControl_Parameter;
+  int PParameterCurrentControl_actual;
+  int PParameterCurrentControl_file;
 
-  IParameterFirstParametersCurrentControl IParameterFirstParametersCurrentControl_Parameter;
-  int IParameterFirstParametersCurrentControl_actual;
-  int IParameterFirstParametersCurrentControl_file;
+  IParameterCurrentControl IParameterCurrentControl_Parameter;
+  int IParameterCurrentControl_actual;
+  int IParameterCurrentControl_file;
 
-  DParameterFirstParametersCurrentControl DParameterFirstParametersCurrentControl_Parameter;
-  int DParameterFirstParametersCurrentControl_actual;
-  int DParameterFirstParametersCurrentControl_file;
+  DParameterCurrentControl DParameterCurrentControl_Parameter;
+  int DParameterCurrentControl_actual;
+  int DParameterCurrentControl_file;
 
-  IClippingParameterFirstParametersCurrentControl IClippingParameterFirstParametersCurrentControl_Parameter;
-  int IClippingParameterFirstParametersCurrentControl_actual;
-  int IClippingParameterFirstParametersCurrentControl_file;
-
-  PParameterSecondParametersCurrentControl PParameterSecondParametersCurrentControl_Parameter;
-  int PParameterSecondParametersCurrentControl_actual;
-  int PParameterSecondParametersCurrentControl_file;
-
-  IParameterSecondParametersCurrentControl IParameterSecondParametersCurrentControl_Parameter;
-  int IParameterSecondParametersCurrentControl_actual;
-  int IParameterSecondParametersCurrentControl_file;
-
-  DParameterSecondParametersCurrentControl DParameterSecondParametersCurrentControl_Parameter;
-  int DParameterSecondParametersCurrentControl_actual;
-  int DParameterSecondParametersCurrentControl_file;
-
-  IClippingParameterSecondParametersCurrentControl IClippingParameterSecondParametersCurrentControl_Parameter;
-  int IClippingParameterSecondParametersCurrentControl_actual;
-  int IClippingParameterSecondParametersCurrentControl_file;
-
-  CurrentControlSwitchingThreshold CurrentControlSwitchingThreshold_Parameter;
-  quantity<angular_velocity> CurrentControlSwitchingThreshold_actual;
-  quantity<angular_velocity> CurrentControlSwitchingThreshold_file;
+  IClippingParameterCurrentControl IClippingParameterCurrentControl_Parameter;
+  int IClippingParameterCurrentControl_actual;
+  int IClippingParameterCurrentControl_file;
 
   CommutationMotorCurrent CommutationMotorCurrent_Parameter;
   quantity<current> CommutationMotorCurrent_actual;
@@ -298,14 +270,6 @@ private:
   int SineInitializationVelocity_actual;
   int SineInitializationVelocity_file;
 
-  CommutationCompensationClockwise CommutationCompensationClockwise_Parameter;
-  int CommutationCompensationClockwise_actual;
-  int CommutationCompensationClockwise_file;
-
-  CommutationCompensationCounterClockwise CommutationCompensationCounterClockwise_Parameter;
-  int CommutationCompensationCounterClockwise_actual;
-  int CommutationCompensationCounterClockwise_file;
-
   InitSineDelay InitSineDelay_Parameter;
   quantity<si::time> InitSineDelay_actual;
   quantity<si::time> InitSineDelay_file;
@@ -313,10 +277,6 @@ private:
   ActivateOvervoltageProtection ActivateOvervoltageProtection_Parameter;
   bool ActivateOvervoltageProtection_actual;
   bool ActivateOvervoltageProtection_file;
-
-  SineCompensationFactor SineCompensationFactor_Parameter;
-  int SineCompensationFactor_actual;
-  int SineCompensationFactor_file;
 
   CommutationMode CommutationMode_Parameter;
   unsigned int CommutationMode_actual;
@@ -341,10 +301,6 @@ private:
   MotorPoles MotorPoles_Parameter;
   unsigned int MotorPoles_actual;
   unsigned int MotorPoles_file;
-
-  PWMSchemeBlockCommutation PWMSchemeBlockCommutation_Parameter;
-  int PWMSchemeBlockCommutation_actual;
-  int PWMSchemeBlockCommutation_file;
 
   ReversingEncoderDirection ReversingEncoderDirection_Parameter;
   bool ReversingEncoderDirection_actual;
@@ -372,8 +328,6 @@ private:
 
   ActualMotorVoltage ActualMotorVoltage_Parameter;
   quantity<electric_potential> ActualMotorVoltage_actual;
-  ActualPWMDutyCycle ActualPWMDutyCycle_Parameter;
-  int ActualPWMDutyCycle_actual;
   PositionError PositionError_Parameter;
   quantity<plane_angle> PositionError_actual;
   PositionErrorSum PositionErrorSum_Parameter;

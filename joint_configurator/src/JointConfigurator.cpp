@@ -90,7 +90,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   std::cout << std::setprecision(15);
 
 
-  double firmwareVer = 0;
+  std::string firmwareVer;
   int controller = 0;
   if (UseParameter) {
     configfile->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
@@ -105,7 +105,7 @@ JointConfigurator::JointConfigurator(YouBotJoint* youbotjoint, std::string confi
   if (UseProtectedParameter) {
     configfilePP->readInto(firmwareVer, "Joint_Type", "FirmwareVersion");
     configfilePP->readInto(controller, "Joint_Type", "ControllerType");
-    if (!(AreSame(version, firmwareVer) && controller == controllerType)) {
+    if (!((version == firmwareVer) && controller == controllerType)) {
       UseProtectedParameter = false;
       throw std::runtime_error("The configuration file for the protected joint parameter contain the wrong controller type or firmware version!");
       delete configfile;
@@ -184,16 +184,6 @@ void JointConfigurator::readParameters() {
     std::cout << "SpeedControlSwitchingThreshold \t\t\t\tactual: " << SpeedControlSwitchingThreshold_actual << " \tNEW VALUE: " << SpeedControlSwitchingThreshold_file << std::endl;
   } else {
     std::cout << "SpeedControlSwitchingThreshold \t\t\t\tactual: " << SpeedControlSwitchingThreshold_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(CurrentControlSwitchingThreshold_Parameter);
-  CurrentControlSwitchingThreshold_Parameter.getParameter(CurrentControlSwitchingThreshold_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "CurrentControlSwitchingThreshold");
-  CurrentControlSwitchingThreshold_file = dummy * radian_per_second;
-  if (!AreSame(CurrentControlSwitchingThreshold_actual.value(), CurrentControlSwitchingThreshold_file.value())) {
-    std::cout << "CurrentControlSwitchingThreshold  \t\t\tactual: " << CurrentControlSwitchingThreshold_actual << " \tNEW VALUE: " << CurrentControlSwitchingThreshold_file << std::endl;
-  } else {
-    std::cout << "CurrentControlSwitchingThreshold  \t\t\tactual: " << CurrentControlSwitchingThreshold_actual << std::endl;
   }
 
   joint->getConfigurationParameter(PParameterFirstParametersPositionControl_Parameter);
@@ -277,46 +267,6 @@ void JointConfigurator::readParameters() {
     std::cout << "IClippingParameterFirstParametersSpeedControl \t\tactual: " << IClippingParameterFirstParametersSpeedControl_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(PParameterFirstParametersCurrentControl_Parameter);
-  PParameterFirstParametersCurrentControl_Parameter.getParameter(PParameterFirstParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "PParameterFirstParametersCurrentControl");
-  PParameterFirstParametersCurrentControl_file = dummy;
-  if (!AreSame(PParameterFirstParametersCurrentControl_actual, PParameterFirstParametersCurrentControl_file)) {
-    std::cout << "PParameterFirstParametersCurrentControl \t\tactual: " << PParameterFirstParametersCurrentControl_actual << " \tNEW VALUE: " << PParameterFirstParametersCurrentControl_file << std::endl;
-  } else {
-    std::cout << "PParameterFirstParametersCurrentControl \t\tactual: " << PParameterFirstParametersCurrentControl_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(IParameterFirstParametersCurrentControl_Parameter);
-  IParameterFirstParametersCurrentControl_Parameter.getParameter(IParameterFirstParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "IParameterFirstParametersCurrentControl");
-  IParameterFirstParametersCurrentControl_file = dummy;
-  if (!AreSame(IParameterFirstParametersCurrentControl_actual, IParameterFirstParametersCurrentControl_file)) {
-    std::cout << "IParameterFirstParametersCurrentControl \t\tactual: " << IParameterFirstParametersCurrentControl_actual << " \tNEW VALUE: " << IParameterFirstParametersCurrentControl_file << std::endl;
-  } else {
-    std::cout << "IParameterFirstParametersCurrentControl \t\tactual: " << IParameterFirstParametersCurrentControl_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(DParameterFirstParametersCurrentControl_Parameter);
-  DParameterFirstParametersCurrentControl_Parameter.getParameter(DParameterFirstParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "DParameterFirstParametersCurrentControl");
-  DParameterFirstParametersCurrentControl_file = dummy;
-  if (!AreSame(DParameterFirstParametersCurrentControl_actual, DParameterFirstParametersCurrentControl_file)) {
-    std::cout << "DParameterFirstParametersCurrentControl \t\tactual: " << DParameterFirstParametersCurrentControl_actual << " \tNEW VALUE: " << DParameterFirstParametersCurrentControl_file << std::endl;
-  } else {
-    std::cout << "DParameterFirstParametersCurrentControl \t\tactual: " << DParameterFirstParametersCurrentControl_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(IClippingParameterFirstParametersCurrentControl_Parameter);
-  IClippingParameterFirstParametersCurrentControl_Parameter.getParameter(IClippingParameterFirstParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "IClippingParameterFirstParametersCurrentControl");
-  IClippingParameterFirstParametersCurrentControl_file = dummy;
-  if (!AreSame(IClippingParameterFirstParametersCurrentControl_actual, IClippingParameterFirstParametersCurrentControl_file)) {
-    std::cout << "IClippingParameterFirstParametersCurrentControl \tactual: " << IClippingParameterFirstParametersCurrentControl_actual << " \tNEW VALUE: " << IClippingParameterFirstParametersCurrentControl_file << std::endl;
-  } else {
-    std::cout << "IClippingParameterFirstParametersCurrentControl \tactual: " << IClippingParameterFirstParametersCurrentControl_actual << std::endl;
-  }
-
   joint->getConfigurationParameter(PParameterSecondParametersPositionControl_Parameter);
   PParameterSecondParametersPositionControl_Parameter.getParameter(PParameterSecondParametersPositionControl_actual);
   configfile->readInto(dummy, "Joint_Parameter", "PParameterSecondParametersPositionControl");
@@ -396,44 +346,44 @@ void JointConfigurator::readParameters() {
   } else {
     std::cout << "IClippingParameterSecondParametersSpeedControl \t\tactual: " << IClippingParameterSecondParametersSpeedControl_actual << std::endl;
   }
-  joint->getConfigurationParameter(PParameterSecondParametersCurrentControl_Parameter);
-  PParameterSecondParametersCurrentControl_Parameter.getParameter(PParameterSecondParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "PParameterSecondParametersCurrentControl");
-  PParameterSecondParametersCurrentControl_file = dummy;
-  if (!AreSame(PParameterSecondParametersCurrentControl_actual, PParameterSecondParametersCurrentControl_file)) {
-    std::cout << "PParameterSecondParametersCurrentControl     \t\tactual: " << PParameterSecondParametersCurrentControl_actual << " \tNEW VALUE: " << PParameterSecondParametersCurrentControl_file << std::endl;
+  joint->getConfigurationParameter(PParameterCurrentControl_Parameter);
+  PParameterCurrentControl_Parameter.getParameter(PParameterCurrentControl_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "PParameterCurrentControl");
+  PParameterCurrentControl_file = dummy;
+  if (!AreSame(PParameterCurrentControl_actual, PParameterCurrentControl_file)) {
+    std::cout << "PParameterCurrentControl     \t\tactual: " << PParameterCurrentControl_actual << " \tNEW VALUE: " << PParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "PParameterSecondParametersCurrentControl     \t\tactual: " << PParameterSecondParametersCurrentControl_actual << std::endl;
+    std::cout << "PParameterCurrentControl     \t\tactual: " << PParameterCurrentControl_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(IParameterSecondParametersCurrentControl_Parameter);
-  IParameterSecondParametersCurrentControl_Parameter.getParameter(IParameterSecondParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "IParameterSecondParametersCurrentControl");
-  IParameterSecondParametersCurrentControl_file = dummy;
-  if (!AreSame(IParameterSecondParametersCurrentControl_actual, IParameterSecondParametersCurrentControl_file)) {
-    std::cout << "IParameterSecondParametersCurrentControl \t\tactual: " << IParameterSecondParametersCurrentControl_actual << " \tNEW VALUE: " << IParameterSecondParametersCurrentControl_file << std::endl;
+  joint->getConfigurationParameter(IParameterCurrentControl_Parameter);
+  IParameterCurrentControl_Parameter.getParameter(IParameterCurrentControl_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "IParameterCurrentControl");
+  IParameterCurrentControl_file = dummy;
+  if (!AreSame(IParameterCurrentControl_actual, IParameterCurrentControl_file)) {
+    std::cout << "IParameterCurrentControl \t\tactual: " << IParameterCurrentControl_actual << " \tNEW VALUE: " << IParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "IParameterSecondParametersCurrentControl \t\tactual: " << IParameterSecondParametersCurrentControl_actual << std::endl;
+    std::cout << "IParameterCurrentControl \t\tactual: " << IParameterCurrentControl_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(DParameterSecondParametersCurrentControl_Parameter);
-  DParameterSecondParametersCurrentControl_Parameter.getParameter(DParameterSecondParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "DParameterSecondParametersCurrentControl");
-  DParameterSecondParametersCurrentControl_file = dummy;
-  if (!AreSame(DParameterSecondParametersCurrentControl_actual, DParameterSecondParametersCurrentControl_file)) {
-    std::cout << "DParameterSecondParametersCurrentControl \t\tactual: " << DParameterSecondParametersCurrentControl_actual << " \tNEW VALUE: " << DParameterSecondParametersCurrentControl_file << std::endl;
+  joint->getConfigurationParameter(DParameterCurrentControl_Parameter);
+  DParameterCurrentControl_Parameter.getParameter(DParameterCurrentControl_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "DParameterCurrentControl");
+  DParameterCurrentControl_file = dummy;
+  if (!AreSame(DParameterCurrentControl_actual, DParameterCurrentControl_file)) {
+    std::cout << "DParameterCurrentControl \t\tactual: " << DParameterCurrentControl_actual << " \tNEW VALUE: " << DParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "DParameterSecondParametersCurrentControl \t\tactual: " << DParameterSecondParametersCurrentControl_actual << std::endl;
+    std::cout << "DParameterCurrentControl \t\tactual: " << DParameterCurrentControl_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
-  IClippingParameterSecondParametersCurrentControl_Parameter.getParameter(IClippingParameterSecondParametersCurrentControl_actual);
-  configfile->readInto(dummy, "Joint_Parameter", "IClippingParameterSecondParametersCurrentControl");
-  IClippingParameterSecondParametersCurrentControl_file = dummy;
-  if (!AreSame(IClippingParameterSecondParametersCurrentControl_actual, IClippingParameterSecondParametersCurrentControl_file)) {
-    std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << " \tNEW VALUE: " << IClippingParameterSecondParametersCurrentControl_file << std::endl;
+  joint->getConfigurationParameter(IClippingParameterCurrentControl_Parameter);
+  IClippingParameterCurrentControl_Parameter.getParameter(IClippingParameterCurrentControl_actual);
+  configfile->readInto(dummy, "Joint_Parameter", "IClippingParameterCurrentControl");
+  IClippingParameterCurrentControl_file = dummy;
+  if (!AreSame(IClippingParameterCurrentControl_actual, IClippingParameterCurrentControl_file)) {
+    std::cout << "IClippingParameterCurrentControl \tactual: " << IClippingParameterCurrentControl_actual << " \tNEW VALUE: " << IClippingParameterCurrentControl_file << std::endl;
   } else {
-    std::cout << "IClippingParameterSecondParametersCurrentControl \tactual: " << IClippingParameterSecondParametersCurrentControl_actual << std::endl;
+    std::cout << "IClippingParameterCurrentControl \tactual: " << IClippingParameterCurrentControl_actual << std::endl;
   }
 
   joint->getConfigurationParameter(MaximumVelocityToSetPosition_Parameter);
@@ -481,16 +431,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
   std::cout << "Controller Type: " << controllerType << " Firmware version: " << version << std::endl << std::endl;
 
   double dummy;
-
-  joint->getConfigurationParameter(PWMLimit_Parameter);
-  PWMLimit_Parameter.getParameter(PWMLimit_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "PWMLimit");
-  PWMLimit_file = dummy;
-  if (PWMLimit_actual != PWMLimit_file) {
-    std::cout << "PWMLimit                  \t\t\t\tactual: " << PWMLimit_actual << " \tNEW VALUE: " << PWMLimit_file << std::endl;
-  } else {
-    std::cout << "PWMLimit                  \t\t\t\tactual: " << PWMLimit_actual << std::endl;
-  }
 
   joint->getConfigurationParameter(MaximumMotorCurrent_Parameter);
   MaximumMotorCurrent_Parameter.getParameter(MaximumMotorCurrent_actual);
@@ -543,16 +483,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "CurrentControlLoopDelay  \t\t\t\tactual: " << CurrentControlLoopDelay_actual << " \tNEW VALUE: " << CurrentControlLoopDelay_file << std::endl;
   } else {
     std::cout << "CurrentControlLoopDelay  \t\t\t\tactual: " << CurrentControlLoopDelay_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(PWMHysteresis_Parameter);
-  PWMHysteresis_Parameter.getParameter(PWMHysteresis_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "PWMHysteresis");
-  PWMHysteresis_file = dummy;
-  if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
-    std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << " \tNEW VALUE: " << PWMHysteresis_file << std::endl;
-  } else {
-    std::cout << "PWMHysteresis \t\t\t\t\t\tactual: " << PWMHysteresis_actual << std::endl;
   }
 
   joint->getConfigurationParameter(CommutationMode_Parameter);
@@ -654,26 +584,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "SineInitializationVelocity \t\t\t\tactual: " << SineInitializationVelocity_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(CommutationCompensationClockwise_Parameter);
-  CommutationCompensationClockwise_Parameter.getParameter(CommutationCompensationClockwise_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "CommutationCompensationClockwise");
-  CommutationCompensationClockwise_file = dummy;
-  if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
-    std::cout << "CommutationCompensationClockwise \t\t\tactual: " << CommutationCompensationClockwise_actual << " \tNEW VALUE: " << CommutationCompensationClockwise_file << std::endl;
-  } else {
-    std::cout << "CommutationCompensationClockwise \t\t\tactual: " << CommutationCompensationClockwise_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
-  CommutationCompensationCounterClockwise_Parameter.getParameter(CommutationCompensationCounterClockwise_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "CommutationCompensationCounterClockwise");
-  CommutationCompensationCounterClockwise_file = dummy;
-  if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
-    std::cout << "CommutationCompensationCounterClockwise \t\tactual: " << CommutationCompensationCounterClockwise_actual << " \tNEW VALUE: " << CommutationCompensationCounterClockwise_file << std::endl;
-  } else {
-    std::cout << "CommutationCompensationCounterClockwise \t\tactual: " << CommutationCompensationCounterClockwise_actual << std::endl;
-  }
-
   joint->getConfigurationParameter(InitSineDelay_Parameter);
   InitSineDelay_Parameter.getParameter(InitSineDelay_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "InitSineDelay");
@@ -692,16 +602,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << " \tNEW VALUE: " << ActivateOvervoltageProtection_file << std::endl;
   } else {
     std::cout << "ActivateOvervoltageProtection \t\t\t\tactual: " << ActivateOvervoltageProtection_actual << std::endl;
-  }
-
-  joint->getConfigurationParameter(SineCompensationFactor_Parameter);
-  SineCompensationFactor_Parameter.getParameter(SineCompensationFactor_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "SineCompensationFactor");
-  SineCompensationFactor_file = dummy;
-  if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
-    std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << " \tNEW VALUE: " << SineCompensationFactor_file << std::endl;
-  } else {
-    std::cout << "SineCompensationFactor \t\t\t\t\tactual: " << SineCompensationFactor_actual << std::endl;
   }
 
   joint->getConfigurationParameter(EncoderResolution_Parameter);
@@ -754,16 +654,6 @@ void JointConfigurator::readPasswordProtectedParameters() {
     std::cout << "MotorPoles \t\t\t\t\t\tactual: " << MotorPoles_actual << std::endl;
   }
 
-  joint->getConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
-  PWMSchemeBlockCommutation_Parameter.getParameter(PWMSchemeBlockCommutation_actual);
-  configfilePP->readInto(dummy, "Joint_Parameter", "PWMSchemeBlockCommutation");
-  PWMSchemeBlockCommutation_file = dummy;
-  if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
-    std::cout << "PWMSchemeBlockCommutation \t\t\t\tactual: " << PWMSchemeBlockCommutation_actual << " \tNEW VALUE: " << PWMSchemeBlockCommutation_file << std::endl;
-  } else {
-    std::cout << "PWMSchemeBlockCommutation \t\t\t\tactual: " << PWMSchemeBlockCommutation_actual << std::endl;
-  }
-
   joint->getConfigurationParameter(ReversingEncoderDirection_Parameter);
   ReversingEncoderDirection_Parameter.getParameter(ReversingEncoderDirection_actual);
   configfilePP->readInto(dummy, "Joint_Parameter", "ReversingEncoderDirection");
@@ -814,10 +704,6 @@ void JointConfigurator::readReadOnlyParameters() {
   joint->getConfigurationParameter(ActualMotorVoltage_Parameter);
   ActualMotorVoltage_Parameter.getParameter(ActualMotorVoltage_actual);
   std::cout << "ActualMotorVoltage \t\t\t\t\tactual: " << ActualMotorVoltage_actual << std::endl;
-
-  joint->getConfigurationParameter(ActualPWMDutyCycle_Parameter);
-  ActualPWMDutyCycle_Parameter.getParameter(ActualPWMDutyCycle_actual);
-  std::cout << "ActualPWMDutyCycle \t\t\t\t\tactual: " << ActualPWMDutyCycle_actual << std::endl;
 
   joint->getConfigurationParameter(ActualCommutationOffset_Parameter);
   ActualCommutationOffset_Parameter.getParameter(ActualCommutationOffset_actual);
@@ -902,12 +788,6 @@ void JointConfigurator::setParametersToJoint() {
     std::cout << "SpeedControlSwitchingThreshold set to: " << SpeedControlSwitchingThreshold_file << std::endl;
   }
 
-  if (!AreSame(CurrentControlSwitchingThreshold_actual.value(), CurrentControlSwitchingThreshold_file.value())) {
-    CurrentControlSwitchingThreshold_Parameter.setParameter(CurrentControlSwitchingThreshold_file);
-    joint->setConfigurationParameter(CurrentControlSwitchingThreshold_Parameter);
-    std::cout << "CurrentControlSwitchingThreshold set to: " << CurrentControlSwitchingThreshold_file << std::endl;
-  }
-
   if (!AreSame(RampGeneratorSpeedAndPositionControl_actual, RampGeneratorSpeedAndPositionControl_file)) {
     RampGeneratorSpeedAndPositionControl_Parameter.setParameter(RampGeneratorSpeedAndPositionControl_file);
     joint->setConfigurationParameter(RampGeneratorSpeedAndPositionControl_Parameter);
@@ -962,32 +842,6 @@ void JointConfigurator::setParametersToJoint() {
     std::cout << "IClippingParameterFirstParametersSpeedControl set to: " << IClippingParameterFirstParametersSpeedControl_file << std::endl;
   }
 
-
-  if (!AreSame(PParameterFirstParametersCurrentControl_actual, PParameterFirstParametersCurrentControl_file)) {
-    PParameterFirstParametersCurrentControl_Parameter.setParameter(PParameterFirstParametersCurrentControl_file);
-    joint->setConfigurationParameter(PParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "PParameterFirstParametersCurrentControl set to: " << PParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
-  if (!AreSame(IParameterFirstParametersCurrentControl_actual, IParameterFirstParametersCurrentControl_file)) {
-    IParameterFirstParametersCurrentControl_Parameter.setParameter(IParameterFirstParametersCurrentControl_file);
-    joint->setConfigurationParameter(IParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "IParameterFirstParametersCurrentControl set to: " << IParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
-
-  if (!AreSame(DParameterFirstParametersCurrentControl_actual, DParameterFirstParametersCurrentControl_file)) {
-    DParameterFirstParametersCurrentControl_Parameter.setParameter(DParameterFirstParametersCurrentControl_file);
-    joint->setConfigurationParameter(DParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "DParameterFirstParametersCurrentControl set to: " << DParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
-  if (!AreSame(IClippingParameterFirstParametersCurrentControl_actual, IClippingParameterFirstParametersCurrentControl_file)) {
-    IClippingParameterFirstParametersCurrentControl_Parameter.setParameter(IClippingParameterFirstParametersCurrentControl_file);
-    joint->setConfigurationParameter(IClippingParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "IClippingParameterFirstParametersCurrentControl set to: " << IClippingParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
   if (!AreSame(PParameterSecondParametersPositionControl_actual, PParameterSecondParametersPositionControl_file)) {
     PParameterSecondParametersPositionControl_Parameter.setParameter(PParameterSecondParametersPositionControl_file);
     joint->setConfigurationParameter(PParameterSecondParametersPositionControl_Parameter);
@@ -1037,28 +891,28 @@ void JointConfigurator::setParametersToJoint() {
     std::cout << "IClippingParameterSecondParametersSpeedControl set to: " << IClippingParameterSecondParametersSpeedControl_file << std::endl;
   }
 
-  if (!AreSame(PParameterSecondParametersCurrentControl_actual, PParameterSecondParametersCurrentControl_file)) {
-    PParameterSecondParametersCurrentControl_Parameter.setParameter(PParameterSecondParametersCurrentControl_file);
-    joint->setConfigurationParameter(PParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "PParameterSecondParametersCurrentControl set to: " << PParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(PParameterCurrentControl_actual, PParameterCurrentControl_file)) {
+    PParameterCurrentControl_Parameter.setParameter(PParameterCurrentControl_file);
+    joint->setConfigurationParameter(PParameterCurrentControl_Parameter);
+    std::cout << "PParameterCurrentControl set to: " << PParameterCurrentControl_file << std::endl;
   }
 
-  if (!AreSame(IParameterSecondParametersCurrentControl_actual, IParameterSecondParametersCurrentControl_file)) {
-    IParameterSecondParametersCurrentControl_Parameter.setParameter(IParameterSecondParametersCurrentControl_file);
-    joint->setConfigurationParameter(IParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "IParameterSecondParametersCurrentControl set to: " << IParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(IParameterCurrentControl_actual, IParameterCurrentControl_file)) {
+    IParameterCurrentControl_Parameter.setParameter(IParameterCurrentControl_file);
+    joint->setConfigurationParameter(IParameterCurrentControl_Parameter);
+    std::cout << "IParameterCurrentControl set to: " << IParameterCurrentControl_file << std::endl;
   }
 
-  if (!AreSame(DParameterSecondParametersCurrentControl_actual, DParameterSecondParametersCurrentControl_file)) {
-    DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
-    joint->setConfigurationParameter(DParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "DParameterSecondParametersCurrentControl set to: " << DParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(DParameterCurrentControl_actual, DParameterCurrentControl_file)) {
+    DParameterCurrentControl_Parameter.setParameter(DParameterCurrentControl_file);
+    joint->setConfigurationParameter(DParameterCurrentControl_Parameter);
+    std::cout << "DParameterCurrentControl set to: " << DParameterCurrentControl_file << std::endl;
   }
 
-  if (!AreSame(IClippingParameterSecondParametersCurrentControl_actual, IClippingParameterSecondParametersCurrentControl_file)) {
-    IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
-    joint->setConfigurationParameter(IClippingParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "IClippingParameterSecondParametersCurrentControl set to: " << IClippingParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(IClippingParameterCurrentControl_actual, IClippingParameterCurrentControl_file)) {
+    IClippingParameterCurrentControl_Parameter.setParameter(IClippingParameterCurrentControl_file);
+    joint->setConfigurationParameter(IClippingParameterCurrentControl_Parameter);
+    std::cout << "IClippingParameterCurrentControl set to: " << IClippingParameterCurrentControl_file << std::endl;
   }
 
   if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
@@ -1092,12 +946,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
 
     std::cout << "Setting parameters for Joint: " << jointName << std::endl;
 
-    if (!AreSame(PWMLimit_actual, PWMLimit_file)) {
-      PWMLimit_Parameter.setParameter(PWMLimit_file);
-      joint->setConfigurationParameter(PWMLimit_Parameter);
-      std::cout << "PWMLimit set to: " << PWMLimit_file << std::endl;
-    }
-
     if (!AreSame(MaximumMotorCurrent_actual.value(), MaximumMotorCurrent_file.value())) {
       MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
       joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
@@ -1114,12 +962,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
       CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
       joint->setConfigurationParameter(CurrentControlLoopDelay_Parameter);
       std::cout << "CurrentControlLoopDelay set to: " << CurrentControlLoopDelay_file << std::endl;
-    }
-
-    if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
-      PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
-      joint->setConfigurationParameter(PWMHysteresis_Parameter);
-      std::cout << "PWMHysteresis set to: " << PWMHysteresis_file << std::endl;
     }
 
     if (!AreSame(SetEncoderCounterZeroAtNextNChannel_actual, SetEncoderCounterZeroAtNextNChannel_file)) {
@@ -1176,18 +1018,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
       std::cout << "SineInitializationVelocity set to: " << SineInitializationVelocity_file << std::endl;
     }
 
-    if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
-      CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
-      joint->setConfigurationParameter(CommutationCompensationClockwise_Parameter);
-      std::cout << "CommutationCompensationClockwise set to: " << CommutationCompensationClockwise_file << std::endl;
-    }
-
-    if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
-      CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
-      joint->setConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
-      std::cout << "CommutationCompensationCounterClockwise set to: " << CommutationCompensationCounterClockwise_file << std::endl;
-    }
-
     if (!AreSame(InitSineDelay_actual.value(), InitSineDelay_file.value())) {
       InitSineDelay_Parameter.setParameter(InitSineDelay_file);
       joint->setConfigurationParameter(InitSineDelay_Parameter);
@@ -1198,12 +1028,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
       ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
       joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
       std::cout << "ActivateOvervoltageProtection set to: " << ActivateOvervoltageProtection_file << std::endl;
-    }
-
-    if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
-      SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
-      joint->setConfigurationParameter(SineCompensationFactor_Parameter);
-      std::cout << "SineCompensationFactor set to: " << SineCompensationFactor_file << std::endl;
     }
 
     if (!AreSame(CommutationMode_actual, CommutationMode_file)) {
@@ -1240,12 +1064,6 @@ void JointConfigurator::setProtectedParametersToJoint() {
       MotorPoles_Parameter.setParameter(MotorPoles_file);
       joint->setConfigurationParameter(MotorPoles_Parameter);
       std::cout << "MotorPoles set to: " << MotorPoles_file << std::endl;
-    }
-
-    if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
-      PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
-      joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
-      std::cout << "PWMSchemeBlockCommutation set to: " << PWMSchemeBlockCommutation_file << std::endl;
     }
 
     if (!AreSame(ReversingEncoderDirection_actual, ReversingEncoderDirection_file)) {
@@ -1319,12 +1137,6 @@ void JointConfigurator::storeParametersToJoint() {
     std::cout << "SpeedControlSwitchingThreshold stored with: " << SpeedControlSwitchingThreshold_file << std::endl;
   }
 
-  if (!AreSame(CurrentControlSwitchingThreshold_actual.value(), CurrentControlSwitchingThreshold_file.value())) {
-    CurrentControlSwitchingThreshold_Parameter.setParameter(CurrentControlSwitchingThreshold_file);
-    joint->storeConfigurationParameterPermanent(CurrentControlSwitchingThreshold_Parameter);
-    std::cout << "CurrentControlSwitchingThreshold stored with: " << CurrentControlSwitchingThreshold_file << std::endl;
-  }
-
   if (!AreSame(RampGeneratorSpeedAndPositionControl_actual, RampGeneratorSpeedAndPositionControl_file)) {
     RampGeneratorSpeedAndPositionControl_Parameter.setParameter(RampGeneratorSpeedAndPositionControl_file);
     joint->storeConfigurationParameterPermanent(RampGeneratorSpeedAndPositionControl_Parameter);
@@ -1379,32 +1191,6 @@ void JointConfigurator::storeParametersToJoint() {
     std::cout << "IClippingParameterFirstParametersSpeedControl stored with: " << IClippingParameterFirstParametersSpeedControl_file << std::endl;
   }
 
-
-  if (!AreSame(PParameterFirstParametersCurrentControl_actual, PParameterFirstParametersCurrentControl_file)) {
-    PParameterFirstParametersCurrentControl_Parameter.setParameter(PParameterFirstParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(PParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "PParameterFirstParametersCurrentControl stored with: " << PParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
-  if (!AreSame(IParameterFirstParametersCurrentControl_actual, IParameterFirstParametersCurrentControl_file)) {
-    IParameterFirstParametersCurrentControl_Parameter.setParameter(IParameterFirstParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(IParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "IParameterFirstParametersCurrentControl stored with: " << IParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
-
-  if (!AreSame(DParameterFirstParametersCurrentControl_actual, DParameterFirstParametersCurrentControl_file)) {
-    DParameterFirstParametersCurrentControl_Parameter.setParameter(DParameterFirstParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(DParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "DParameterFirstParametersCurrentControl stored with: " << DParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
-  if (!AreSame(IClippingParameterFirstParametersCurrentControl_actual, IClippingParameterFirstParametersCurrentControl_file)) {
-    IClippingParameterFirstParametersCurrentControl_Parameter.setParameter(IClippingParameterFirstParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(IClippingParameterFirstParametersCurrentControl_Parameter);
-    std::cout << "IClippingParameterFirstParametersCurrentControl stored with: " << IClippingParameterFirstParametersCurrentControl_file << std::endl;
-  }
-
   if (!AreSame(PParameterSecondParametersPositionControl_actual, PParameterSecondParametersPositionControl_file)) {
     PParameterSecondParametersPositionControl_Parameter.setParameter(PParameterSecondParametersPositionControl_file);
     joint->storeConfigurationParameterPermanent(PParameterSecondParametersPositionControl_Parameter);
@@ -1454,28 +1240,28 @@ void JointConfigurator::storeParametersToJoint() {
     std::cout << "IClippingParameterSecondParametersSpeedControl stored with: " << IClippingParameterSecondParametersSpeedControl_file << std::endl;
   }
 
-  if (!AreSame(PParameterSecondParametersCurrentControl_actual, PParameterSecondParametersCurrentControl_file)) {
-    PParameterSecondParametersCurrentControl_Parameter.setParameter(PParameterSecondParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(PParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "PParameterSecondParametersCurrentControl stored with: " << PParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(PParameterCurrentControl_actual, PParameterCurrentControl_file)) {
+    PParameterCurrentControl_Parameter.setParameter(PParameterCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(PParameterCurrentControl_Parameter);
+    std::cout << "PParameterCurrentControl stored with: " << PParameterCurrentControl_file << std::endl;
   }
 
-  if (!AreSame(IParameterSecondParametersCurrentControl_actual, IParameterSecondParametersCurrentControl_file)) {
-    IParameterSecondParametersCurrentControl_Parameter.setParameter(IParameterSecondParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(IParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "IParameterSecondParametersCurrentControl stored with: " << IParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(IParameterCurrentControl_actual, IParameterCurrentControl_file)) {
+    IParameterCurrentControl_Parameter.setParameter(IParameterCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(IParameterCurrentControl_Parameter);
+    std::cout << "IParameterCurrentControl stored with: " << IParameterCurrentControl_file << std::endl;
   }
 
-  if (!AreSame(DParameterSecondParametersCurrentControl_actual, DParameterSecondParametersCurrentControl_file)) {
-    DParameterSecondParametersCurrentControl_Parameter.setParameter(DParameterSecondParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(DParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "DParameterSecondParametersCurrentControl stored with: " << DParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(DParameterCurrentControl_actual, DParameterCurrentControl_file)) {
+    DParameterCurrentControl_Parameter.setParameter(DParameterCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(DParameterCurrentControl_Parameter);
+    std::cout << "DParameterCurrentControl stored with: " << DParameterCurrentControl_file << std::endl;
   }
 
-  if (!AreSame(IClippingParameterSecondParametersCurrentControl_actual, IClippingParameterSecondParametersCurrentControl_file)) {
-    IClippingParameterSecondParametersCurrentControl_Parameter.setParameter(IClippingParameterSecondParametersCurrentControl_file);
-    joint->storeConfigurationParameterPermanent(IClippingParameterSecondParametersCurrentControl_Parameter);
-    std::cout << "IClippingParameterSecondParametersCurrentControl stored with: " << IClippingParameterSecondParametersCurrentControl_file << std::endl;
+  if (!AreSame(IClippingParameterCurrentControl_actual, IClippingParameterCurrentControl_file)) {
+    IClippingParameterCurrentControl_Parameter.setParameter(IClippingParameterCurrentControl_file);
+    joint->storeConfigurationParameterPermanent(IClippingParameterCurrentControl_Parameter);
+    std::cout << "IClippingParameterCurrentControl stored with: " << IClippingParameterCurrentControl_file << std::endl;
   }
 
   if (!AreSame(MaximumVelocityToSetPosition_actual.value(), MaximumVelocityToSetPosition_file.value())) {
@@ -1509,12 +1295,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
 
     std::cout << "Storing parameters for Joint: " << jointName << std::endl;
 
-    if (!AreSame(PWMLimit_actual, PWMLimit_file)) {
-      PWMLimit_Parameter.setParameter(PWMLimit_file);
-      joint->setConfigurationParameter(PWMLimit_Parameter);
-      std::cout << "PWMLimit set to: " << PWMLimit_file << std::endl;
-    }
-
     if (!AreSame(MaximumMotorCurrent_actual.value(), MaximumMotorCurrent_file.value())) {
       MaximumMotorCurrent_Parameter.setParameter(MaximumMotorCurrent_file);
       joint->setConfigurationParameter(MaximumMotorCurrent_Parameter);
@@ -1531,12 +1311,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
       CurrentControlLoopDelay_Parameter.setParameter(CurrentControlLoopDelay_file);
       joint->setConfigurationParameter(CurrentControlLoopDelay_Parameter);
       std::cout << "CurrentControlLoopDelay set to: " << CurrentControlLoopDelay_file << std::endl;
-    }
-
-    if (!AreSame(PWMHysteresis_actual, PWMHysteresis_file)) {
-      PWMHysteresis_Parameter.setParameter(PWMHysteresis_file);
-      joint->setConfigurationParameter(PWMHysteresis_Parameter);
-      std::cout << "PWMHysteresis set to: " << PWMHysteresis_file << std::endl;
     }
 
     if (!AreSame(SetEncoderCounterZeroAtNextNChannel_actual, SetEncoderCounterZeroAtNextNChannel_file)) {
@@ -1593,18 +1367,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
       std::cout << "SineInitializationVelocity set to: " << SineInitializationVelocity_file << std::endl;
     }
 
-    if (!AreSame(CommutationCompensationClockwise_actual, CommutationCompensationClockwise_file)) {
-      CommutationCompensationClockwise_Parameter.setParameter(CommutationCompensationClockwise_file);
-      joint->setConfigurationParameter(CommutationCompensationClockwise_Parameter);
-      std::cout << "CommutationCompensationClockwise set to: " << CommutationCompensationClockwise_file << std::endl;
-    }
-
-    if (!AreSame(CommutationCompensationCounterClockwise_actual, CommutationCompensationCounterClockwise_file)) {
-      CommutationCompensationCounterClockwise_Parameter.setParameter(CommutationCompensationCounterClockwise_file);
-      joint->setConfigurationParameter(CommutationCompensationCounterClockwise_Parameter);
-      std::cout << "CommutationCompensationCounterClockwise set to: " << CommutationCompensationCounterClockwise_file << std::endl;
-    }
-
     if (!AreSame(InitSineDelay_actual.value(), InitSineDelay_file.value())) {
       InitSineDelay_Parameter.setParameter(InitSineDelay_file);
       joint->setConfigurationParameter(InitSineDelay_Parameter);
@@ -1615,12 +1377,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
       ActivateOvervoltageProtection_Parameter.setParameter(ActivateOvervoltageProtection_file);
       joint->setConfigurationParameter(ActivateOvervoltageProtection_Parameter);
       std::cout << "ActivateOvervoltageProtection set to: " << ActivateOvervoltageProtection_file << std::endl;
-    }
-
-    if (!AreSame(SineCompensationFactor_actual, SineCompensationFactor_file)) {
-      SineCompensationFactor_Parameter.setParameter(SineCompensationFactor_file);
-      joint->setConfigurationParameter(SineCompensationFactor_Parameter);
-      std::cout << "SineCompensationFactor set to: " << SineCompensationFactor_file << std::endl;
     }
 
     if (!AreSame(CommutationMode_actual, CommutationMode_file)) {
@@ -1657,12 +1413,6 @@ void JointConfigurator::storeProtectedParametersToJoint() {
       MotorPoles_Parameter.setParameter(MotorPoles_file);
       joint->setConfigurationParameter(MotorPoles_Parameter);
       std::cout << "MotorPoles set to: " << MotorPoles_file << std::endl;
-    }
-
-    if (!AreSame(PWMSchemeBlockCommutation_actual, PWMSchemeBlockCommutation_file)) {
-      PWMSchemeBlockCommutation_Parameter.setParameter(PWMSchemeBlockCommutation_file);
-      joint->setConfigurationParameter(PWMSchemeBlockCommutation_Parameter);
-      std::cout << "PWMSchemeBlockCommutation set to: " << PWMSchemeBlockCommutation_file << std::endl;
     }
 
     if (!AreSame(ReversingEncoderDirection_actual, ReversingEncoderDirection_file)) {
