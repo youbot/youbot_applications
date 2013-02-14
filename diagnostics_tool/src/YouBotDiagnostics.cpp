@@ -142,7 +142,7 @@ void YouBotDiagnostics::getAllTopologicalInformation()
     
 	ticksPerRound.setParameter(4000);
 	int controllerType;
-    double firmwareVersion;
+    string firmwareVersion;
 
 	*outputFile << "----- Topological Information of all slaves: -----" << endl;
 
@@ -201,7 +201,7 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 
 			it->second.joint->getConfigurationParameter(firmwareTypeVersion);
 			firmwareTypeVersion.getParameter(controllerType, firmwareVersion);
-			it->second.firmwareVersion = firmwareVersion;
+			it->second.firmwareVersion = atof(firmwareVersion.c_str());
 			
 			stringstream name;
 			name << "joint_" << jointNo;
@@ -234,7 +234,7 @@ void YouBotDiagnostics::getAllTopologicalInformation()
 
 			it->second.joint->getConfigurationParameter(firmwareTypeVersion);
 			firmwareTypeVersion.getParameter(controllerType, firmwareVersion);
-			it->second.firmwareVersion = firmwareVersion;
+			it->second.firmwareVersion = atof(firmwareVersion.c_str());
 			
 			stringstream name;
 			name << "joint_" << jointNo;
