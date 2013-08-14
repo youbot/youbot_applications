@@ -1,0 +1,4 @@
+- git:
+    local-name: youbot_driver
+    uri: https://github.com/youbot/youbot_driver.git
+    version: master
